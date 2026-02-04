@@ -1,0 +1,48 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--background);
+  position: relative;
+  overflow: hidden;
+}
+
+.background {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  background: linear-gradient(to bottom, #F5F3FF, white);
+}
+
+.orb1 {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.2), transparent);
+  filter: blur(64px);
+}
+
+.orb2 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: linear-gradient(to top right, rgba(252, 214, 180, 0.3), transparent);
+  filter: blur(64px);
+}
+
+.orb3 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom right, rgba(233, 213, 255, 0.4), transparent);
+  filter: blur(64px);
+}
+

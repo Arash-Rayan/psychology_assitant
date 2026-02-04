@@ -1,0 +1,769 @@
+.container {
+  min-height: 100vh;
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.content {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.headerTitle {
+  font-size: 2.25rem;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.headerSubtitle {
+  font-size: 1.25rem;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.navButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.navButtonActive {
+  background: linear-gradient(to left, var(--primary), #7C3AED);
+  color: white;
+  box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.25);
+}
+
+.navButtonActiveForms {
+  background: linear-gradient(to left, #f2c94c, #e0b73c);
+  color: white;
+  box-shadow: 0 10px 15px -3px rgba(242, 201, 76, 0.25);
+}
+
+.navButtonInactive {
+  background-color: white;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.navButtonInactive:hover {
+  background-color: rgba(139, 92, 246, 0.05);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.navButton svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.aiBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1rem;
+  background: linear-gradient(to left, rgba(139, 92, 246, 0.1), rgba(233, 213, 255, 0.2));
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.aiBadge svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--primary);
+}
+
+.aiBadgeText {
+  color: var(--foreground);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .statsGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.statCard {
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.statCard:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: scale(1.05);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.statCardPrimary {
+  background-color: rgba(139, 92, 246, 0.05);
+}
+
+.statCardSafe {
+  background-color: rgba(111, 207, 151, 0.05);
+}
+
+.statCardAttention {
+  background-color: rgba(242, 201, 76, 0.05);
+}
+
+.statCardUrgent {
+  background-color: rgba(235, 87, 87, 0.05);
+}
+
+.statContent {
+  position: relative;
+  z-index: 10;
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.statIcon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.statCard:hover .statIcon {
+  transform: scale(1.1);
+}
+
+.statIconPrimary {
+  background: linear-gradient(to bottom right, var(--primary), rgba(139, 92, 246, 0.8));
+}
+
+.statIconSafe {
+  background: linear-gradient(to bottom right, #6fcf97, #5fb587);
+}
+
+.statIconAttention {
+  background: linear-gradient(to bottom right, #f2c94c, #e0b73c);
+}
+
+.statIconUrgent {
+  background: linear-gradient(to bottom right, #eb5757, #d84747);
+}
+
+.statIcon svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: white;
+}
+
+.statValue {
+  font-size: 2.25rem;
+  color: var(--foreground);
+}
+
+.statLabel {
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.statHoverEffect {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.statCard:hover .statHoverEffect {
+  opacity: 0.05;
+}
+
+.statHoverEffectPrimary {
+  background: linear-gradient(to bottom right, var(--primary), rgba(139, 92, 246, 0.8));
+}
+
+.statHoverEffectSafe {
+  background: linear-gradient(to bottom right, #6fcf97, #5fb587);
+}
+
+.statHoverEffectAttention {
+  background: linear-gradient(to bottom right, #f2c94c, #e0b73c);
+}
+
+.statHoverEffectUrgent {
+  background: linear-gradient(to bottom right, #eb5757, #d84747);
+}
+
+.chartCard {
+  padding: 2rem;
+  border-radius: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s;
+}
+
+.chartCard:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.aiInsightsCard {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: linear-gradient(to left, rgba(139, 92, 246, 0.1), rgba(233, 213, 255, 0.1), rgba(139, 92, 246, 0.05));
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.aiInsightsHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.aiInsightsIcon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(to bottom right, var(--primary), rgba(139, 92, 246, 0.8));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.aiInsightsIcon svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: white;
+}
+
+.aiInsightsContent {
+  flex: 1;
+}
+
+.aiInsightsTitle {
+  font-size: 1.25rem;
+  color: var(--foreground);
+  margin-bottom: 0.75rem;
+  margin: 0 0 0.75rem 0;
+}
+
+.aiInsightsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: var(--muted-foreground);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.aiInsightItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.aiInsightDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}
+
+.aiInsightDotRed {
+  background-color: #eb5757;
+}
+
+.aiInsightDotPrimary {
+  background-color: var(--primary);
+}
+
+.patientsSection {
+  margin-top: 2rem;
+}
+
+.patientsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.patientsTitle {
+  font-size: 1.5rem;
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.patientsTitle svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--primary);
+}
+
+.filtersContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  background-color: white;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.filterGroup svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--muted-foreground);
+  margin-right: 0.5rem;
+}
+
+.filterSelect {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background-color: transparent;
+  border: 0;
+  color: var(--foreground);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.filterSelect:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+}
+
+.activeFilters {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  background-color: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.activeFilters svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--primary);
+}
+
+.activeFiltersText {
+  font-size: 0.875rem;
+  color: var(--primary);
+}
+
+.clearFilterButton {
+  background-color: transparent;
+  border: none;
+  padding: 0.375rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.clearFilterButton:hover {
+  background-color: rgba(139, 92, 246, 0.2);
+}
+
+.clearFilterButton svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--primary);
+}
+
+.patientsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .patientsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .patientsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.noResults {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.noResultsIcon {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 1rem;
+  background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.1), rgba(233, 213, 255, 0.2));
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.noResultsIcon svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--muted-foreground);
+}
+
+.noResultsText {
+  font-size: 1.25rem;
+  color: var(--muted-foreground);
+  margin-bottom: 1rem;
+  margin: 0 0 1rem 0;
+}
+
+.clearFiltersButton {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(to left, var(--primary), rgba(139, 92, 246, 0.8));
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.clearFiltersButton:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Forms Tab Styles */
+.infoCard {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: linear-gradient(to left, rgba(139, 92, 246, 0.1), rgba(233, 213, 255, 0.1), rgba(139, 92, 246, 0.05));
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.infoCardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.infoCardIcon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(to bottom right, var(--primary), rgba(139, 92, 246, 0.8));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.infoCardIcon svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: white;
+}
+
+.infoCardContent {
+  flex: 1;
+}
+
+.infoCardTitle {
+  font-size: 1.25rem;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.infoCardDescription {
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.sessionNotesCard {
+  padding: 2rem;
+  border-radius: 1rem;
+  background: linear-gradient(to bottom right, rgba(242, 201, 76, 0.1), rgba(224, 183, 60, 0.05));
+  border: 1px solid rgba(242, 201, 76, 0.2);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.sessionNotesCard:hover {
+  border-color: rgba(242, 201, 76, 0.4);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.sessionNotesContent {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.sessionNotesIcon {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 1rem;
+  background: linear-gradient(to bottom right, #f2c94c, #e0b73c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.sessionNotesCard:hover .sessionNotesIcon {
+  transform: scale(1.1);
+}
+
+.sessionNotesIcon svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: white;
+}
+
+.sessionNotesText {
+  flex: 1;
+}
+
+.sessionNotesTitle {
+  font-size: 1.5rem;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+  margin: 0 0 0.5rem 0;
+  transition: color 0.3s;
+}
+
+.sessionNotesCard:hover .sessionNotesTitle {
+  color: #f2c94c;
+}
+
+.sessionNotesDescription {
+  color: var(--muted-foreground);
+  margin-bottom: 0.75rem;
+  margin: 0 0 0.75rem 0;
+}
+
+.sessionNotesMeta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.metaBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.metaBadge svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--primary);
+}
+
+.metaBadgeText {
+  color: var(--foreground);
+}
+
+.sessionNotesArrow {
+  width: 2rem;
+  height: 2rem;
+  color: #f2c94c;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.sessionNotesCard:hover .sessionNotesArrow {
+  opacity: 1;
+}
+
+.statsGridSmall {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .statsGridSmall {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.statCardSmall {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background-color: white;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.statCardSmallHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.statCardSmallIcon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statCardSmallIconPrimary {
+  background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.1));
+}
+
+.statCardSmallIconSafe {
+  background: linear-gradient(to bottom right, rgba(111, 207, 151, 0.2), rgba(111, 207, 151, 0.1));
+}
+
+.statCardSmallIconAttention {
+  background: linear-gradient(to bottom right, rgba(242, 201, 76, 0.2), rgba(242, 201, 76, 0.1));
+}
+
+.statCardSmallIcon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.statCardSmallIconPrimary svg {
+  color: var(--primary);
+}
+
+.statCardSmallIconSafe svg {
+  color: #6fcf97;
+}
+
+.statCardSmallIconAttention svg {
+  color: #f2c94c;
+}
+
+.statCardSmallLabel {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.statCardSmallValue {
+  font-size: 1.5rem;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.tabsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 0;
+}
+
+.tabsWrapper {
+  width: 100%;
+}
+

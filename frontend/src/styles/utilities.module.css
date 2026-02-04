@@ -1,0 +1,282 @@
+/* Utility classes for common patterns */
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.flexCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.itemsCenter {
+  align-items: center;
+}
+
+.justifyCenter {
+  justify-content: center;
+}
+
+.justifyBetween {
+  justify-content: space-between;
+}
+
+.gap2 {
+  gap: 0.5rem;
+}
+
+.gap3 {
+  gap: 0.75rem;
+}
+
+.gap4 {
+  gap: 1rem;
+}
+
+.gap6 {
+  gap: 1.5rem;
+}
+
+.gap8 {
+  gap: 2rem;
+}
+
+.gap12 {
+  gap: 3rem;
+}
+
+.rounded {
+  border-radius: 0.25rem;
+}
+
+.roundedLg {
+  border-radius: 0.5rem;
+}
+
+.roundedXl {
+  border-radius: 0.75rem;
+}
+
+.rounded2xl {
+  border-radius: 1rem;
+}
+
+.rounded3xl {
+  border-radius: 1.5rem;
+}
+
+.roundedFull {
+  border-radius: 9999px;
+}
+
+.p2 {
+  padding: 0.5rem;
+}
+
+.p4 {
+  padding: 1rem;
+}
+
+.p6 {
+  padding: 1.5rem;
+}
+
+.p8 {
+  padding: 2rem;
+}
+
+.px4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.px6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.px8 {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.py2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.py4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.py6 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.pt4 {
+  padding-top: 1rem;
+}
+
+.pt8 {
+  padding-top: 2rem;
+}
+
+.pb4 {
+  padding-bottom: 1rem;
+}
+
+.pb8 {
+  padding-bottom: 2rem;
+}
+
+.mb4 {
+  margin-bottom: 1rem;
+}
+
+.mb6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb8 {
+  margin-bottom: 2rem;
+}
+
+.mt4 {
+  margin-top: 1rem;
+}
+
+.textCenter {
+  text-align: center;
+}
+
+.textPrimary {
+  color: var(--primary);
+}
+
+.textForeground {
+  color: var(--foreground);
+}
+
+.textMuted {
+  color: var(--muted-foreground);
+}
+
+.bgPrimary {
+  background-color: var(--primary);
+}
+
+.bgWhite {
+  background-color: white;
+}
+
+.bgPrimary10 {
+  background-color: rgba(139, 92, 246, 0.1);
+}
+
+.shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.shadowLg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.shadowXl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.border {
+  border: 1px solid var(--border);
+}
+
+.transition {
+  transition: all 0.3s;
+}
+
+.hoverScale:hover {
+  transform: scale(1.05);
+}
+
+.minHScreen {
+  min-height: 100vh;
+}
+
+.wFull {
+  width: 100%;
+}
+
+.hFull {
+  height: 100%;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.inset0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.z50 {
+  z-index: 50;
+}
+
+.opacity90 {
+  opacity: 0.9;
+}
+
+.inlineBlock {
+  display: inline-block;
+}
+
+.inlineFlex {
+  display: inline-flex;
+}
+
+.grid {
+  display: grid;
+}
+
+.gridCols2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gridCols4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .mdGridCols2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .mdGridCols4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .lgGridCols4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+

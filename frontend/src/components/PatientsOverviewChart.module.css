@@ -1,0 +1,117 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerText h3 {
+  font-size: 1.25rem;
+  color: var(--foreground);
+  margin-bottom: 0.25rem;
+  margin: 0 0 0.25rem 0;
+}
+
+.headerText p {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.averageBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  background-color: rgba(249, 250, 251, 0.5);
+}
+
+.averageBadge svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--primary);
+}
+
+.averageBadgeText {
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+
+.chartContainer {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+}
+
+.chartWrapper {
+  height: 400px;
+  width: 100%;
+  position: relative;
+}
+
+.tooltip {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+}
+
+.tooltipName {
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.tooltipText {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legendDot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+}
+
+.legendDotSafe {
+  background-color: #6fcf97;
+}
+
+.legendDotAttention {
+  background-color: #f2c94c;
+}
+
+.legendDotUrgent {
+  background-color: #eb5757;
+}
+
+.legendText {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
