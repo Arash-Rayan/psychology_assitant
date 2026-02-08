@@ -67,16 +67,6 @@ export function Header() {
               <span>پنل درمانگر</span>
               <LayoutDashboard />
             </Link>
-            
-            <Link
-              href="/auth"
-              className={`${styles.navButton} ${
-                isActive('/auth') ? styles.navButtonActive : styles.navButtonInactive
-              }`}
-            >
-              <span>ورود / ثبت‌نام</span>
-              <UserCircle2 />
-            </Link>
           </nav>
           
           {/* Mobile Hamburger Button */}

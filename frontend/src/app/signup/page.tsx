@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "motion/react";
-import { Lock, Mail, User, Loader2, Heart } from "lucide-react";
+import { Lock, Mail, User, Loader2, Heart, ArrowRight } from "lucide-react";
 import styles from "@/components/HomePage.module.css";
 import authStyles from "../login/AuthPage.module.css";
 import { toast } from "sonner";
@@ -67,6 +67,14 @@ export default function SignupPage() {
               transition={{ duration: 0.6 }}
               className={authStyles.authCard}
             >
+              <Link 
+                href="/home" 
+                className={authStyles.backButton}
+              >
+                <ArrowRight size={18} />
+                <span>بازگشت به خانه</span>
+              </Link>
+              
               <div className={authStyles.cardHeader}>
                 <h1 className={authStyles.authTitle}>ایجاد حساب کاربری</h1>
                 <p className={authStyles.authSubtitle}>
@@ -98,11 +106,9 @@ export default function SignupPage() {
                       },
                     })}
                   />
-                  {errors.name && (
-                    <p className={authStyles.errorText}>
-                      {errors.name.message}
-                    </p>
-                  )}
+                  <p className={`${authStyles.errorText} ${!errors.name ? authStyles.errorTextEmpty : ''}`}>
+                    {errors.name?.message || "\u00A0"}
+                  </p>
                 </div>
 
                 <div className={authStyles.formGroup}>
@@ -120,11 +126,9 @@ export default function SignupPage() {
                       required: "ایمیل الزامی است.",
                     })}
                   />
-                  {errors.email && (
-                    <p className={authStyles.errorText}>
-                      {errors.email.message}
-                    </p>
-                  )}
+                  <p className={`${authStyles.errorText} ${!errors.email ? authStyles.errorTextEmpty : ''}`}>
+                    {errors.email?.message || "\u00A0"}
+                  </p>
                 </div>
 
                 <div className={authStyles.formGroup}>
@@ -146,11 +150,9 @@ export default function SignupPage() {
                       },
                     })}
                   />
-                  {errors.password && (
-                    <p className={authStyles.errorText}>
-                      {errors.password.message}
-                    </p>
-                  )}
+                  <p className={`${authStyles.errorText} ${!errors.password ? authStyles.errorTextEmpty : ''}`}>
+                    {errors.password?.message || "\u00A0"}
+                  </p>
                 </div>
 
                 <button

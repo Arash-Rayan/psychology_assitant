@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "motion/react";
-import { Lock, Mail, User, Loader2 } from "lucide-react";
+import { Lock, Mail, User, Loader2, ArrowRight } from "lucide-react";
 import styles from "@/components/HomePage.module.css";
 import authStyles from "./AuthPage.module.css";
 import { toast } from "sonner";
@@ -70,6 +70,14 @@ export default function LoginPage() {
               transition={{ duration: 0.6 }}
               className={authStyles.authCard}
             >
+              <Link 
+                href="/home" 
+                className={authStyles.backButton}
+              >
+                <ArrowRight size={18} />
+                <span>بازگشت به خانه</span>
+              </Link>
+              
               <div className={authStyles.cardHeader}>
                 <h1 className={authStyles.authTitle}>ورود به حساب کاربری</h1>
                 <p className={authStyles.authSubtitle}>
@@ -96,11 +104,9 @@ export default function LoginPage() {
                       required: "ایمیل الزامی است.",
                     })}
                   />
-                  {errors.email && (
-                    <p className={authStyles.errorText}>
-                      {errors.email.message}
-                    </p>
-                  )}
+                  <p className={`${authStyles.errorText} ${!errors.email ? authStyles.errorTextEmpty : ''}`}>
+                    {errors.email?.message || "\u00A0"}
+                  </p>
                 </div>
 
                 <div className={authStyles.formGroup}>
@@ -122,11 +128,9 @@ export default function LoginPage() {
                       },
                     })}
                   />
-                  {errors.password && (
-                    <p className={authStyles.errorText}>
-                      {errors.password.message}
-                    </p>
-                  )}
+                  <p className={`${authStyles.errorText} ${!errors.password ? authStyles.errorTextEmpty : ''}`}>
+                    {errors.password?.message || "\u00A0"}
+                  </p>
                 </div>
 
                 <button
