@@ -19,7 +19,7 @@ export default function AuthChoicePage() {
               className={authStyles.authCard}
             >
               <div className={authStyles.cardHeader}>
-                <h1 className={authStyles.authTitle}>خوش آمدید به روان‌یار</h1>
+                <h1 className={authStyles.authTitle}>خوش آمدید به روانصد</h1>
                 <p className={authStyles.authSubtitle}>
                   برای شروع، انتخاب کنید که می‌خواهید وارد شوید یا یک حساب جدید
                   بسازید.

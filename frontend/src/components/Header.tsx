@@ -23,7 +23,7 @@ export function Header() {
             <div className={styles.logoIcon}>
               <Brain />
             </div>
-            <span className={styles.logoText}>روان‌یار</span>
+            <span className={styles.logoText}>روانصد</span>
           </div>
           
           {/* Desktop Navigation */}

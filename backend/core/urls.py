@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.urls import path
 
-from chatbot.api import api
+from chatbot.views import chat
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", api.urls),
+    path("chat", chat, name="chat"),
 ]
 

@@ -15,6 +15,8 @@ interface Message {
 type MoodType = 'very_sad' | 'sad' | 'normal' | 'good' | 'amazing';
 
 export function ChatbotPage() {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000';
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -106,7 +108,7 @@ export function ChatbotPage() {
     }, 1500);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
 
     const userMessage: Message = {
@@ -116,32 +118,65 @@ export function ChatbotPage() {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsTyping(true);
+  setMessages(prev => [...prev, userMessage]);
+  const currentInput = inputValue;
+  setInputValue('');
+  setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responses = [
-        { text: 'متوجه منظورتون شدم. ممکنه بیشتر توضیح بدید؟', emotion: 'neutral' as const },
-        { text: 'خیلی خوب است که این احساستون رو با من در میان گذاشتید. بیایید باهم کارش کنیم.', emotion: 'positive' as const },
-        { text: 'درک می‌کنم که این موقعیت برای شما سخت است. می‌خواهید درباره‌اش بیشتر صحبت کنیم؟', emotion: 'neutral' as const }
-      ];
-      
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: randomResponse.text,
-        sender: 'bot',
-        emotion: randomResponse.emotion,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, botMessage]);
-      setIsTyping(false);
-    }, 1500);
-  };
+  try {
+    const res = await fetch(`${API_BASE_URL}/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: currentInput }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data?.reply) {
+      throw new Error(data?.error || 'Request failed');
+    }
+
+    const fullText: string = data.reply;
+    const botId = (Date.now() + 1).toString();
+
+    // Start with an empty bot message
+    const botMessage: Message = {
+      id: botId,
+      text: '',
+      sender: 'bot',
+      emotion: 'neutral',
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, botMessage]);
+
+    let index = 0;
+    const interval = setInterval(() => {
+      index += 1;
+      const partial = fullText.slice(0, index);
+
+      setMessages(prev =>
+        prev.map(m => (m.id === botId ? { ...m, text: partial } : m))
+      );
+
+      if (index >= fullText.length) {
+        clearInterval(interval);
+        setIsTyping(false);
+      }
+    }, 30);
+  } catch (error) {
+    const errorMessage: Message = {
+      id: (Date.now() + 2).toString(),
+      text: 'خطا در ارتباط با سرور. لطفاً بعداً دوباره امتحان کنید.',
+      sender: 'bot',
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, errorMessage]);
+    setIsTyping(false);
+  }
+};
 
   const getEmotionClass = (emotion?: string) => {
     if (emotion === 'positive') return styles.emotionPositive;
@@ -165,7 +200,7 @@ export function ChatbotPage() {
                 <Brain />
               </div>
               <div className={styles.headerText}>
-                <h2>روان‌یار</h2>
+                <h2>روانصد</h2>
                 <p>دستیار هوشمند سلامت روان</p>
               </div>
               <div className={styles.statusContainer}>

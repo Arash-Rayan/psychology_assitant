@@ -79,7 +79,7 @@ export function HomePage() {
                   className={styles.primaryButton}
                 >
                   <MessageCircle />
-                  <span>شروع گفتگو با روان‌یار</span>
+                  <span>شروع گفتگو با روانصد</span>
                 </Link>
                 
                 <button className={styles.secondaryButton}>
@@ -190,7 +190,7 @@ export function HomePage() {
             <div className={styles.ctaInner}>
               <Brain className={styles.ctaIcon} />
               <h2 className={styles.ctaTitle}>آماده شروع هستید؟</h2>
-              <p className={styles.ctaDescription}>همین حالا با روان‌یار گفتگو را شروع کنید</p>
+              <p className={styles.ctaDescription}>همین حالا با روانصد گفتگو را شروع کنید</p>
               <Link
                 href="/chat"
                 className={styles.ctaButton}
