@@ -1,43 +1,48 @@
 :root {
   --font-size: 16px;
-  --background: #F5F3FF;
-  --foreground: #2D2D2D;
-  --card: #FFFFFF;
-  --card-foreground: #2D2D2D;
-  --popover: #FFFFFF;
-  --popover-foreground: #2D2D2D;
-  --primary: #8B5CF6;
-  --primary-foreground: #FFFFFF;
-  --primary-hover: #7C3AED;
-  --secondary: #FCD6B4;
-  --secondary-foreground: #2D2D2D;
-  --muted: #F9FAFB;
-  --muted-foreground: #6B7280;
-  --accent: #E9D5FF;
-  --accent-foreground: #2D2D2D;
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
-  --border: rgba(139, 92, 246, 0.15);
+  /* Light, clean background similar to reference */
+  --background: #f7fbff;
+  --foreground: #1f2933;
+  --card: #ffffff;
+  --card-foreground: #1f2933;
+  --popover: #ffffff;
+  --popover-foreground: #1f2933;
+  /* Teal / aqua primary inspired by the CTA button */
+  --primary: #3cc7d9;
+  --primary-foreground: #ffffff;
+  --primary-hover: #26a8c0;
+  /* Soft supporting color similar to subtle gradients */
+  --secondary: #e4f6fb;
+  --secondary-foreground: #1f2933;
+  --muted: #f3f6fb;
+  --muted-foreground: #64748b;
+  /* Gentle accent with a hint of purple/blue */
+  --accent: #d7e5ff;
+  --accent-foreground: #1f2933;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: rgba(148, 163, 184, 0.28);
   --input: transparent;
-  --input-background: #FFFFFF;
-  --switch-background: #E9D5FF;
+  --input-background: #ffffff;
+  --switch-background: #d7e5ff;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: rgba(139, 92, 246, 0.3);
+  --ring: rgba(60, 199, 217, 0.3);
+  /* Keep chart colors but they now sit on the new background */
   --chart-1: #6fcf97;
   --chart-2: #f2c94c;
   --chart-3: #eb5757;
-  --chart-4: #8B5CF6;
-  --chart-5: #FCD6B4;
+  --chart-4: #3cc7d9;
+  --chart-5: #bb6bd9;
   --radius: 1rem;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #2D2D2D;
-  --sidebar-primary: #8B5CF6;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: rgba(139, 92, 246, 0.1);
-  --sidebar-accent-foreground: #2D2D2D;
-  --sidebar-border: rgba(139, 92, 246, 0.15);
-  --sidebar-ring: rgba(139, 92, 246, 0.3);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1f2933;
+  --sidebar-primary: #3cc7d9;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(60, 199, 217, 0.08);
+  --sidebar-accent-foreground: #1f2933;
+  --sidebar-border: rgba(148, 163, 184, 0.28);
+  --sidebar-ring: rgba(60, 199, 217, 0.35);
 }
 
 .dark {

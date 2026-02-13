@@ -5,7 +5,7 @@ from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 
 from openai import OpenAI
-
+from .prompts.interview import prompt
 
 def _add_cors_headers(response: JsonResponse) -> JsonResponse:
     response["Access-Control-Allow-Origin"] = "*"
@@ -56,10 +56,11 @@ def chat(request: HttpRequest):
         response = client.chat.completions.create(
             model="deepseek-chat",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant"},
+                {"role": "system", "content":prompt},
                 {"role": "user", "content": message},
             ],
             stream=False,
+            temperature = 0,
         )
         reply = response.choices[0].message.content
     except Exception:

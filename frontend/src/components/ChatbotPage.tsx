@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, Smile, Meh, Frown, Heart, Brain, Angry, SmilePlus } from 'lucide-react';
 import styles from './ChatbotPage.module.css';
@@ -30,6 +30,8 @@ export function ChatbotPage() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [moodSelected, setMoodSelected] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesAreaRef = useRef<HTMLDivElement>(null);
 
   const emotionIcons = {
     positive: Smile,
@@ -44,6 +46,15 @@ export function ChatbotPage() {
     { type: 'good' as MoodType, emoji: '😊', label: 'خوب', color: '#22c55e' },
     { type: 'amazing' as MoodType, emoji: '😄', label: 'عالی', color: '#10b981' }
   ];
+
+  // Auto-scroll to bottom when messages change or during streaming
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
 
   const handleMoodSelect = (mood: MoodType) => {
     if (moodSelected) return;
@@ -161,9 +172,14 @@ export function ChatbotPage() {
         prev.map(m => (m.id === botId ? { ...m, text: partial } : m))
       );
 
+      // Scroll to bottom during streaming
+      scrollToBottom();
+
       if (index >= fullText.length) {
         clearInterval(interval);
         setIsTyping(false);
+        // Final scroll after streaming completes
+        setTimeout(() => scrollToBottom(), 100);
       }
     }, 30);
   } catch (error) {
@@ -213,7 +229,7 @@ export function ChatbotPage() {
           </div>
 
           {/* Messages Area */}
-          <div className={styles.messagesArea}>
+          <div className={styles.messagesArea} ref={messagesAreaRef}>
             <AnimatePresence>
               {messages.map((message) => (
                 <motion.div
@@ -309,6 +325,7 @@ export function ChatbotPage() {
                 </div>
               </motion.div>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input Area */}
