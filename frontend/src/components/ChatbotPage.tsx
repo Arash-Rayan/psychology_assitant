@@ -129,70 +129,75 @@ export function ChatbotPage() {
       timestamp: new Date()
     };
 
-  setMessages(prev => [...prev, userMessage]);
-  const currentInput = inputValue;
-  setInputValue('');
-  setIsTyping(true);
+    setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputValue;
+    setInputValue('');
+    setIsTyping(true);
 
-  try {
-    const res = await fetch(`${API_BASE_URL}/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message: currentInput }),
-    });
+    try {
+      const res = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: currentInput }),
+      });
 
-    const data = await res.json();
-
-    if (!res.ok || !data?.reply) {
-      throw new Error(data?.error || 'Request failed');
-    }
-
-    const fullText: string = data.reply;
-    const botId = (Date.now() + 1).toString();
-
-    // Start with an empty bot message
-    const botMessage: Message = {
-      id: botId,
-      text: '',
-      sender: 'bot',
-      emotion: 'neutral',
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, botMessage]);
-
-    let index = 0;
-    const interval = setInterval(() => {
-      index += 1;
-      const partial = fullText.slice(0, index);
-
-      setMessages(prev =>
-        prev.map(m => (m.id === botId ? { ...m, text: partial } : m))
-      );
-
-      // Scroll to bottom during streaming
-      scrollToBottom();
-
-      if (index >= fullText.length) {
-        clearInterval(interval);
-        setIsTyping(false);
-        // Final scroll after streaming completes
-        setTimeout(() => scrollToBottom(), 100);
+      if (!res.ok || !res.body) {
+        throw new Error('Request failed');
       }
-    }, 30);
-  } catch (error) {
-    const errorMessage: Message = {
-      id: (Date.now() + 2).toString(),
-      text: 'خطا در ارتباط با سرور. لطفاً بعداً دوباره امتحان کنید.',
-      sender: 'bot',
-      timestamp: new Date()
-    };
-    setMessages(prev => [...prev, errorMessage]);
-    setIsTyping(false);
-  }
-};
+
+      const botId = (Date.now() + 1).toString();
+
+      // Start with an empty bot message to be filled as chunks arrive
+      const botMessage: Message = {
+        id: botId,
+        text: '',
+        sender: 'bot',
+        emotion: 'neutral',
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let accumulated = '';
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+
+        if (value) {
+          const chunk = decoder.decode(value, { stream: !done });
+          if (!chunk) continue;
+
+          accumulated += chunk;
+
+          setMessages(prev =>
+            prev.map(m => (m.id === botId ? { ...m, text: accumulated } : m))
+          );
+
+          // Scroll to bottom during streaming
+          scrollToBottom();
+        }
+      }
+
+      setIsTyping(false);
+      // Final scroll after streaming completes
+      setTimeout(() => scrollToBottom(), 100);
+    } catch (error) {
+      const errorMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        text: 'خطا در ارتباط با سرور. لطفاً بعداً دوباره امتحان کنید.',
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      setIsTyping(false);
+    }
+  };
 
   const getEmotionClass = (emotion?: string) => {
     if (emotion === 'positive') return styles.emotionPositive;

@@ -1,6 +1,6 @@
 'use client';
 
-import { Brain, MessageCircle, LayoutDashboard, Home, Menu, X, UserCircle2 } from 'lucide-react';
+import { Brain, MessageCircle, LayoutDashboard, Home, Menu, X, UserCircle2, Info } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -46,6 +46,16 @@ export function Header() {
             >
               <span>خانه</span>
               <Home />
+            </Link>
+
+            <Link
+              href="/about"
+              className={`${styles.navButton} ${
+                isActive('/about') ? styles.navButtonActive : styles.navButtonInactive
+              }`}
+            >
+              <span>درباره ما</span>
+              <Info />
             </Link>
             
             <Link
@@ -102,6 +112,17 @@ export function Header() {
             >
               <span>خانه</span>
               <Home />
+            </Link>
+
+            <Link
+              href="/about"
+              className={`${styles.navButton} ${
+                isActive('/about') ? styles.navButtonActive : styles.navButtonInactive
+              }`}
+              onClick={closeMobileMenu}
+            >
+              <span>درباره ما</span>
+              <Info />
             </Link>
             
             <Link

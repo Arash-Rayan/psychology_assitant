@@ -108,7 +108,7 @@ const formCategories: FormCategory[] = [
 ];
 
 interface NewSessionNotePageProps {
-  patientName: string;
+  patientName?: string;
   onClose: () => void;
 }
 
@@ -122,6 +122,9 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
   const [isRecording, setIsRecording] = useState(false);
 
   const [formData, setFormData] = useState({
+    patientName: patientName ?? '',
+    age: '',
+    gender: '',
     date: '',
     duration: '',
     mood: '',
@@ -203,7 +206,9 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
               </button>
               <div>
                 <h1 className="text-2xl text-foreground">افزودن یادداشت جلسه جدید</h1>
-                <p className="text-sm text-muted-foreground mt-1">مراجع: {patientName}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  مراجع: {formData.patientName || 'بدون نام'}
+                </p>
               </div>
             </div>
             <button
@@ -310,6 +315,49 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
               <h2 className="text-xl text-foreground mb-6">اطلاعات اولیه جلسه</h2>
               
               <div className="space-y-4" dir="rtl">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-2">
+                    <Label htmlFor="patientName" className="text-right block mb-2">نام و نام خانوادگی مراجع</Label>
+                    <Input
+                      id="patientName"
+                      type="text"
+                      placeholder="مثال: علی رضایی"
+                      dir="rtl"
+                      value={formData.patientName}
+                      onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="age" className="text-right block mb-2">سن</Label>
+                    <Input
+                      id="age"
+                      type="number"
+                      min={0}
+                      max={120}
+                      placeholder="مثال: ۳۲"
+                      dir="rtl"
+                      value={formData.age}
+                      onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="gender" className="text-right block mb-2">جنسیت</Label>
+                  <select
+                    id="gender"
+                    className="w-full px-3 py-2 rounded-xl border border-border bg-white text-right focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    dir="rtl"
+                    value={formData.gender}
+                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                  >
+                    <option value="">انتخاب کنید</option>
+                    <option value="female">زن</option>
+                    <option value="male">مرد</option>
+                    <option value="other">سایر / ترجیح می‌دهم نگویم</option>
+                  </select>
+                </div>
+
                 <div>
                   <Label htmlFor="date" className="text-right block mb-2">تاریخ جلسه</Label>
                   <Input

@@ -82,9 +82,12 @@ export function HomePage() {
                   <span>شروع گفتگو با روانصد</span>
                 </Link>
                 
-                <button className={styles.secondaryButton}>
+                <Link
+                  href="/about"
+                  className={styles.secondaryButton}
+                >
                   <span>درباره ما</span>
-                </button>
+                </Link>
               </motion.div>
             </div>
             

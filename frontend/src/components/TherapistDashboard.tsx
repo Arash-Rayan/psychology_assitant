@@ -15,6 +15,7 @@ import { SCHEMA_TYPES, SCHEMA_TYPE_KEYS, SchemaType } from './SchemaTypes';
 import { generatePatients } from './generatePatientData';
 import { FormBuilderDialog } from './FormBuilderDialog';
 import { SessionNotesView } from './SessionNotesView';
+import NewSessionNotePage from './NewSessionNotePage';
 import styles from './TherapistDashboard.module.css';
 
 export function TherapistDashboard() {
@@ -25,6 +26,7 @@ export function TherapistDashboard() {
   const [activeTab, setActiveTab] = useState('patients');
   const [showFormBuilder, setShowFormBuilder] = useState(false);
   const [showSessionNotes, setShowSessionNotes] = useState(false);
+  const [showGlobalNewNote, setShowGlobalNewNote] = useState(false);
   const patientsListRef = useRef<HTMLDivElement>(null);
 
   // Generate 100 patients (client-side only to avoid hydration mismatch)
@@ -436,6 +438,30 @@ export function TherapistDashboard() {
                       </div>
                     </div>
 
+                    {/* New Session Note Card */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.05 }}
+                      onClick={() => setShowGlobalNewNote(true)}
+                      className={styles.sessionNotesCard}
+                    >
+                      <div className={styles.sessionNotesContent}>
+                        <div className={styles.sessionNotesIcon}>
+                          <Plus />
+                        </div>
+                        <div className={styles.sessionNotesText}>
+                          <h3 className={styles.sessionNotesTitle}>
+                            افزودن یادداشت جدید
+                          </h3>
+                          <p className={styles.sessionNotesDescription}>
+                            ثبت یادداشت برای مراجع جدید یا جلسات جدید مراجعین قبلی
+                          </p>
+                        </div>
+                        <ChevronRight className={styles.sessionNotesArrow} />
+                      </div>
+                    </motion.div>
+
                     {/* Session Notes Card */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -560,6 +586,15 @@ export function TherapistDashboard() {
         open={showFormBuilder}
         onClose={() => setShowFormBuilder(false)}
       />
+
+      {/* Global New Session Note Page */}
+      {showGlobalNewNote && (
+        <div className="fixed inset-0 z-50 bg-black/20">
+          <NewSessionNotePage
+            onClose={() => setShowGlobalNewNote(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }

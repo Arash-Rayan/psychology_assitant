@@ -1,18 +1,45 @@
 import json
 import os
 
-from django.http import JsonResponse, HttpRequest
+from django.http import JsonResponse, HttpRequest, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from openai import OpenAI
-from .prompts.interview import prompt
+from .prompts.interview import prompt as model_instruct
 
-def _add_cors_headers(response: JsonResponse) -> JsonResponse:
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
+
+
+def _add_cors_headers(response: JsonResponse | StreamingHttpResponse) -> JsonResponse | StreamingHttpResponse:
     response["Access-Control-Allow-Origin"] = "*"
     response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
     response["Access-Control-Allow-Headers"] = "Content-Type"
     return response
 
+
+# single in-memory history for the chatbot
+history: list[BaseMessage] = []
+
+# set up LangChain components once (non-streaming and streaming use the same chain)
+_api_key = os.environ.get("DEEPSEEK_API_KEY")
+llm = ChatOpenAI(
+    model="deepseek-chat",
+    api_key=_api_key,
+    base_url="https://api.deepseek.com",
+    temperature=0.7,
+)
+
+prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", model_instruct),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{input}"),
+    ]
+)
+
+chain = prompt | llm
 
 @csrf_exempt
 def chat(request: HttpRequest):
@@ -50,26 +77,24 @@ def chat(request: HttpRequest):
         )
         return _add_cors_headers(resp)
 
-    client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
+    # streaming generator: send tokens as they are generated
+    def stream_response():
+        full_reply_parts: list[str] = []
 
-    try:
-        response = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=[
-                {"role": "system", "content":prompt},
-                {"role": "user", "content": message},
-            ],
-            stream=False,
-            temperature = 0,
-        )
-        reply = response.choices[0].message.content
-    except Exception:
-        resp = JsonResponse(
-            {"error": "Failed to get response from language model"},
-            status=502,
-        )
-        return _add_cors_headers(resp)
+        # stream tokens/chunks from the model
+        for chunk in chain.stream({"input": message, "chat_history": history}):
+            token = chunk.content or ""
+            if not token:
+                continue
+            full_reply_parts.append(token)
+            # send raw text chunks; frontend reads the stream and appends
+            yield token
 
-    resp = JsonResponse({"reply": reply})
+        # after streaming is done, update history with full reply
+        full_reply = "".join(full_reply_parts)
+        history.append(HumanMessage(content=message))
+        history.append(AIMessage(content=full_reply))
+
+    resp = StreamingHttpResponse(stream_response(), content_type="text/plain; charset=utf-8")
     return _add_cors_headers(resp)
 
