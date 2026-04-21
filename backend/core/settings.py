@@ -53,15 +53,12 @@ TEMPLATES = [
 WSGI_APPLICATION = "core.wsgi.application"
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-if DATABASE_URL:
-    DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)}
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL is required and must point to a PostgreSQL database.")
+
+DATABASES = {
+    "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

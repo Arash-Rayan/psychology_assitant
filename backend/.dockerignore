@@ -3,7 +3,6 @@ __pycache__
 .env
 .env.*
 .git
-*.sqlite3
 staticfiles
 venv
 .venv

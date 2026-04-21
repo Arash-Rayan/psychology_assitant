@@ -53,5 +53,5 @@ Return your output strictly in JSON format like this example:
 }
 
 Do not include anything outside of the JSON. Analyze the text carefully, considering both explicit statements and implied schemas.
-
+output must be in persian
 """
