@@ -514,7 +514,12 @@ export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber
     duration: '45',
     mood: '',
     mainTopics: '',
+    chiefComplaint: '',
+    historyBackground: '',
+    sessionObjective: '',
     summary: '',
+    formulation: '',
+    treatmentPlan: '',
     homework: '',
     nextSessionGoals: ''
   });
@@ -630,7 +635,12 @@ export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber
         duration: '45',
         mood: '',
         mainTopics: '',
+        chiefComplaint: '',
+        historyBackground: '',
+        sessionObjective: '',
         summary: '',
+        formulation: '',
+        treatmentPlan: '',
         homework: '',
         nextSessionGoals: ''
       });
@@ -983,61 +993,125 @@ export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber
                   />
                 </motion.div>
 
-                {/* Session Summary */}
+                {/* Clinical report structure */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
+                  className="rounded-xl border border-border/60 bg-muted/10 p-4"
+                  dir="rtl"
                 >
-                  <Label className="flex items-center gap-2 mb-2 text-foreground">
-                    <BookOpen className="w-4 h-4 text-primary" />
-                    خلاصه جلسه <span className="text-[#eb5757]">*</span>
-                  </Label>
-                  <Textarea
-                    value={formData.summary}
-                    onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-                    placeholder="خلاصه‌ای از مباحث مطرح شده، پیشرفت‌ها و مشاهدات خود را وارد کنید..."
-                    className="w-full min-h-[120px] resize-none"
-                    dir="rtl"
-                  />
-                </motion.div>
+                  <div className="mb-4 pb-3 border-b border-border/50">
+                    <p className="text-xs font-semibold text-foreground text-right">ساختار گزارش بالینی جلسه</p>
+                    <p className="text-[11px] text-muted-foreground/75 mt-1 text-right leading-snug">
+                      در عرض بزرگ در دو ستون؛ راهنماها کوتاه هستند.
+                    </p>
+                  </div>
 
-                {/* Homework */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.35 }}
-                >
-                  <Label className="flex items-center gap-2 mb-2 text-foreground">
-                    <Home className="w-4 h-4 text-primary" />
-                    تکالیف خانگی
-                  </Label>
-                  <Textarea
-                    value={formData.homework}
-                    onChange={(e) => setFormData({ ...formData, homework: e.target.value })}
-                    placeholder="تمرینات و تکالیفی که به مراجع داده شده است..."
-                    className="w-full min-h-[100px] resize-none"
-                    dir="rtl"
-                  />
-                </motion.div>
-
-                {/* Next Session Goals */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  <Label className="flex items-center gap-2 mb-2 text-foreground">
-                    <Target className="w-4 h-4 text-primary" />
-                    اهداف جلسه بعد
-                  </Label>
-                  <Textarea
-                    value={formData.nextSessionGoals}
-                    onChange={(e) => setFormData({ ...formData, nextSessionGoals: e.target.value })}
-                    placeholder="موضوعات و اهدافی که قرار است در جلسه بعدی بررسی شوند..."
-                    className="w-full min-h-[100px] resize-none"
-                    dir="rtl"
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                      <div className="rounded-lg border border-border/50 bg-background/80 p-3 space-y-1">
+                        <Label className="text-xs font-medium text-foreground block text-right">۱. شکایت اصلی مراجع</Label>
+                        <p className="text-[11px] text-muted-foreground/70 text-right leading-snug">علت مراجعه؛ کوتاه.</p>
+                        <Textarea
+                          value={formData.chiefComplaint}
+                          onChange={(e) => setFormData({ ...formData, chiefComplaint: e.target.value })}
+                          placeholder="..."
+                          className="min-h-[72px] text-sm w-full resize-y rounded-md border-border/50"
+                          dir="rtl"
+                        />
+                      </div>
+                      <div className="rounded-lg border border-border/50 bg-background/80 p-3 space-y-1">
+                        <Label className="text-xs font-medium text-foreground block text-right">۲. پیشینه و سابقه</Label>
+                        <p className="text-[11px] text-muted-foreground/70 text-right leading-snug">آغاز، زمینه، روند.</p>
+                        <Textarea
+                          value={formData.historyBackground}
+                          onChange={(e) => setFormData({ ...formData, historyBackground: e.target.value })}
+                          placeholder="..."
+                          className="min-h-[72px] text-sm w-full resize-y rounded-md border-border/50"
+                          dir="rtl"
+                        />
+                      </div>
+                      <div className="rounded-lg border border-border/50 bg-background/80 p-3 space-y-1">
+                        <Label className="text-xs font-medium text-foreground block text-right">۳. هدف جلسه فعلی</Label>
+                        <p className="text-[11px] text-muted-foreground/70 text-right leading-snug">دستور این جلسه.</p>
+                        <Textarea
+                          value={formData.sessionObjective}
+                          onChange={(e) => setFormData({ ...formData, sessionObjective: e.target.value })}
+                          placeholder="..."
+                          className="min-h-[72px] text-sm w-full resize-y rounded-md border-border/50"
+                          dir="rtl"
+                        />
+                      </div>
+                      <div className="rounded-lg border border-border/50 bg-background/80 p-3 space-y-1">
+                        <Label className="flex items-center justify-end gap-1.5 text-xs font-medium text-foreground">
+                          <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                          ۴. خلاصه جلسه
+                          <span className="text-[#eb5757]">*</span>
+                        </Label>
+                        <p className="text-[11px] text-muted-foreground/70 text-right leading-snug">محتوای اصلی جلسه.</p>
+                        <Textarea
+                          value={formData.summary}
+                          onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                          placeholder="..."
+                          className="min-h-[100px] text-sm w-full resize-y rounded-md border-border/50"
+                          dir="rtl"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="rounded-lg border border-border/50 bg-background/80 p-3 space-y-1">
+                        <Label className="text-xs font-medium text-foreground block text-right">۵. فرمولاسیون</Label>
+                        <p className="text-[11px] text-muted-foreground/70 text-right leading-snug">تحلیل و فرضیه‌ها.</p>
+                        <Textarea
+                          value={formData.formulation}
+                          onChange={(e) => setFormData({ ...formData, formulation: e.target.value })}
+                          placeholder="..."
+                          className="min-h-[72px] text-sm w-full resize-y rounded-md border-border/50"
+                          dir="rtl"
+                        />
+                      </div>
+                      <div className="rounded-lg border border-border/50 bg-background/80 p-3 space-y-1">
+                        <Label className="text-xs font-medium text-foreground block text-right">۶. طرح درمان</Label>
+                        <p className="text-[11px] text-muted-foreground/70 text-right leading-snug">مسیر مداخله.</p>
+                        <Textarea
+                          value={formData.treatmentPlan}
+                          onChange={(e) => setFormData({ ...formData, treatmentPlan: e.target.value })}
+                          placeholder="..."
+                          className="min-h-[72px] text-sm w-full resize-y rounded-md border-border/50"
+                          dir="rtl"
+                        />
+                      </div>
+                      <div className="rounded-lg border border-border/50 bg-background/80 p-3 space-y-1">
+                        <Label className="flex items-center justify-end gap-1.5 text-xs font-medium text-foreground">
+                          <Home className="w-3.5 h-3.5 text-primary shrink-0" />
+                          ۷. تکالیف خانگی
+                        </Label>
+                        <p className="text-[11px] text-muted-foreground/70 text-right leading-snug">تا جلسه بعد.</p>
+                        <Textarea
+                          value={formData.homework}
+                          onChange={(e) => setFormData({ ...formData, homework: e.target.value })}
+                          placeholder="..."
+                          className="min-h-[80px] text-sm w-full resize-y rounded-md border-border/50"
+                          dir="rtl"
+                        />
+                      </div>
+                      <div className="rounded-lg border border-dashed border-border/60 bg-muted/20 p-3 space-y-1">
+                        <Label className="flex items-center justify-end gap-1.5 text-xs font-medium text-foreground">
+                          <Target className="w-3.5 h-3.5 text-primary shrink-0" />
+                          اهداف جلسه بعد
+                          <span className="text-muted-foreground/70 font-normal">(اختیاری)</span>
+                        </Label>
+                        <Textarea
+                          value={formData.nextSessionGoals}
+                          onChange={(e) => setFormData({ ...formData, nextSessionGoals: e.target.value })}
+                          placeholder="..."
+                          className="min-h-[72px] text-sm w-full resize-y rounded-md border-border/50"
+                          dir="rtl"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </motion.div>
               </div>
 

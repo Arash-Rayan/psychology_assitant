@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, TrendingUp, AlertCircle, Activity, Brain, Sparkles, Network, X, 
@@ -15,18 +16,22 @@ import { SCHEMA_TYPES, SCHEMA_TYPE_KEYS, SchemaType } from './SchemaTypes';
 import { generatePatients } from './generatePatientData';
 import { FormBuilderDialog } from './FormBuilderDialog';
 import { SessionNotesView } from './SessionNotesView';
-import NewSessionNotePage from './NewSessionNotePage';
 import styles from './TherapistDashboard.module.css';
 
-export function TherapistDashboard() {
+interface TherapistDashboardProps {
+  initialTab?: 'patients' | 'forms';
+  initialShowSessionNotes?: boolean;
+}
+
+export function TherapistDashboard({ initialTab = 'patients', initialShowSessionNotes = false }: TherapistDashboardProps) {
+  const router = useRouter();
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [showUrgentPanel, setShowUrgentPanel] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'all' | 'safe' | 'attention' | 'urgent'>('all');
   const [filterSchema, setFilterSchema] = useState<SchemaType | 'all'>('all');
-  const [activeTab, setActiveTab] = useState('patients');
+  const [activeTab, setActiveTab] = useState<'patients' | 'forms'>(initialTab);
   const [showFormBuilder, setShowFormBuilder] = useState(false);
-  const [showSessionNotes, setShowSessionNotes] = useState(false);
-  const [showGlobalNewNote, setShowGlobalNewNote] = useState(false);
+  const [showSessionNotes, setShowSessionNotes] = useState(initialShowSessionNotes);
   const patientsListRef = useRef<HTMLDivElement>(null);
 
   // Generate 100 patients (client-side only to avoid hydration mismatch)
@@ -172,7 +177,7 @@ export function TherapistDashboard() {
             {/* Navigation Buttons */}
             <div className={styles.navButtons}>
               <button
-                onClick={() => setActiveTab('forms')}
+                onClick={() => router.push('/dashboard/forms')}
                 className={`${styles.navButton} ${
                   activeTab === 'forms' ? styles.navButtonActiveForms : styles.navButtonInactive
                 }`}
@@ -182,7 +187,7 @@ export function TherapistDashboard() {
               </button>
               
               <button
-                onClick={() => setActiveTab('patients')}
+                onClick={() => router.push('/dashboard')}
                 className={`${styles.navButton} ${
                   activeTab === 'patients' ? styles.navButtonActive : styles.navButtonInactive
                 }`}
@@ -430,9 +435,9 @@ export function TherapistDashboard() {
                           <FileText />
                         </div>
                         <div className={styles.infoCardContent}>
-                          <h3 className={styles.infoCardTitle}>مدیریت یادداشت‌های جلسات</h3>
+                          <h3 className={styles.infoCardTitle}>مدیریت لیست مراجعین</h3>
                           <p className={styles.infoCardDescription}>
-                            یادداشت‌های جلسات درمانی خود را برای هر مراجع ثبت و مدیریت کنید
+                            لیست مراجعین خود را مشاهده و مدیریت کنید
                           </p>
                         </div>
                       </div>
@@ -443,7 +448,7 @@ export function TherapistDashboard() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.05 }}
-                      onClick={() => setShowGlobalNewNote(true)}
+                      onClick={() => router.push('/dashboard/new-note')}
                       className={styles.sessionNotesCard}
                     >
                       <div className={styles.sessionNotesContent}>
@@ -467,7 +472,7 @@ export function TherapistDashboard() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 }}
-                      onClick={() => setShowSessionNotes(true)}
+                      onClick={() => router.push('/dashboard/forms/patients-list')}
                       className={styles.sessionNotesCard}
                     >
                       <div className={styles.sessionNotesContent}>
@@ -476,10 +481,10 @@ export function TherapistDashboard() {
                         </div>
                         <div className={styles.sessionNotesText}>
                           <h3 className={styles.sessionNotesTitle}>
-                            یادداشت‌های جلسات
+                            لیست مراجعین
                           </h3>
                           <p className={styles.sessionNotesDescription}>
-                            مشاهده و مدیریت یادداشت‌های جلسات درمانی مراجعین
+                            مشاهده و مدیریت لیست مراجعین
                           </p>
                           <div className={styles.sessionNotesMeta}>
                             <div className={styles.metaBadge}>
@@ -587,14 +592,6 @@ export function TherapistDashboard() {
         onClose={() => setShowFormBuilder(false)}
       />
 
-      {/* Global New Session Note Page */}
-      {showGlobalNewNote && (
-        <div className="fixed inset-0 z-50 bg-black/20">
-          <NewSessionNotePage
-            onClose={() => setShowGlobalNewNote(false)}
-          />
-        </div>
-      )}
     </div>
   );
 }

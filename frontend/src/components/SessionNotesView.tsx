@@ -1,10 +1,9 @@
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronRight, FileText, Calendar, User, ArrowRight, Plus, Edit, Trash2 } from 'lucide-react';
+import { ChevronRight, FileText, Calendar, User, ArrowRight, Plus, Edit, Trash2, Brain } from 'lucide-react';
 import { Patient } from './PatientCard';
 import { AddSessionNoteDialog } from './AddSessionNoteDialog';
-import NewSessionNotePage from './NewSessionNotePage';
-
 interface SessionNote {
   id: string;
   date: string;
@@ -12,7 +11,12 @@ interface SessionNote {
   duration: string;
   mood: string;
   mainTopics: string[];
+  chiefComplaint: string;
+  historyBackground: string;
+  sessionObjective: string;
   summary: string;
+  formulation: string;
+  treatmentPlan: string;
   homework: string;
   nextSessionGoals: string;
 }
@@ -23,10 +27,11 @@ interface SessionNotesViewProps {
 }
 
 export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
+  const router = useRouter();
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [selectedView, setSelectedView] = useState<'menu' | 'notes' | 'analysis'>('menu');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddNote, setShowAddNote] = useState(false);
-  const [showNewNotePage, setShowNewNotePage] = useState(false);
 
   // Mock session notes data
   const getSessionNotes = (patientId: string): SessionNote[] => {
@@ -44,7 +49,12 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
         'روابط خانوادگی',
         'مدیریت استرس'
       ].slice(0, Math.floor(Math.random() * 3) + 2),
+      chiefComplaint: 'مراجع به دلیل اضطراب مداوم در محیط کار و اختلال در خواب مراجعه کرده است.',
+      historyBackground: 'علائم از حدود شش ماه پیش تشدید شده؛ سابقه خانوادگی اضطراب ذکر شده است.',
+      sessionObjective: 'کاهش شدت اضطراب هنگام ارائه در جلسات کاری و آموزش تکنیک‌های تنظیم هیجان.',
       summary: 'مراجع در این جلسه پیشرفت خوبی در مدیریت احساسات خود نشان داد. مشکلات مربوط به محیط کار به تفصیل بررسی شد و راهکارهای عملی ارائه گردید.',
+      formulation: 'الگوی اجتناب از موقعیت‌های ارائه، با باورهای ناکارآمد درباره قضاوت دیگران تقویت می‌شود.',
+      treatmentPlan: 'ادامه درمان شناختی–رفتاری با تمرین مواجهه تدریجی و بازسازی باورها.',
       homework: 'انجام تمرینات تنفسی روزانه، ثبت احساسات در دفترچه یادداشت، تمرین گفتگوی مثبت با خود',
       nextSessionGoals: 'بررسی پیشرفت در تمرینات خانگی، کار روی طرحواره‌های شناختی، تمرکز بر روابط بین‌فردی'
     }));
@@ -68,7 +78,9 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
         <div className="flex items-center gap-4">
           <button
             onClick={() => {
-              if (selectedPatientId) {
+              if (selectedPatientId && selectedView !== 'menu') {
+                setSelectedView('menu');
+              } else if (selectedPatientId) {
                 setSelectedPatientId(null);
               } else {
                 onBack();
@@ -84,18 +96,28 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f2c94c] to-[#e0b73c] flex items-center justify-center shadow-md">
                 <FileText className="w-5 h-5 text-white" />
               </div>
-              {selectedPatient ? `یادداشت‌های جلسات - ${selectedPatient.name}` : 'یادداشت‌های جلسات'}
+              {!selectedPatient
+                ? 'یادداشت‌های جلسات'
+                : selectedView === 'menu'
+                ? `انتخاب نوع مشاهده - ${selectedPatient.name}`
+                : selectedView === 'notes'
+                ? `یادداشت‌های جلسات - ${selectedPatient.name}`
+                : `تحلیل هوش مصنوعی - ${selectedPatient.name}`}
             </h2>
             <p className="text-muted-foreground mt-1 mr-14">
-              {selectedPatient 
-                ? `${sessionNotes.length} جلسه ثبت شده` 
-                : 'انتخاب مراجع برای مشاهده یادداشت‌ها'}
+              {!selectedPatient
+                ? 'انتخاب مراجع برای مشاهده یادداشت‌ها'
+                : selectedView === 'menu'
+                ? 'یکی از گزینه‌های زیر را انتخاب کنید'
+                : selectedView === 'notes'
+                ? `${sessionNotes.length} جلسه ثبت شده`
+                : 'نمای کلی تحلیل هوش مصنوعی مراجع'}
             </p>
           </div>
         </div>
-        {selectedPatient && (
+        {selectedPatient && selectedView === 'notes' && (
           <button 
-            onClick={() => setShowNewNotePage(true)}
+            onClick={() => router.push('/dashboard/new-note')}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-l from-[#f2c94c] to-[#e0b73c] text-white hover:shadow-lg transition-all duration-300"
           >
             <Plus className="w-4 h-4" />
@@ -139,7 +161,10 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.02 }}
-                    onClick={() => setSelectedPatientId(patient.id)}
+                    onClick={() => {
+                      setSelectedPatientId(patient.id);
+                      setSelectedView('menu');
+                    }}
                     className="group p-5 rounded-xl bg-white border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer"
                   >
                     <div className="flex items-start justify-between mb-3">
@@ -180,7 +205,37 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
               </div>
             )}
           </motion.div>
-        ) : (
+        ) : selectedView === 'menu' ? (
+          <motion.div
+            key="patient-view-menu"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            <button
+              onClick={() => setSelectedView('notes')}
+              className="text-right p-6 rounded-xl bg-white border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg text-foreground">یادداشت جلسات</h3>
+                <FileText className="w-5 h-5 text-primary" />
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground">مشاهده یادداشت‌های مراجع</p>
+            </button>
+
+            <button
+              onClick={() => setSelectedView('analysis')}
+              className="text-right p-6 rounded-xl bg-white border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg text-foreground">تحلیل هوش مصنوعی</h3>
+                <Brain className="w-5 h-5 text-primary" />
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground">مشاهده تحلیل خلاصه مراجع</p>
+            </button>
+          </motion.div>
+        ) : selectedView === 'notes' ? (
           // Session Notes List
           <motion.div
             key="notes-list"
@@ -243,19 +298,37 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
                   </div>
                 </div>
 
-                {/* Summary */}
-                <div className="mb-4">
-                  <h4 className="text-sm text-muted-foreground mb-2 text-right">خلاصه جلسه:</h4>
-                  <p className="text-foreground leading-relaxed text-right">{note.summary}</p>
+                <div className="space-y-4 mb-4">
+                  <div>
+                    <h4 className="text-sm text-muted-foreground mb-2 text-right">۱. شکایت اصلی مراجع</h4>
+                    <p className="text-foreground leading-relaxed text-right">{note.chiefComplaint}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm text-muted-foreground mb-2 text-right">۲. پیشینه و سابقه مشکل</h4>
+                    <p className="text-foreground leading-relaxed text-right">{note.historyBackground}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm text-muted-foreground mb-2 text-right">۳. دستور و هدف جلسه فعلی</h4>
+                    <p className="text-foreground leading-relaxed text-right">{note.sessionObjective}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm text-muted-foreground mb-2 text-right">۴. خلاصه جلسه</h4>
+                    <p className="text-foreground leading-relaxed text-right">{note.summary}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm text-muted-foreground mb-2 text-right">۵. فرمولاسیون و تحلیل بالینی</h4>
+                    <p className="text-foreground leading-relaxed text-right">{note.formulation}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm text-muted-foreground mb-2 text-right">۶. طرح درمان</h4>
+                    <p className="text-foreground leading-relaxed text-right">{note.treatmentPlan}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm text-muted-foreground mb-2 text-right">۷. تکالیف و تمرین‌های خانگی</h4>
+                    <p className="text-foreground leading-relaxed text-right">{note.homework}</p>
+                  </div>
                 </div>
 
-                {/* Homework */}
-                <div className="mb-4">
-                  <h4 className="text-sm text-muted-foreground mb-2 text-right">تکالیف خانگی:</h4>
-                  <p className="text-foreground leading-relaxed text-right">{note.homework}</p>
-                </div>
-
-                {/* Next Session Goals */}
                 <div className="p-4 rounded-xl bg-gradient-to-l from-primary/5 to-transparent border border-primary/10">
                   <h4 className="text-sm text-muted-foreground mb-2 text-right">اهداف جلسه بعد:</h4>
                   <p className="text-foreground leading-relaxed text-right">{note.nextSessionGoals}</p>
@@ -270,13 +343,32 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
                 </div>
                 <p className="text-xl text-muted-foreground mb-4">هنوز یادداشتی ثبت نشده است</p>
                 <button 
-                  onClick={() => setShowNewNotePage(true)}
+                  onClick={() => router.push('/dashboard/new-note')}
                   className="px-6 py-3 rounded-xl bg-gradient-to-l from-[#f2c94c] to-[#e0b73c] text-white hover:shadow-lg transition-all duration-300"
                 >
                   ایجاد اولین یادداشت
                 </button>
               </div>
             )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="analysis-view"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-4"
+          >
+            <div className="p-6 rounded-xl bg-white border border-border">
+              <h3 className="text-lg text-foreground mb-2 text-right">تحلیل هوش مصنوعی مراجع</h3>
+              <p className="text-muted-foreground text-right leading-8">
+                {selectedPatient?.status === 'safe'
+                  ? 'وضعیت مراجع پایدار است و روند درمانی مطلوب گزارش می‌شود.'
+                  : selectedPatient?.status === 'attention'
+                  ? 'مراجع نیاز به توجه دارد و توصیه می‌شود پایش درمانی با دقت بیشتری ادامه پیدا کند.'
+                  : 'مراجع در وضعیت فوری قرار دارد و نیاز به پیگیری نزدیک‌تر و مداخلات فعال‌تر دیده می‌شود.'}
+              </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -291,15 +383,6 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
         />
       )}
 
-      {/* New Session Note Page */}
-      {showNewNotePage && selectedPatient && (
-        <div className="fixed inset-0 z-50">
-          <NewSessionNotePage
-            patientName={selectedPatient.name}
-            onClose={() => setShowNewNotePage(false)}
-          />
-        </div>
-      )}
     </div>
   );
 }

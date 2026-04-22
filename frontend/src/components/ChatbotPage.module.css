@@ -315,6 +315,36 @@
   margin: 0;
 }
 
+.markdownContent {
+  text-align: right;
+  direction: rtl;
+  unicode-bidi: plaintext;
+  white-space: pre-wrap;
+}
+
+.markdownContent p {
+  margin: 0 0 0.65rem 0;
+}
+
+.markdownContent p:last-child {
+  margin-bottom: 0;
+}
+
+.markdownContent ol,
+.markdownContent ul {
+  margin: 0.35rem 0 0.85rem 0;
+  padding-right: 1.2rem;
+  padding-left: 0;
+}
+
+.markdownContent li {
+  margin: 0.25rem 0;
+}
+
+.markdownContent strong {
+  font-weight: 700;
+}
+
 /* Mood emoji selection */
 .moodEmojisContainer {
   display: grid;

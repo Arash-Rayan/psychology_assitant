@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, Smile, Meh, Frown, Heart, Brain, Angry, SmilePlus } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import styles from './ChatbotPage.module.css';
 
 interface Message {
@@ -30,6 +31,7 @@ export function ChatbotPage() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [moodSelected, setMoodSelected] = useState(false);
+  const [streamingBotId, setStreamingBotId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
 
@@ -159,6 +161,7 @@ export function ChatbotPage() {
       };
 
       setMessages(prev => [...prev, botMessage]);
+      setStreamingBotId(botId);
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -185,6 +188,7 @@ export function ChatbotPage() {
       }
 
       setIsTyping(false);
+      setStreamingBotId(null);
       // Final scroll after streaming completes
       setTimeout(() => scrollToBottom(), 100);
     } catch (error) {
@@ -196,6 +200,7 @@ export function ChatbotPage() {
       };
       setMessages(prev => [...prev, errorMessage]);
       setIsTyping(false);
+      setStreamingBotId(null);
     }
   };
 
@@ -255,7 +260,17 @@ export function ChatbotPage() {
                         message.sender === 'user' ? styles.messageContentUser : styles.messageContentBot
                       }`}
                     >
-                      <p className={styles.messageText}>{message.text}</p>
+                      {message.sender === 'bot' && message.id === streamingBotId ? (
+                        <p className={styles.messageText}>{message.text}</p>
+                      ) : message.sender === 'bot' ? (
+                        <div className={`${styles.messageText} ${styles.markdownContent}`}>
+                          <ReactMarkdown>
+                            {message.text}
+                          </ReactMarkdown>
+                        </div>
+                      ) : (
+                        <p className={styles.messageText}>{message.text}</p>
+                      )}
                       
                       {/* Mood emoji buttons */}
                       {message.showMoodEmojis && !moodSelected && (
