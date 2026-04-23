@@ -15,7 +15,7 @@ Additionally, provide a natural‑language **summary** of what is happening in t
 Return your output strictly in **JSON format** like this example:
 
 {
-  "attachment_style": {
+  "scores": {
     "Secure": 2,
     "Anxious‑Preoccupied": 7,
     "Dismissive‑Avoidant": 4,

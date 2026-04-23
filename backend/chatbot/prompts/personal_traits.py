@@ -16,7 +16,7 @@ Additionally, provide a natural-language **summary** of what is happening in the
 Return your output strictly in **JSON format** like this example:
 
 {
-  "personality_traits": {
+  scores:  {
     "Borderline": 5,
     "Narcissistic": 6,
     "Dependent": 3,

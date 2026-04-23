@@ -20,7 +20,7 @@ Additionally, provide a natural-language summary of what is happening in the tex
 Return your output strictly in JSON format like this example:
 
 {
-  "emotional_state": {
+  "scores": {
     "depression": 4,
     "anxiety": 0,
     "guilt": 3

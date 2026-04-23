@@ -16,7 +16,7 @@ Additionally, provide a natural-language **summary** of what is happening in the
 Return your output strictly in **JSON format** like this example:
 
 {
-  "possible_disorders": {
+  "scores": {
     "Probable Depression": 6,
     "Probable Generalized Anxiety": 5,
     "Probable OCD": 3,

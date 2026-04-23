@@ -19,7 +19,7 @@ Additionally, provide a natural-language summary of what is happening in the tex
 Return your output strictly in JSON format like this example:
 
 {
-  "cognitive_distortions": {
+  "scores": {
     "All-or-Nothing Thinking": 4,
     "Catastrophizing": 6,
     "Mind Reading": 0

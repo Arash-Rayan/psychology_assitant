@@ -16,7 +16,7 @@ Additionally, provide a natural-language **summary** of what is happening in the
 Return your output strictly in **JSON format** like this example:
 
 {
-  "functional_levels": {
+  "scores": {
     "Occupational / Work Functioning": 4,
     "Academic / Educational Functioning": 3,
     "Social Functioning": 5,

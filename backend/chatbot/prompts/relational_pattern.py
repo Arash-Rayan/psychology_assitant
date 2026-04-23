@@ -17,7 +17,7 @@ Additionally, provide a natural-language **summary** of what is happening in the
 Return your output strictly in **JSON format** like this example:
 
 {
-  "relational_patterns": {
+  "scores": {
     "Recurrent Conflict Pattern": 6,
     "Unhealthy Dependence": 5,
     "Push-Pull / Rejection-Cling Cycle": 4,

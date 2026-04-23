@@ -29,7 +29,7 @@ Additionally, provide a natural-language **summary** of what is happening in the
 Return your output strictly in JSON format like this example:
 
 {
-  "schemas": {
+  "scores": {
     "Abandonment/Instability": 4,
     "Mistrust/Abuse": 0,
     "Emotional Deprivation": 6,

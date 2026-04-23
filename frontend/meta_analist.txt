@@ -1,0 +1,64 @@
+{
+    "attachment": {
+      "scores": {
+        "Secure": 1,
+        "Anxious-Preoccupied": 9,
+        "Dismissive-Avoidant": 6,
+        "Fearful-Avoidant": 8
+      }
+    },
+    "clinical_disorder": {
+      "scores": {
+        "Probable Depression": 7,
+        "Probable Generalized Anxiety": 8,
+        "Probable OCD": 4,
+        "Probable PTSD": 5,
+        "Probable Bipolar Disorder": 1
+      }
+    },
+    "cognitive_distortion": {
+      "scores": {
+        "All-or-Nothing Thinking": 8,
+        "Catastrophizing": 6,
+        "Mind Reading": 9,
+        "Negative Future Prediction": 7,
+        "Overgeneralization": 7,
+        "Personalization": 8,
+        "Labeling": 7,
+        "Negative Mental Filtering": 8
+      }
+    },
+    "relational_pattern": {
+      "scores": {
+        "Recurrent Conflict Pattern": 9,
+        "Unhealthy Dependence": 8,
+        "Push-Pull / Rejection-Cling Cycle": 9,
+        "Controlling Behavior": 6,
+        "Pathological Jealousy": 2,
+        "Repeated Infidelity": 1
+      }
+    },
+    "schema": {
+      "scores": {
+        "Abandonment/Instability": 8,
+        "Mistrust/Abuse": 7,
+        "Emotional Deprivation": 6,
+        "Defectiveness/Shame": 9,
+        "Social Isolation/Alienation": 4,
+        "Dependence/Incompetence": 3,
+        "Vulnerability to Harm or Illness": 5,
+        "Enmeshment/Undeveloped Self": 6,
+        "Failure": 4,
+        "Entitlement/Grandiosity": 0,
+        "Insufficient Self-Control/Self-Discipline": 2,
+        "Subjugation": 7,
+        "Self-Sacrifice": 5,
+        "Approval-Seeking/Recognition-Seeking": 6,
+        "Negativity/Pessimism": 8,
+        "Emotional Inhibition": 3,
+        "Unrelenting Standards/Hypercriticalness": 6,
+        "Punitiveness": 5
+      }
+    },
+    "final_summary": "The individual is caught in a toxic and repetitive relationship pattern, experiencing intense guilt, worthlessness, and insecurity. They struggle with a strong sense of defectiveness and shame, often questioning themselves and their moral integrity. They feel unheard and emotionally deprived, and perceive the partner's behavior as disrespectful and invalidating. There is a clear internal conflict between the need for stability and the desire for freedom, while still holding onto hope for change in the past relationship. Attachment style is predominantly anxious and fearful, with avoidant tendencies. Emotional distress is high, with signs of anxiety and depression. Cognitive distortions such as mind reading, black-and-white thinking, and personalization are strongly present. Relationship dynamics show a repeated push-pull cycle and unhealthy dependence. Core schemas include defectiveness, abandonment, mistrust, and pessimism."
+  }

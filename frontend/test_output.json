@@ -1,0 +1,94 @@
+{
+  "attachment": {
+    "scores": {
+      "Secure": 1,
+      "Anxious-Preoccupied": 9,
+      "Dismissive-Avoidant": 6,
+      "Fearful-Avoidant": 8
+    },
+    "summary": "The person is deeply conflicted, oscillating between longing and avoidance..."
+  },
+
+  "clinical_disorder": {
+    "scores": {
+      "Probable Depression": 7,
+      "Probable Generalized Anxiety": 8,
+      "Probable OCD": 4,
+      "Probable PTSD": 6,
+      "Probable Bipolar Disorder": 2
+    },
+    "summary": "The person shows high anxiety, guilt, intrusive thoughts and trauma-like symptoms..."
+  },
+
+  "cognetive_distortion": {
+    "scores": {
+      "All-or-Nothing Thinking": 8,
+      "Catastrophizing": 7,
+      "Mind Reading": 9,
+      "Negative Future Prediction": 8,
+      "Overgeneralization": 6,
+      "Personalization": 7,
+      "Labeling": 6,
+      "Negative Mental Filtering": 8
+    },
+    "summary": "Strong cognitive distortions dominate thinking, especially mind reading and catastrophizing..."
+  },
+
+  "functional_level": {
+    "scores": {
+      "Occupational / Work Functioning": 0,
+      "Academic / Educational Functioning": 0,
+      "Social Functioning": 8,
+      "Sleep Disturbances": 0,
+      "Concentration / Attention Difficulties": 9
+    },
+    "summary": "Severe impairment in attention and social functioning with high emotional overload..."
+  },
+
+  "personal_traits": {
+    "scores": {
+      "Borderline": 8,
+      "Narcissistic": 2,
+      "Dependent": 7,
+      "Avoidant": 6,
+      "Paranoid": 5
+    },
+    "summary": "High emotional instability, dependency and fear of abandonment dominate personality traits..."
+  },
+
+  "relational_pattern": {
+    "scores": {
+      "Recurrent Conflict Pattern": 9,
+      "Unhealthy Dependence": 8,
+      "Push-Pull / Rejection-Cling Cycle": 9,
+      "Controlling Behavior": 7,
+      "Pathological Jealousy": 4,
+      "Repeated Infidelity": 2
+    },
+    "summary": "A toxic relational cycle with strong push-pull dynamics, dependency, and control issues..."
+  },
+
+  "schema": {
+    "scores": {
+      "Abandonment/Instability": 8,
+      "Mistrust/Abuse": 7,
+      "Emotional Deprivation": 6,
+      "Defectiveness/Shame": 9,
+      "Social Isolation/Alienation": 5,
+      "Dependence/Incompetence": 4,
+      "Vulnerability to Harm or Illness": 3,
+      "Enmeshment/Undeveloped Self": 6,
+      "Failure": 5,
+      "Entitlement/Grandiosity": 0,
+      "Insufficient Self-Control/Self-Discipline": 2,
+      "Subjugation": 7,
+      "Self-Sacrifice": 3,
+      "Approval-Seeking/Recognition-Seeking": 6,
+      "Negativity/Pessimism": 8,
+      "Emotional Inhibition": 4,
+      "Unrelenting Standards/Hypercriticalness": 7,
+      "Punitiveness": 6
+    },
+    "summary": "Core schemas of defectiveness, abandonment and mistrust dominate emotional processing..."
+  }
+}

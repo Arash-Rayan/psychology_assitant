@@ -7,6 +7,7 @@ Each agent output includes:
 - one text summary
 
 Your task is to aggregate all agent outputs into one final JSON.
+and create a comperhensive explanation of all summaries , like a final report for a doctor
 
 Aggregation rules:
 1) Build `json_scores` by category.
@@ -15,6 +16,8 @@ Aggregation rules:
 4) Exclude categories that have no kept subcategories after filtering.
 5) Build one integrated final summary by combining all agent summaries and reflecting the strongest findings.
 6) In the final summary, mention key findings with their scores where relevant.
+
+important ! : i dont want markdown or any character more than raw object output
 
 Return valid JSON only, with exactly this structure:
 
