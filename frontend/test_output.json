@@ -1,37 +1,79 @@
 {
   "attachment": {
     "scores": {
-      "Secure": 1,
+      "Secure": 0,
       "Anxious-Preoccupied": 9,
-      "Dismissive-Avoidant": 6,
+      "Dismissive-Avoidant": 2,
       "Fearful-Avoidant": 8
     },
-    "summary": "The person is deeply conflicted, oscillating between longing and avoidance..."
+    "evidence": {
+      "Secure": [],
+      "Anxious-Preoccupied": [
+        "احساس گناه و عذاب وجدان شدیدی داشتم و دارم",
+        "چرا من باید با بوی گردن اون توی اون لحظه یاد یه نفر دیگه بیوفتم",
+        "چرا انقدر امید دارم ۲ سال دیگه یا ۵ سال دیگه تغییر کرده باشه",
+        "چرا نمیخواد احساس کنم دوست داشتنی و ارزشمندم",
+        "دوباره آشفتم نا امنم"
+      ],
+      "Dismissive-Avoidant": [
+        "نمیخوام برگردم توی اون چرخه تکراری",
+        "دلم میخواد آزاد تر زندگی کنم و رها باشم"
+      ],
+      "Fearful-Avoidant": [
+        "توی دوگانگیم",
+        "مگه میشه آدم همزمان دو تا چیز رو بخواد اونم انقدر متضاد",
+        "حس خفگی دارم",
+        "همش چرخه اس انگار رفتارای تکراری قهر و دعوا"
+      ]
+    },
+    "summary": "شدیداً درگیر دوگانگی عاطفی است و بین دلبستگی و اجتناب نوسان دارد. (Anxious-Preoccupied 9) همراه با ترس از رهاشدگی و چرخه رابطه‌ای تکراری (Fearful-Avoidant 8)."
   },
 
   "clinical_disorder": {
     "scores": {
       "Probable Depression": 7,
       "Probable Generalized Anxiety": 8,
-      "Probable OCD": 4,
+      "Probable OCD": 3,
       "Probable PTSD": 6,
       "Probable Bipolar Disorder": 2
     },
-    "summary": "The person shows high anxiety, guilt, intrusive thoughts and trauma-like symptoms..."
+    "evidence": {
+      "Probable Depression": [
+        "۱ هفته اس حموم نرفتم",
+        "حس خفگی دارم"
+      ],
+      "Probable Generalized Anxiety": [
+        "چراها همش توی سرمه",
+        "خیلی گیجم خیلی آشفتم"
+      ],
+      "Probable PTSD": [
+        "بوی گردنش یک لحظه من و یاد ماهان انداخت",
+        "همش چرخه اس انگار"
+      ]
+    },
+    "summary": "علائم اضطراب شدید و نشخوار فکری (Probable Generalized Anxiety 8) همراه با نشانه‌های افسردگی و افت عملکرد (Probable Depression 7) دیده می‌شود."
   },
 
-  "cognetive_distortion": {
+  "cognitive_distortion": {
     "scores": {
       "All-or-Nothing Thinking": 8,
       "Catastrophizing": 7,
       "Mind Reading": 9,
       "Negative Future Prediction": 8,
-      "Overgeneralization": 6,
-      "Personalization": 7,
+      "Overgeneralization": 7,
+      "Personalization": 8,
       "Labeling": 6,
-      "Negative Mental Filtering": 8
+      "Negative Mental Filtering": 9
     },
-    "summary": "Strong cognitive distortions dominate thinking, especially mind reading and catastrophizing..."
+    "evidence": {
+      "Mind Reading": [
+        "میدونم میخواد احساس گناه بهم بده"
+      ],
+      "Catastrophizing": [
+        "حس خفگی دارم"
+      ]
+    },
+    "summary": "تفکر قطبی و پیش‌بینی منفی آینده غالب است (All-or-Nothing Thinking 8, Negative Future Prediction 8)."
   },
 
   "functional_level": {
@@ -40,9 +82,19 @@
       "Academic / Educational Functioning": 0,
       "Social Functioning": 8,
       "Sleep Disturbances": 0,
-      "Concentration / Attention Difficulties": 9
+      "Concentration / Attention Difficulties": 7
     },
-    "summary": "Severe impairment in attention and social functioning with high emotional overload..."
+    "evidence": {
+      "Social Functioning": [
+        "نمیخوام ببینمت",
+        "نمیخوام برگردم"
+      ],
+      "Concentration / Attention Difficulties": [
+        "همش چراها توی سرمه",
+        "خیلی گیجم"
+      ]
+    },
+    "summary": "اختلال شدید در عملکرد اجتماعی و تمرکز دیده می‌شود (Social Functioning 8)."
   },
 
   "personal_traits": {
@@ -53,7 +105,12 @@
       "Avoidant": 6,
       "Paranoid": 5
     },
-    "summary": "High emotional instability, dependency and fear of abandonment dominate personality traits..."
+    "evidence": {
+      "Borderline": [
+        "دوست دارم باشه ولی دلم نمیخواد"
+      ]
+    },
+    "summary": "نوسان شدید هیجانی و هویت متزلزل دیده می‌شود (Borderline 8)."
   },
 
   "relational_pattern": {
@@ -61,34 +118,29 @@
       "Recurrent Conflict Pattern": 9,
       "Unhealthy Dependence": 8,
       "Push-Pull / Rejection-Cling Cycle": 9,
-      "Controlling Behavior": 7,
-      "Pathological Jealousy": 4,
-      "Repeated Infidelity": 2
+      "Controlling Behavior": 7
     },
-    "summary": "A toxic relational cycle with strong push-pull dynamics, dependency, and control issues..."
+    "evidence": {
+      "Recurrent Conflict Pattern": [
+        "رفتارای تکراری قهر و دعوا"
+      ]
+    },
+    "summary": "الگوی چرخه‌ای رابطه‌ای بسیار شدید و تکرارشونده است (Push-Pull Cycle 9)."
   },
 
   "schema": {
     "scores": {
       "Abandonment/Instability": 8,
-      "Mistrust/Abuse": 7,
-      "Emotional Deprivation": 6,
-      "Defectiveness/Shame": 9,
-      "Social Isolation/Alienation": 5,
-      "Dependence/Incompetence": 4,
-      "Vulnerability to Harm or Illness": 3,
-      "Enmeshment/Undeveloped Self": 6,
-      "Failure": 5,
-      "Entitlement/Grandiosity": 0,
-      "Insufficient Self-Control/Self-Discipline": 2,
-      "Subjugation": 7,
-      "Self-Sacrifice": 3,
-      "Approval-Seeking/Recognition-Seeking": 6,
-      "Negativity/Pessimism": 8,
-      "Emotional Inhibition": 4,
-      "Unrelenting Standards/Hypercriticalness": 7,
-      "Punitiveness": 6
+      "Mistrust/Abuse": 9,
+      "Emotional Deprivation": 7,
+      "Defectiveness/Shame": 8,
+      "Negativity/Pessimism": 9
     },
-    "summary": "Core schemas of defectiveness, abandonment and mistrust dominate emotional processing..."
+    "evidence": {
+      "Mistrust/Abuse": [
+        "چرا انقدر دروغ میگه"
+      ]
+    },
+    "summary": "طرح‌واره بی‌اعتمادی و شرم بسیار غالب است (Mistrust/Abuse 9, Defectiveness/Shame 8)."
   }
 }

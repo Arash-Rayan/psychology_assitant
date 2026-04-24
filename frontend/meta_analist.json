@@ -1,0 +1,53 @@
+{
+    "meta_analyst": {
+      "json_scores": {
+        "attachment": {
+          "Anxious-Preoccupied": 9,
+          "Fearful-Avoidant": 8
+        },
+        "clinical_disorder": {
+          "Probable Depression": 7,
+          "Probable Generalized Anxiety": 8,
+          "Probable PTSD": 6
+        },
+        "cognetive_distortion": {
+          "All-or-Nothing Thinking": 8,
+          "Catastrophizing": 7,
+          "Mind Reading": 9,
+          "Negative Future Prediction": 8,
+          "Overgeneralization": 7,
+          "Personalization": 8,
+          "Labeling": 6,
+          "Negative Mental Filtering": 9
+        },
+        "functional_level": {
+          "Social Functioning": 8,
+          "Concentration / Attention Difficulties": 7
+        },
+        "personal_traits": {
+          "Borderline": 8,
+          "Dependent": 7,
+          "Avoidant": 6
+        },
+        "relational_pattern": {
+          "Recurrent Conflict Pattern": 9,
+          "Unhealthy Dependence": 8,
+          "Push-Pull / Rejection-Cling Cycle": 9,
+          "Controlling Behavior": 7
+        },
+        "schema": {
+          "Abandonment/Instability": 8,
+          "Mistrust/Abuse": 9,
+          "Emotional Deprivation": 7,
+          "Defectiveness/Shame": 8,
+          "Enmeshment/Undeveloped Self": 6,
+          "Subjugation": 7,
+          "Approval-Seeking/Recognition-Seeking": 6,
+          "Negativity/Pessimism": 9,
+          "Unrelenting Standards/Hypercriticalness": 6,
+          "Punitiveness": 7
+        }
+      },
+      "final_summary": "The client presents with severe attachment insecurity (Anxious-Preoccupied 9, Fearful-Avoidant 8) and significant emotional dysregulation. Clinical features include anxiety (8), depression (7), and trauma-related symptoms (6). Cognitive distortions are highly pervasive, especially mind reading (9), negative filtering (9), and catastrophizing (7). These patterns are strongly supported by maladaptive schemas such as mistrust/abuse (9), negativity (9), and abandonment (8). Functionally, there is marked impairment in social functioning (8) and concentration (7). Personality structure shows borderline traits (8) with dependent and avoidant features contributing to unstable relational dynamics. The relational system is dominated by a push-pull cycle (9) and recurrent conflict (9), maintaining chronic emotional instability and relational distress."
+    }
+  }
