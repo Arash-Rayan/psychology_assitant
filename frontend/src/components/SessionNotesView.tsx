@@ -4,6 +4,319 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, FileText, Calendar, User, ArrowRight, Plus, Edit, Trash2, Brain } from 'lucide-react';
 import { Patient } from './PatientCard';
 import { AddSessionNoteDialog } from './AddSessionNoteDialog';
+
+interface SchemaAnalysisItem {
+  نمره: number;
+  شواهد: string[];
+  تحلیل_بالینی: string;
+}
+
+const schemaAnalysisData: Record<string, SchemaAnalysisItem> = {
+  'نقص/شرم': {
+    نمره: 95,
+    شواهد: [
+      'چه مشکلی دارم من ؟ نکنه واقعا آدمیم که هیچ تعهد اخلاقی نداره؟',
+      'بهش گفتم اگه من انقدر خراب و بدم تو چرا میخوای منو ببینی؟',
+      'هیچوقت کافی بودم ؟',
+      'دوباره باید به اون اثبات کنم دوباره آشفتم نا امنم'
+    ],
+    تحلیل_بالینی:
+      'فرد مکرراً یکپارچگی اخلاقی و ارزش خود را زیر سوال می‌برد و خود را ذاتاً «بد» یا «معیوب» می‌بیند. احساس می‌کند باید دائماً خود را به شریک زندگی‌اش اثبات کند، که نشان‌دهنده باور عمیقی مبنی بر معیوب بودن بنیادین و بی‌ارزش بودن برای عشق ورزیدن است مگر اینکه جبران کند.'
+  },
+  'بدبینی/سوءاستفاده': {
+    نمره: 90,
+    شواهد: [
+      'تو دنبال یه نکته برای تحقیر و توهین من میگردی این نکته رو بهت نمیدم چون لایق این نیستم انقدر بخوای تحقیرم کنی یا توهین کنی یا تهمت بزنی',
+      'چرا انقدر دروغ میگه ؟ چرا نمیخواد احساس کنم دوست داشتنی و ارزشمندم ؟',
+      'همش بازی بود ؟',
+      'میدونم میخواد احساس گناه بهم بده بعدا که پیاماش و جواب ندادم',
+      'اون پریشب داشت با همکارش جلوی من لاس میزد'
+    ],
+    تحلیل_بالینی:
+      'فرد شریک زندگی خود را عمداً فریبکار، دستکاری‌گر و تحقیرکننده درک می‌کند. او انتظار خیانت دارد و معتقد است شریک به دنبال تخریب اوست، که منجر به محافظه‌کاری و اعتقاد به ناامن بودن بنیادین رابطه می‌شود.'
+  },
+  'محرومیت هیجانی': {
+    نمره: 75,
+    شواهد: [
+      'میدونم هرگز امنیت نداشتم توی این رابطه میدونم شنیده نشدم',
+      'چرا نمیخواد احساس کنم دوست داشتنی و ارزشمندم؟',
+      'حس میکنم دوباره برگشتم ۱۸ سالگی دوباره باید به اون اثبات کنم'
+    ],
+    تحلیل_بالینی:
+      'فرد کمبود مزمن حمایت عاطفی را بیان می‌کند و می‌گوید هرگز شنیده نشده یا امنیت نداشته است. نیاز مداوم به اثبات خود نشان‌دهنده محرومیت از تأیید و پذیرش بی‌قید و شرط است که او را از نظر عاطفی بدون حمایت رها کرده است.'
+  },
+  'درهم‌تنیدگی/خود تحول‌نیافته': {
+    نمره: 85,
+    شواهد: [
+      'حس خفگی دارم حس میکنم با همدیگهایم و باید بهش متعهد باشم',
+      'نمیخوام بهش متعهد باشم و نمیخوام تعهد رو خراب کنم',
+      'بهش گفتم ... این ایده ... بهم احساس خفگی میده دلم میخواد آزاد تر زندگی کنم و رها باشم',
+      'همه ی خواسته ها درونم دو وجهین',
+      'ثبات میخوام آزادی میخوام'
+    ],
+    تحلیل_بالینی:
+      'فرد در رابطه احساس خفگی و به دام افتادن می‌کند و نوعی ادغام هویت‌ها را تجربه می‌کند که مانع استقلال او می‌شود. او همزمان صمیمیت و آزادی را می‌خواهد که نشان‌دهنده عدم وجود خود متمایز و تفکیک‌شده است. تردید مداوم و نیاز همزمان به ارتباط و رهایی، منعکس‌کننده درهم‌تنیدگی است.'
+  }
+};
+
+const attachmentAnalysisData = {
+  ایمن: {
+    نمره: 0,
+    شواهد: [] as string[],
+    تحلیل_بالینی:
+      'هیچ نشانه معناداری از الگوی دلبستگی ایمن در متن مشاهده نمی‌شود. فرد دچار ناامنی شدید هیجانی، بی‌ثباتی در رابطه و فقدان احساس امنیت پایدار در رابطه دلبستگی است.'
+  },
+  'اضطرابی / دوسوگرا': {
+    نمره: 4,
+    شواهد: [
+      'چرا نمیخواد احساس کنم دوست داشتنی و ارزشمندم؟',
+      'میدونم هرگز امنیت نداشتم توی این رابطه',
+      'دوباره آشفتم، ناامنم',
+      'حس میکنم دوباره برگشتم ۱۸ سالگی، دوباره باید به اون اثبات کنم',
+      'دوست دارم باشه ولی عمیقا دلم نمیخواد باشه',
+      'من بر میگردم اول چرخه',
+      'چرا انقدر امید دارم ۲ سال دیگه یا ۵ سال دیگه تغییر کرده باشه؟'
+    ],
+    تحلیل_بالینی:
+      'الگوی اضطرابی-مشغول با فعال‌سازی شدید سیستم دلبستگی دیده می‌شود. فرد دچار نیاز به تأیید، نگرانی درباره دوست‌داشتنی بودن، و ترس از ناامنی در رابطه است. نشخوار فکری درباره تغییر احتمالی طرف مقابل و تکرار چرخه‌های رابطه‌ای نشان‌دهنده درگیری ذهنی مداوم با رابطه است. همزمان احساس ناامنی و عدم کفایت شخصی در رابطه برجسته است.'
+  },
+  'اجتنابی / طردکننده': {
+    نمره: 3,
+    شواهد: [
+      'نمیخوام ببینمت، نمیخوام برگردم توی اون چرخه تکراری',
+      'بهم زنگ نزن، پیام نده',
+      'دلم میخواد آزاد تر زندگی کنم و رها باشم',
+      'این از همین الان نفسم و میگیره',
+      'ثبات میخوام، آزادی میخوام',
+      'حس خفگی دارم'
+    ],
+    تحلیل_بالینی:
+      'الگوی اجتنابی به صورت فعال‌سازی مکانیزم فاصله‌گیری دیده می‌شود. فرد تمایل به قطع تماس، حفظ استقلال و فرار از احساس خفگی در رابطه دارد. این رفتارها نشان‌دهنده تلاش برای کاهش فشار هیجانی ناشی از صمیمیت هستند، اما این اجتناب در کنار وابستگی عاطفی عمل می‌کند و پایدار نیست.'
+  },
+  'آشفته (ترسناک-اجتنابی)': {
+    نمره: 4,
+    شواهد: [
+      'مگه میشه آدم همزمان دو تا چیز رو بخواد؟ اونم انقدر متضاد؟',
+      'دوست دارم باشه ولی عمیقا دلم نمیخواد باشه',
+      'همش چرخه اس انگار، رفتارای تکراری، قهر و دعوا بعد خوشحالی عمیق، خوشحالی عمیق و بعد قهر و دعوا',
+      'نمیدونم چمه، نمیدونم کار درست چیه، خیلی گیجم، خیلی آشفتم',
+      'بابام گربلاس... وقتی بابام هست چند دقیقه نمیتونم تحملش کنم و همش تو اتاقم با در قفلم'
+    ],
+    تحلیل_بالینی:
+      'الگوی آشفته با تعارض شدید بین نیاز به نزدیکی و ترس از آن مشخص می‌شود. فرد دچار نوسان‌های هیجانی، سردرگمی در تصمیم‌گیری و عدم انسجام در استراتژی‌های رابطه‌ای است. چرخه‌های تکراری رابطه (نزدیکی، تعارض، فاصله‌گیری) و اشاره به تجربه‌های دشوار با پدر می‌تواند نشان‌دهنده ریشه‌های دلبستگی اولیه ناایمن باشد. این الگو بیانگر عدم ثبات در سیستم دلبستگی و فعال‌سازی همزمان سیستم‌های متناقض (approach/avoidance) است.'
+  }
+};
+
+const clinicalDisorderAnalysisData = {
+  اختلالات: {
+    'اختلال افسردگی اساسی': {
+      اطمینان: 80,
+      شواهد: [
+        '۱ هفته اس حموم نرفتم به جز اون روزی که قرار بود برم خونشون',
+        'حال روحیم بد میشه',
+        'کاری نمیکنم',
+        'دوباره آشفتم',
+        'نا امنم',
+        'حس خفگی دارم'
+      ],
+      تحلیل_بالینی:
+        'متن نشان‌دهنده علائم قابل توجه افسردگی شامل کاهش انگیزه و کناره‌گیری از فعالیت‌های روزمره (حمام نرفتن، انجام ندادن کارها)، خلق پایین و احساس بدحالی روانی است. همچنین احساس ناامنی و خفگی می‌تواند با اضطراب همراه افسردگی همخوان باشد. این الگو نشان‌دهنده افت عملکرد و کاهش انرژی است که با معیارهای DSM-5-TR برای افسردگی اساسی سازگار است.'
+    },
+    'اختلال اضطراب فراگیر': {
+      اطمینان: 75,
+      شواهد: [
+        'این چراها همش توی سرمه',
+        'توی دوگانگیم',
+        'همه ی خواسته ها درونم دو وجهین',
+        'خیلی گیجم',
+        'اعصابم خورد میشه ببینمشون'
+      ],
+      تحلیل_بالینی:
+        'نشانه‌هایی از نگرانی مداوم، نشخوار فکری و دشواری در کنترل افکار اضطرابی وجود دارد. فرد درگیر دوگانگی ذهنی و سردرگمی در تصمیم‌گیری است. این الگو همراه با تحریک‌پذیری و تنش هیجانی می‌تواند با معیارهای اختلال اضطراب فراگیر همخوانی داشته باشد.'
+    }
+  }
+};
+
+const cognitiveDistortionAnalysisData = {
+  distortions: {
+    'All-or-Nothing Thinking': {
+      score: 5,
+      evidence: [
+        'نمیخوام بهش متعهد باشم و نمیخوام تعهد رو خراب کنم',
+        'مگه میشه آدم همزمان دو تا چیز رو بخواد ؟ اونم انقدر متضاد ؟'
+      ],
+      summary: 'شواهدی از دوگانگی و تفکر سیاه‌وسفید در خواسته‌های متناقض و احساس تعهد.'
+    },
+    'Mind Reading': {
+      score: 7,
+      evidence: [
+        'تو دلت میخواد منو ببینی صدامو بشنوی',
+        'میدونم میخواد احساس گناه بهم بده بعدا که پیاماش و جواب ندادم'
+      ],
+      summary: 'باور قطعی درباره افکار و نیت‌های طرف مقابل بدون شواهد کافی.'
+    },
+    'Negative Future Prediction': {
+      score: 6,
+      evidence: [
+        'چرا انقدر امید دارم ۲ سال دیگه یا ۵ سال دیگه تغییر کرده باشه ؟ اونکه امروز نشون داد هموز دنبال تحقیر کردن منه ؟',
+        'انگار میدونم دوباره با همین آدمی که تغییر نکرده برمیگردم'
+      ],
+      summary: 'پیش‌بینی منفی و قطعی درباره تکرار الگوهای گذشته و عدم تغییر.'
+    },
+    Personalization: {
+      score: 6,
+      evidence: [
+        'چرا من باید با بوی گردن اون توی اون لحظه یاد یه نفر دیگه بیوفتم چه مشکلی دارم من ؟',
+        'نکنه واقعا آدمیم که هیچ تعهد اخلاقی نداره ؟'
+      ],
+      summary: 'خود را مسئول و مقصر دانستن برای یک خاطره طبیعی و نسبت دادن آن به نقص اخلاقی.'
+    },
+    Labeling: {
+      score: 4,
+      evidence: ['نکنه واقعا آدمیم که هیچ تعهد اخلاقی نداره ؟'],
+      summary: 'برچسب زدن منفی به کل شخصیت خود بر اساس یک رویداد.'
+    }
+  }
+};
+
+const cognitiveDistortionPersianLabels: Record<string, string> = {
+  'All-or-Nothing Thinking': 'تفکر همه یا هیچ',
+  'Mind Reading': 'ذهن‌خوانی',
+  'Negative Future Prediction': 'پیش‌بینی منفی آینده',
+  Personalization: 'شخصی‌سازی',
+  Labeling: 'برچسب‌زنی'
+};
+
+const personalTraitAnalysisData = {
+  traits: {
+    'Borderline traits': {
+      score: 8,
+      evidence: [
+        'دوست دارم باشه ولی عمیقا دلم نمیخواد باشه',
+        'همش بازی بود؟ همش چرخه است انگار',
+        'قهر و دعوا بعد خوشحالی عمیق',
+        'همه خواسته ها درونم دو وجهین',
+        'از دیشب که دیدمش حس میکنم دوباره برگشتم ۱۸ سالگی',
+        'حس خفگی دارم'
+      ],
+      summary: 'نوسانات شدید عاطفی، ترس از رها شدن، هویت ناپایدار، روابط متضاد'
+    },
+    'Dependent traits': {
+      score: 5,
+      evidence: [
+        'نمیدونم کار درست چیه',
+        'میگم بعدا چون انگار میدونم دوباره با همین آدمی که تغییر نکرده برمیگردم',
+        'نمیخوام بهش متعهد باشم ولی نمیخوام تعهد رو خراب کنم'
+      ],
+      summary: 'وابستگی عاطفی و مشکل در قطع رابطه، نیاز به تایید'
+    },
+    'Paranoid traits': {
+      score: 6,
+      evidence: [
+        'چرا نمیخواد احساس کنم دوست داشتنی و ارزشمندم؟',
+        'چرا انقدر دروغ میگه؟',
+        'تو دنبال یه نکته برای تحقیر و توهین من میگردی'
+      ],
+      summary: 'بدبینی و سوءظن به نیت دیگران، احساس تحقیر شدن'
+    }
+  }
+};
+
+const relationalPatternAnalysisData = {
+  relational_pattern: {
+    'Recurrent Conflict Pattern': {
+      score: 8,
+      evidence: ['رفتارای تکراری قهر و دعوا بعد خوشحالی عمیق و بعد قهر و دعوا', 'من بر میگردم اول چرخه'],
+      summary: 'الگوی تکراری از قهر و دعوا و سپس خوشحالی عمیق، بازگشت به چرخه'
+    },
+    'Unhealthy Dependence': {
+      score: 6,
+      evidence: ['دوست دارم باشه ولی عمیقا دلم نمیخواد باشه', 'میدونم دوباره با همین آدمی که تغییر نکرده برمیگردم'],
+      summary: 'نیاز عاطفی به حضور او در عین آگاهی از آسیب‌زایی رابطه'
+    },
+    'Push-Pull / Rejection-Cling Cycle': {
+      score: 7,
+      evidence: ['هر بار میبینمت من بر میگردم اول چرخه', 'نمیخوام ببینمت ولی امید دارم ۲ سال دیگه تغییر کرده باشه'],
+      summary: 'رفتار متناوب طرد و جذب نسبت به طرف مقابل'
+    },
+    'Controlling Behavior': {
+      score: 7,
+      evidence: ['خیلی مهمه کسی دستش به تن و بدنت نخوره', 'حلقه رو چرا نگه داشتی', 'دنبال تحقیر و توهین من میگردی'],
+      summary: 'کنترل بر بدن و روابط کاربر، همراه با تحقیر و بازجویی'
+    }
+  }
+};
+
+const functionalLevelAnalysisData = {
+  functional_level: {
+    'Social Functioning': {
+      score: 7,
+      evidence: [
+        'وقتی بابام هست چند دقیقه نمیتونم تحملش کنم و همش تو اتاقم با در قفلم',
+        'بهش گفتم هربار میبینمت ... بر میگردم اول چرخه',
+        'دلش میخواد منو ببینی صدامو بشنوی',
+        'حس خفگی دارم'
+      ],
+      summary:
+        'تعاملات با پارتنر سابق به شکل سمی و چرخه‌ای ادامه دارد و حضور پدر غیرقابل تحمل است، که منجر به انزوای شدید شده است.'
+    },
+    'Concentration / Attention Difficulties': {
+      score: 6,
+      evidence: ['این چراها همش توی سرمه', 'خیلی گیجم', 'همه ی خواسته ها درونم دووجهین'],
+      summary: 'افکار مزاحم و دوگانگی شدید باعث اختلال در تمرکز و تصمیم‌گیری روزمره شده است.'
+    }
+  }
+};
+
+const functionalLevelPersianLabels: Record<string, string> = {
+  'Social Functioning': 'عملکرد اجتماعی',
+  'Concentration / Attention Difficulties': 'مشکل تمرکز / توجه'
+};
+
+const relationalPatternPersianLabels: Record<string, string> = {
+  'Recurrent Conflict Pattern': 'الگوی تعارض تکرارشونده',
+  'Unhealthy Dependence': 'وابستگی ناسالم',
+  'Push-Pull / Rejection-Cling Cycle': 'چرخه طرد-جذب',
+  'Controlling Behavior': 'رفتار کنترل‌گرانه'
+};
+
+const personalTraitPersianLabels: Record<string, string> = {
+  'Borderline traits': 'ویژگی‌های مرزی',
+  'Dependent traits': 'ویژگی‌های وابسته',
+  'Paranoid traits': 'ویژگی‌های پارانوئید'
+};
+
+const clinicalSummaryIntro =
+  'کاربر از سردرگمی شدید، دوسوگرایی و فشار روانی ناشی از یک رابطه عاطفی گذشته یا در حال فروپاشی صحبت می‌کند.';
+
+const clinicalSummarySections = [
+  {
+    title: 'محور اصلی تجربه',
+    content:
+      'بوی گردن فردی جدید (یا فعلی)، او را یاد فرد دیگری به نام «ماهان» انداخته و همین موضوع باعث احساس گناه و عذاب وجدان شدید شده است. کاربر بارها از خود می‌پرسد آیا دچار مشکل اخلاقی است یا نمی‌تواند به تعهداتش پایبند بماند.'
+  },
+  {
+    title: 'الگوی رابطه و فشار بین‌فردی',
+    content:
+      'کاربر تماس‌های مکرر طرف مقابل را توصیف می‌کند که با بهانه‌های مختلف (از جمله ارائه ایده شغلی برای نگهداری از حیوانات) تلاش می‌کند ارتباط را حفظ کند؛ اما کاربر این رفتار را تحقیرآمیز می‌بیند و معتقد است این تعامل‌ها او را به چرخه سمی گذشته برمی‌گرداند. همچنین احساس می‌کند طرف مقابل با ایجاد احساس گناه، به دنبال کنترل هیجانی اوست.'
+  },
+  {
+    title: 'تعارض درونی',
+    content:
+      'کاربر از بی‌ثباتی، ناامنی، احساس خفگی و الگوی تکرارشونده «قهر، دعوا، شادی عمیق» در رابطه صحبت می‌کند.',
+    bullets: ['هم دلتنگ طرف مقابل است', 'هم عمیقاً نمی‌خواهد به رابطه بازگردد']
+  },
+  {
+    title: 'زمینه خانوادگی و تنظیم هیجان',
+    content:
+      'کاربر اشاره می‌کند در حضور پدر احساس امنیت ندارد و خود را در اتاق حبس می‌کند؛ در مقابل، حضور مادر برای او آرامش‌بخش است.'
+  },
+  {
+    title: 'جمع‌بندی',
+    content:
+      'در پایان، کاربر بیان می‌کند که خواهان «ثبات» و «آزادی» است، هنوز نمی‌داند انتخاب درست چیست، و همچنان احساس گیجی و آشفتگی دارد. با این حال، از اینکه در برابر فشار رابطه‌ای، از تن دادن به خواسته‌های فیزیکی طرف مقابل خودداری کرده، احساس رضایت دارد.'
+  }
+];
 interface SessionNote {
   id: string;
   date: string;
@@ -30,6 +343,16 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
   const router = useRouter();
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [selectedView, setSelectedView] = useState<'menu' | 'notes' | 'analysis'>('menu');
+  const [analysisMode, setAnalysisMode] = useState<
+    | 'clinical'
+    | 'schema'
+    | 'attachment'
+    | 'clinical_disorder'
+    | 'cognitive_distortion'
+    | 'personal_train'
+    | 'relational_pattern'
+    | 'functional_level'
+  >('clinical');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddNote, setShowAddNote] = useState(false);
 
@@ -66,6 +389,21 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
 
   const selectedPatient = patients.find(p => p.id === selectedPatientId);
   const sessionNotes = selectedPatientId ? getSessionNotes(selectedPatientId) : [];
+  const schemaEntries = Object.entries(schemaAnalysisData).sort((a, b) => b[1].نمره - a[1].نمره);
+  const attachmentEntries = Object.entries(attachmentAnalysisData);
+  const attachmentScoreEntries = [...attachmentEntries].sort((a, b) => b[1].نمره - a[1].نمره);
+  const clinicalDisorderEntries = Object.entries(clinicalDisorderAnalysisData.اختلالات);
+  const clinicalDisorderScoreEntries = [...clinicalDisorderEntries].sort((a, b) => b[1].اطمینان - a[1].اطمینان);
+  const cognitiveDistortionEntries = Object.entries(cognitiveDistortionAnalysisData.distortions);
+  const cognitiveDistortionScoreEntries = [...cognitiveDistortionEntries].sort((a, b) => b[1].score - a[1].score);
+  const personalTraitEntries = Object.entries(personalTraitAnalysisData.traits);
+  const personalTraitScoreEntries = [...personalTraitEntries].sort((a, b) => b[1].score - a[1].score);
+  const relationalPatternEntries = Object.entries(relationalPatternAnalysisData.relational_pattern);
+  const relationalPatternScoreEntries = [...relationalPatternEntries].sort((a, b) => b[1].score - a[1].score);
+  const functionalLevelEntries = Object.entries(functionalLevelAnalysisData.functional_level);
+  const functionalLevelScoreEntries = [...functionalLevelEntries].sort((a, b) => b[1].score - a[1].score);
+  const chartWidth = Math.max(760, schemaEntries.length * 170);
+  const chartColors = ['#7C3AED', '#2563EB', '#06B6D4', '#10B981', '#F59E0B', '#EF4444'];
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -164,6 +502,7 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
                     onClick={() => {
                       setSelectedPatientId(patient.id);
                       setSelectedView('menu');
+                      setAnalysisMode('clinical');
                     }}
                     className="group p-5 rounded-xl bg-white border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer"
                   >
@@ -359,16 +698,967 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
             exit={{ opacity: 0, x: -20 }}
             className="space-y-4"
           >
-            <div className="p-6 rounded-xl bg-white border border-border">
-              <h3 className="text-lg text-foreground mb-2 text-right">تحلیل هوش مصنوعی مراجع</h3>
-              <p className="text-muted-foreground text-right leading-8">
-                {selectedPatient?.status === 'safe'
-                  ? 'وضعیت مراجع پایدار است و روند درمانی مطلوب گزارش می‌شود.'
-                  : selectedPatient?.status === 'attention'
-                  ? 'مراجع نیاز به توجه دارد و توصیه می‌شود پایش درمانی با دقت بیشتری ادامه پیدا کند.'
-                  : 'مراجع در وضعیت فوری قرار دارد و نیاز به پیگیری نزدیک‌تر و مداخلات فعال‌تر دیده می‌شود.'}
-              </p>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setAnalysisMode('clinical')}
+                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
+                  analysisMode === 'clinical'
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'bg-white border-border text-foreground hover:border-primary/30'
+                }`}
+              >
+                خلاصه بالینی مکالمه
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalysisMode('schema')}
+                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
+                  analysisMode === 'schema'
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'bg-white border-border text-foreground hover:border-primary/30'
+                }`}
+              >
+                طرحواره
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalysisMode('attachment')}
+                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
+                  analysisMode === 'attachment'
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'bg-white border-border text-foreground hover:border-primary/30'
+                }`}
+              >
+                دلبستگی
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalysisMode('clinical_disorder')}
+                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
+                  analysisMode === 'clinical_disorder'
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'bg-white border-border text-foreground hover:border-primary/30'
+                }`}
+              >
+                اختلالات بالینی
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalysisMode('cognitive_distortion')}
+                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
+                  analysisMode === 'cognitive_distortion'
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'bg-white border-border text-foreground hover:border-primary/30'
+                }`}
+              >
+                تحریف‌های شناختی
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalysisMode('personal_train')}
+                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
+                  analysisMode === 'personal_train'
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'bg-white border-border text-foreground hover:border-primary/30'
+                }`}
+              >
+                ویژگی‌های شخصیتی
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalysisMode('relational_pattern')}
+                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
+                  analysisMode === 'relational_pattern'
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'bg-white border-border text-foreground hover:border-primary/30'
+                }`}
+              >
+                الگوهای رابطه‌ای
+              </button>
+              <button
+                type="button"
+                onClick={() => setAnalysisMode('functional_level')}
+                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
+                  analysisMode === 'functional_level'
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'bg-white border-border text-foreground hover:border-primary/30'
+                }`}
+              >
+                سطح عملکرد
+              </button>
             </div>
+
+            {analysisMode === 'clinical' ? (
+              <div className="p-6 rounded-xl bg-white border border-border">
+                <h3 className="text-lg text-foreground mb-4 text-right">خلاصه بالینی مکالمه</h3>
+
+                <div className="rounded-xl border border-primary/15 bg-gradient-to-l from-primary/10 to-transparent p-4 mb-5">
+                  <p className="text-foreground text-right leading-8">{clinicalSummaryIntro}</p>
+                </div>
+
+                <div className="space-y-3">
+                  {clinicalSummarySections.map((section) => (
+                    <div key={section.title} className="rounded-xl border border-border bg-white p-4">
+                      <h4 className="text-base text-foreground text-right mb-2">{section.title}</h4>
+                      <p className="text-muted-foreground text-right leading-8">{section.content}</p>
+                      {section.bullets && section.bullets.length > 0 && (
+                        <ul className="mt-3 pr-5 list-disc space-y-1 text-muted-foreground text-right">
+                          {section.bullets.map((bullet) => (
+                            <li key={bullet}>{bullet}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : analysisMode === 'schema' ? (
+              <div className="space-y-4">
+                <div className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                  <h4 className="text-base text-foreground text-right mb-4">نمودار ستونی شدت طرحواره‌ها</h4>
+                  <div className="rounded-xl border border-border/60 bg-white p-4">
+                    <div className="h-80 w-full overflow-x-auto">
+                      <div className="w-full h-full flex justify-center">
+                      <svg
+                        width={chartWidth}
+                        height={300}
+                        viewBox={`0 0 ${chartWidth} 300`}
+                        role="img"
+                        aria-label="Schema probability bar chart"
+                      >
+                        {([0, 25, 50, 75, 100] as const).map((tick) => {
+                          const y = 240 - (tick / 100) * 180;
+                          return (
+                            <g key={`tick-${tick}`}>
+                              <line x1={60} y1={y} x2={chartWidth - 20} y2={y} stroke="#e5e7eb" strokeWidth="1" />
+                              <text x={66} y={y + 4} textAnchor="start" fontSize="11" fill="#6b7280">{tick}</text>
+                            </g>
+                          );
+                        })}
+
+                        <line x1={60} y1={240} x2={chartWidth - 20} y2={240} stroke="#d1d5db" strokeWidth="1.5" />
+                        <line x1={60} y1={60} x2={60} y2={240} stroke="#d1d5db" strokeWidth="1.5" />
+                        <text x={24} y={150} textAnchor="middle" fontSize="11" fill="#6b7280" transform="rotate(-90 24 150)">
+                          احتمال مدل
+                        </text>
+
+                        {schemaEntries.map(([schemaName, schema], index) => {
+                          const barWidth = 58;
+                          const availableWidth = chartWidth - 120;
+                          const gap = availableWidth / Math.max(1, schemaEntries.length);
+                          const x = 60 + gap * index + (gap - barWidth) / 2;
+                          const barHeight = (schema.نمره / 100) * 180;
+                          const y = 240 - barHeight;
+                          const color = chartColors[index % chartColors.length];
+                          const label = schemaName.length > 16 ? `${schemaName.slice(0, 16)}...` : schemaName;
+                          return (
+                            <g key={`svg-bar-${schemaName}`}>
+                              <rect x={x} y={y} width={barWidth} height={barHeight} rx={8} ry={8} fill={color} />
+                              <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" fontSize="12" fill="#111827">
+                                {schema.نمره}
+                              </text>
+                              <text x={x + barWidth / 2} y={264} textAnchor="middle" fontSize="11" fill="#6b7280">
+                                {label}
+                              </text>
+                            </g>
+                          );
+                        })}
+                        <text x={chartWidth / 2} y={292} textAnchor="middle" fontSize="12" fill="#6b7280">
+                          طرحواره‌ها
+                        </text>
+                      </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-xl bg-white border border-border">
+                  <h3 className="text-lg text-foreground text-right mb-2">تحلیل طرحواره (JSON)</h3>
+                  <p className="text-sm text-muted-foreground text-right">
+                    شدت هر طرحواره بر اساس احتمال مدل از ۱۰۰ نمایش داده شده است.
+                  </p>
+                </div>
+
+                {schemaEntries.map(([schemaName, schema]) => (
+                  <div key={schemaName} className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm">
+                        {schemaName}
+                      </span>
+                      <span className="text-sm text-foreground">
+                        احتمال مدل: <span className="text-primary">{schema.نمره}</span>/100
+                      </span>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${schema.نمره}%` }}
+                          transition={{ duration: 0.8, ease: 'easeOut' }}
+                          className={`h-full rounded-full ${
+                            schema.نمره >= 90
+                              ? 'bg-gradient-to-l from-[#eb5757] to-[#f29999]'
+                              : schema.نمره >= 80
+                              ? 'bg-gradient-to-l from-[#f2c94c] to-[#f6db86]'
+                              : 'bg-gradient-to-l from-[#6fcf97] to-[#9be2b7]'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <h4 className="text-sm text-foreground mb-2 text-right">شواهد</h4>
+                      <ul className="space-y-2 list-disc pr-5 text-right text-sm text-muted-foreground leading-7">
+                        {schema.شواهد.map((evidence, index) => (
+                          <li key={`${schemaName}-evidence-${index}`}>{evidence}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                      <h4 className="text-sm text-foreground mb-2 text-right">تحلیل بالینی</h4>
+                      <p className="text-sm text-muted-foreground text-right leading-8">
+                        {schema.تحلیل_بالینی}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : analysisMode === 'attachment' ? (
+              <div className="space-y-4">
+                <div className="p-5 rounded-xl bg-white border border-border">
+                  <h3 className="text-lg text-foreground text-right mb-2">تحلیل سبک دلبستگی</h3>
+                  <p className="text-sm text-muted-foreground text-right">
+                    احتمال هر سبک دلبستگی در بازه ۰ تا ۱۰ نمایش داده شده است.
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                  <h4 className="text-base text-foreground text-right mb-4">نمودار ستونی سبک‌های دلبستگی</h4>
+                  <div className="rounded-xl border border-border/60 bg-white p-4">
+                    <div className="h-80 w-full overflow-x-auto">
+                      <div className="w-full h-full flex justify-center">
+                        <svg
+                          width={Math.max(760, attachmentScoreEntries.length * 170)}
+                          height={300}
+                          viewBox={`0 0 ${Math.max(760, attachmentScoreEntries.length * 170)} 300`}
+                          role="img"
+                          aria-label="Attachment probability bar chart"
+                        >
+                          {([0, 2, 4, 6, 8, 10] as const).map((tick) => {
+                            const y = 240 - (tick / 10) * 180;
+                            return (
+                              <g key={`attachment-tick-${tick}`}>
+                                <line
+                                  x1={60}
+                                  y1={y}
+                                  x2={Math.max(760, attachmentScoreEntries.length * 170) - 20}
+                                  y2={y}
+                                  stroke="#e5e7eb"
+                                  strokeWidth="1"
+                                />
+                                <text x={66} y={y + 4} textAnchor="start" fontSize="11" fill="#6b7280">
+                                  {tick}
+                                </text>
+                              </g>
+                            );
+                          })}
+
+                          <line
+                            x1={60}
+                            y1={240}
+                            x2={Math.max(760, attachmentScoreEntries.length * 170) - 20}
+                            y2={240}
+                            stroke="#d1d5db"
+                            strokeWidth="1.5"
+                          />
+                          <line x1={60} y1={60} x2={60} y2={240} stroke="#d1d5db" strokeWidth="1.5" />
+                          <text x={24} y={150} textAnchor="middle" fontSize="11" fill="#6b7280" transform="rotate(-90 24 150)">
+                            احتمال مدل
+                          </text>
+
+                          {attachmentScoreEntries.map(([styleName, attachmentData], index) => {
+                            const barWidth = 58;
+                            const chartWidth = Math.max(760, attachmentScoreEntries.length * 170);
+                            const availableWidth = chartWidth - 120;
+                            const gap = availableWidth / Math.max(1, attachmentScoreEntries.length);
+                            const x = 60 + gap * index + (gap - barWidth) / 2;
+                            const barHeight = (attachmentData.نمره / 10) * 180;
+                            const y = 240 - barHeight;
+                            const color = chartColors[index % chartColors.length];
+                            const label = styleName.length > 16 ? `${styleName.slice(0, 16)}...` : styleName;
+
+                            return (
+                              <g key={`svg-attachment-${styleName}`}>
+                                <rect x={x} y={y} width={barWidth} height={barHeight} rx={8} ry={8} fill={color} />
+                                <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" fontSize="12" fill="#111827">
+                                  {attachmentData.نمره}
+                                </text>
+                                <text x={x + barWidth / 2} y={264} textAnchor="middle" fontSize="11" fill="#6b7280">
+                                  {label}
+                                </text>
+                              </g>
+                            );
+                          })}
+                          <text
+                            x={Math.max(760, attachmentScoreEntries.length * 170) / 2}
+                            y={292}
+                            textAnchor="middle"
+                            fontSize="12"
+                            fill="#6b7280"
+                          >
+                            سبک‌های دلبستگی
+                          </text>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                  <h4 className="text-base text-foreground text-right mb-4">نمرات سبک‌های دلبستگی</h4>
+                  <div className="space-y-3">
+                    {attachmentScoreEntries.map(([styleName, attachmentData]) => (
+                      <div key={`attachment-score-${styleName}`}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm text-foreground">{styleName}</span>
+                          <span className="text-sm text-primary">{attachmentData.نمره}/10</span>
+                        </div>
+                        <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(attachmentData.نمره / 10) * 100}%` }}
+                            transition={{ duration: 0.8, ease: 'easeOut' }}
+                            className={`h-full rounded-full ${
+                              attachmentData.نمره >= 8
+                                ? 'bg-gradient-to-l from-[#ef4444] to-[#f87171]'
+                                : attachmentData.نمره >= 5
+                                ? 'bg-gradient-to-l from-[#f59e0b] to-[#fbbf24]'
+                                : 'bg-gradient-to-l from-[#22c55e] to-[#4ade80]'
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {attachmentEntries.map(([styleName, attachmentData]) => (
+                  <div key={`attachment-evidence-${styleName}`} className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm">
+                        {styleName}
+                      </span>
+                      <span className="text-sm text-foreground">
+                        احتمال مدل:{' '}
+                        <span className="text-primary">
+                          {attachmentData.نمره}/10
+                        </span>
+                      </span>
+                    </div>
+                    {attachmentData.شواهد.length > 0 ? (
+                      <ul className="space-y-2 list-disc pr-5 text-right text-sm text-muted-foreground leading-7">
+                        {attachmentData.شواهد.map((evidence, index) => (
+                          <li key={`${styleName}-evidence-${index}`}>{evidence}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-muted-foreground text-right">شواهد معناداری برای این سبک گزارش نشده است.</p>
+                    )}
+                    <div className="mt-4 p-4 rounded-lg bg-primary/5 border border-primary/10">
+                      <h4 className="text-sm text-foreground mb-2 text-right">تحلیل بالینی</h4>
+                      <p className="text-sm text-muted-foreground text-right leading-8">
+                        {attachmentData.تحلیل_بالینی}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : analysisMode === 'clinical_disorder' ? (
+              <div className="space-y-4">
+                <div className="p-5 rounded-xl bg-white border border-border">
+                  <h3 className="text-lg text-foreground text-right mb-2">تحلیل اختلالات بالینی</h3>
+                  <p className="text-sm text-muted-foreground text-right">
+                    شدت احتمالی هر اختلال در بازه ۰ تا ۱۰ نمایش داده شده است.
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                  <h4 className="text-base text-foreground text-right mb-4">نمودار ستونی اختلالات بالینی</h4>
+                  <div className="rounded-xl border border-border/60 bg-white p-4">
+                    <div className="h-80 w-full overflow-x-auto">
+                      <div className="w-full h-full flex justify-center">
+                        <svg
+                          width={Math.max(820, clinicalDisorderScoreEntries.length * 170)}
+                          height={300}
+                          viewBox={`0 0 ${Math.max(820, clinicalDisorderScoreEntries.length * 170)} 300`}
+                          role="img"
+                          aria-label="Clinical disorder probability bar chart"
+                        >
+                          {([0, 2, 4, 6, 8, 10] as const).map((tick) => {
+                            const y = 240 - (tick / 10) * 180;
+                            return (
+                              <g key={`clinical-tick-${tick}`}>
+                                <line
+                                  x1={60}
+                                  y1={y}
+                                  x2={Math.max(820, clinicalDisorderScoreEntries.length * 170) - 20}
+                                  y2={y}
+                                  stroke="#e5e7eb"
+                                  strokeWidth="1"
+                                />
+                                <text x={66} y={y + 4} textAnchor="start" fontSize="11" fill="#6b7280">
+                                  {tick}
+                                </text>
+                              </g>
+                            );
+                          })}
+
+                          <line
+                            x1={60}
+                            y1={240}
+                            x2={Math.max(820, clinicalDisorderScoreEntries.length * 170) - 20}
+                            y2={240}
+                            stroke="#d1d5db"
+                            strokeWidth="1.5"
+                          />
+                          <line x1={60} y1={60} x2={60} y2={240} stroke="#d1d5db" strokeWidth="1.5" />
+                          <text x={24} y={150} textAnchor="middle" fontSize="11" fill="#6b7280" transform="rotate(-90 24 150)">
+                            احتمال مدل
+                          </text>
+
+                          {clinicalDisorderScoreEntries.map(([disorderName, score], index) => {
+                            const barWidth = 58;
+                            const chartWidth = Math.max(820, clinicalDisorderScoreEntries.length * 170);
+                            const availableWidth = chartWidth - 120;
+                            const gap = availableWidth / Math.max(1, clinicalDisorderScoreEntries.length);
+                            const x = 60 + gap * index + (gap - barWidth) / 2;
+                            const barHeight = (score.اطمینان / 100) * 180;
+                            const y = 240 - barHeight;
+                            const color = chartColors[index % chartColors.length];
+                            const label = disorderName.length > 16 ? `${disorderName.slice(0, 16)}...` : disorderName;
+
+                            return (
+                              <g key={`svg-clinical-${disorderName}`}>
+                                <rect x={x} y={y} width={barWidth} height={barHeight} rx={8} ry={8} fill={color} />
+                                <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" fontSize="12" fill="#111827">
+                                  {score.اطمینان}
+                                </text>
+                                <text x={x + barWidth / 2} y={264} textAnchor="middle" fontSize="11" fill="#6b7280">
+                                  {label}
+                                </text>
+                              </g>
+                            );
+                          })}
+                          <text
+                            x={Math.max(820, clinicalDisorderScoreEntries.length * 170) / 2}
+                            y={292}
+                            textAnchor="middle"
+                            fontSize="12"
+                            fill="#6b7280"
+                          >
+                            اختلالات بالینی
+                          </text>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {clinicalDisorderEntries.map(([disorderName, disorderData]) => (
+                  <div key={`clinical-evidence-${disorderName}`} className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm">
+                        {disorderName}
+                      </span>
+                      <span className="text-sm text-foreground">
+                        احتمال مدل:{' '}
+                        <span className="text-primary">
+                          {disorderData.اطمینان}/100
+                        </span>
+                      </span>
+                    </div>
+                    {disorderData.شواهد.length > 0 ? (
+                      <ul className="space-y-2 list-disc pr-5 text-right text-sm text-muted-foreground leading-7">
+                        {disorderData.شواهد.map((evidence, index) => (
+                          <li key={`${disorderName}-evidence-${index}`}>{evidence}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-muted-foreground text-right">شواهد معناداری برای این اختلال گزارش نشده است.</p>
+                    )}
+                    <div className="mt-4 p-4 rounded-lg bg-primary/5 border border-primary/10">
+                      <h4 className="text-sm text-foreground mb-2 text-right">تحلیل بالینی</h4>
+                      <p className="text-sm text-muted-foreground text-right leading-8">{disorderData.تحلیل_بالینی}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : analysisMode === 'cognitive_distortion' ? (
+              <div className="space-y-4">
+                <div className="p-5 rounded-xl bg-white border border-border">
+                  <h3 className="text-lg text-foreground text-right mb-2">تحلیل تحریف‌های شناختی</h3>
+                  <p className="text-sm text-muted-foreground text-right">
+                    شدت هر تحریف شناختی در بازه ۰ تا ۱۰ نمایش داده شده است.
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                  <h4 className="text-base text-foreground text-right mb-4">نمودار ستونی تحریف‌های شناختی</h4>
+                  <div className="rounded-xl border border-border/60 bg-white p-4">
+                    <div className="h-80 w-full overflow-x-auto">
+                      <div className="w-full h-full flex justify-center">
+                        <svg
+                          width={Math.max(820, cognitiveDistortionScoreEntries.length * 170)}
+                          height={300}
+                          viewBox={`0 0 ${Math.max(820, cognitiveDistortionScoreEntries.length * 170)} 300`}
+                          role="img"
+                          aria-label="Cognitive distortions bar chart"
+                        >
+                          {([0, 2, 4, 6, 8, 10] as const).map((tick) => {
+                            const y = 240 - (tick / 10) * 180;
+                            return (
+                              <g key={`distortion-tick-${tick}`}>
+                                <line
+                                  x1={60}
+                                  y1={y}
+                                  x2={Math.max(820, cognitiveDistortionScoreEntries.length * 170) - 20}
+                                  y2={y}
+                                  stroke="#e5e7eb"
+                                  strokeWidth="1"
+                                />
+                                <text x={66} y={y + 4} textAnchor="start" fontSize="11" fill="#6b7280">
+                                  {tick}
+                                </text>
+                              </g>
+                            );
+                          })}
+
+                          <line
+                            x1={60}
+                            y1={240}
+                            x2={Math.max(820, cognitiveDistortionScoreEntries.length * 170) - 20}
+                            y2={240}
+                            stroke="#d1d5db"
+                            strokeWidth="1.5"
+                          />
+                          <line x1={60} y1={60} x2={60} y2={240} stroke="#d1d5db" strokeWidth="1.5" />
+                          <text x={24} y={150} textAnchor="middle" fontSize="11" fill="#6b7280" transform="rotate(-90 24 150)">
+                            احتمال مدل
+                          </text>
+
+                          {cognitiveDistortionScoreEntries.map(([distortionName, distortionData], index) => {
+                            const barWidth = 58;
+                            const chartWidth = Math.max(820, cognitiveDistortionScoreEntries.length * 170);
+                            const availableWidth = chartWidth - 120;
+                            const gap = availableWidth / Math.max(1, cognitiveDistortionScoreEntries.length);
+                            const x = 60 + gap * index + (gap - barWidth) / 2;
+                            const barHeight = (distortionData.score / 10) * 180;
+                            const y = 240 - barHeight;
+                            const color = chartColors[index % chartColors.length];
+                            const localizedName = cognitiveDistortionPersianLabels[distortionName] ?? distortionName;
+                            const label = localizedName.length > 16 ? `${localizedName.slice(0, 16)}...` : localizedName;
+
+                            return (
+                              <g key={`svg-distortion-${distortionName}`}>
+                                <rect x={x} y={y} width={barWidth} height={barHeight} rx={8} ry={8} fill={color} />
+                                <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" fontSize="12" fill="#111827">
+                                  {distortionData.score}
+                                </text>
+                                <text x={x + barWidth / 2} y={264} textAnchor="middle" fontSize="11" fill="#6b7280">
+                                  {label}
+                                </text>
+                              </g>
+                            );
+                          })}
+                          <text
+                            x={Math.max(820, cognitiveDistortionScoreEntries.length * 170) / 2}
+                            y={292}
+                            textAnchor="middle"
+                            fontSize="12"
+                            fill="#6b7280"
+                          >
+                            تحریف‌های شناختی
+                          </text>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {cognitiveDistortionEntries.map(([distortionName, distortionData]) => (
+                  <div key={`distortion-card-${distortionName}`} className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm">
+                        {cognitiveDistortionPersianLabels[distortionName] ?? distortionName}
+                      </span>
+                      <span className="text-sm text-foreground">
+                        احتمال مدل: <span className="text-primary">{distortionData.score}</span>/10
+                      </span>
+                    </div>
+                    <div className="mb-4">
+                      <h4 className="text-sm text-foreground mb-2 text-right">شواهد</h4>
+                      <ul className="space-y-2 list-disc pr-5 text-right text-sm text-muted-foreground leading-7">
+                        {distortionData.evidence.map((evidence, index) => (
+                          <li key={`${distortionName}-evidence-${index}`}>{evidence}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                      <h4 className="text-sm text-foreground mb-2 text-right">خلاصه</h4>
+                      <p className="text-sm text-muted-foreground text-right leading-8">{distortionData.summary}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : analysisMode === 'personal_train' ? (
+              <div className="space-y-4">
+                <div className="p-5 rounded-xl bg-white border border-border">
+                  <h3 className="text-lg text-foreground text-right mb-2">تحلیل ویژگی‌های شخصیتی</h3>
+                  <p className="text-sm text-muted-foreground text-right">
+                    شدت هر trait در بازه ۰ تا ۱۰ نمایش داده شده است.
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                  <h4 className="text-base text-foreground text-right mb-4">نمودار ستونی ویژگی‌های شخصیتی</h4>
+                  <div className="rounded-xl border border-border/60 bg-white p-4">
+                    <div className="h-80 w-full overflow-x-auto">
+                      <div className="w-full h-full flex justify-center">
+                        <svg
+                          width={Math.max(760, personalTraitScoreEntries.length * 170)}
+                          height={300}
+                          viewBox={`0 0 ${Math.max(760, personalTraitScoreEntries.length * 170)} 300`}
+                          role="img"
+                          aria-label="Personal traits bar chart"
+                        >
+                          {([0, 2, 4, 6, 8, 10] as const).map((tick) => {
+                            const y = 240 - (tick / 10) * 180;
+                            return (
+                              <g key={`trait-tick-${tick}`}>
+                                <line
+                                  x1={60}
+                                  y1={y}
+                                  x2={Math.max(760, personalTraitScoreEntries.length * 170) - 20}
+                                  y2={y}
+                                  stroke="#e5e7eb"
+                                  strokeWidth="1"
+                                />
+                                <text x={66} y={y + 4} textAnchor="start" fontSize="11" fill="#6b7280">
+                                  {tick}
+                                </text>
+                              </g>
+                            );
+                          })}
+                          <line
+                            x1={60}
+                            y1={240}
+                            x2={Math.max(760, personalTraitScoreEntries.length * 170) - 20}
+                            y2={240}
+                            stroke="#d1d5db"
+                            strokeWidth="1.5"
+                          />
+                          <line x1={60} y1={60} x2={60} y2={240} stroke="#d1d5db" strokeWidth="1.5" />
+                          <text x={24} y={150} textAnchor="middle" fontSize="11" fill="#6b7280" transform="rotate(-90 24 150)">
+                            احتمال مدل
+                          </text>
+
+                          {personalTraitScoreEntries.map(([traitName, traitData], index) => {
+                            const barWidth = 58;
+                            const chartWidth = Math.max(760, personalTraitScoreEntries.length * 170);
+                            const availableWidth = chartWidth - 120;
+                            const gap = availableWidth / Math.max(1, personalTraitScoreEntries.length);
+                            const x = 60 + gap * index + (gap - barWidth) / 2;
+                            const barHeight = (traitData.score / 10) * 180;
+                            const y = 240 - barHeight;
+                            const color = chartColors[index % chartColors.length];
+                            const localizedName = personalTraitPersianLabels[traitName] ?? traitName;
+                            const label = localizedName.length > 16 ? `${localizedName.slice(0, 16)}...` : localizedName;
+                            return (
+                              <g key={`svg-trait-${traitName}`}>
+                                <rect x={x} y={y} width={barWidth} height={barHeight} rx={8} ry={8} fill={color} />
+                                <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" fontSize="12" fill="#111827">
+                                  {traitData.score}
+                                </text>
+                                <text x={x + barWidth / 2} y={264} textAnchor="middle" fontSize="11" fill="#6b7280">
+                                  {label}
+                                </text>
+                              </g>
+                            );
+                          })}
+                          <text
+                            x={Math.max(760, personalTraitScoreEntries.length * 170) / 2}
+                            y={292}
+                            textAnchor="middle"
+                            fontSize="12"
+                            fill="#6b7280"
+                          >
+                            ویژگی‌های شخصیتی
+                          </text>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {personalTraitEntries.map(([traitName, traitData]) => (
+                  <div key={`trait-card-${traitName}`} className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm">
+                        {personalTraitPersianLabels[traitName] ?? traitName}
+                      </span>
+                      <span className="text-sm text-foreground">
+                        احتمال مدل: <span className="text-primary">{traitData.score}</span>/10
+                      </span>
+                    </div>
+                    <div className="mb-4">
+                      <h4 className="text-sm text-foreground mb-2 text-right">شواهد</h4>
+                      <ul className="space-y-2 list-disc pr-5 text-right text-sm text-muted-foreground leading-7">
+                        {traitData.evidence.map((evidence, index) => (
+                          <li key={`${traitName}-evidence-${index}`}>{evidence}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                      <h4 className="text-sm text-foreground mb-2 text-right">خلاصه</h4>
+                      <p className="text-sm text-muted-foreground text-right leading-8">{traitData.summary}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : analysisMode === 'relational_pattern' ? (
+              <div className="space-y-4">
+                <div className="p-5 rounded-xl bg-white border border-border">
+                  <h3 className="text-lg text-foreground text-right mb-2">تحلیل الگوهای رابطه‌ای</h3>
+                  <p className="text-sm text-muted-foreground text-right">
+                    شدت هر الگوی رابطه‌ای در بازه ۰ تا ۱۰ نمایش داده شده است.
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                  <h4 className="text-base text-foreground text-right mb-4">نمودار ستونی الگوهای رابطه‌ای</h4>
+                  <div className="rounded-xl border border-border/60 bg-white p-4">
+                    <div className="h-80 w-full overflow-x-auto">
+                      <div className="w-full h-full flex justify-center">
+                        <svg
+                          width={Math.max(760, relationalPatternScoreEntries.length * 170)}
+                          height={300}
+                          viewBox={`0 0 ${Math.max(760, relationalPatternScoreEntries.length * 170)} 300`}
+                          role="img"
+                          aria-label="Relational patterns bar chart"
+                        >
+                          {([0, 2, 4, 6, 8, 10] as const).map((tick) => {
+                            const y = 240 - (tick / 10) * 180;
+                            return (
+                              <g key={`relation-tick-${tick}`}>
+                                <line
+                                  x1={60}
+                                  y1={y}
+                                  x2={Math.max(760, relationalPatternScoreEntries.length * 170) - 20}
+                                  y2={y}
+                                  stroke="#e5e7eb"
+                                  strokeWidth="1"
+                                />
+                                <text x={66} y={y + 4} textAnchor="start" fontSize="11" fill="#6b7280">
+                                  {tick}
+                                </text>
+                              </g>
+                            );
+                          })}
+                          <line
+                            x1={60}
+                            y1={240}
+                            x2={Math.max(760, relationalPatternScoreEntries.length * 170) - 20}
+                            y2={240}
+                            stroke="#d1d5db"
+                            strokeWidth="1.5"
+                          />
+                          <line x1={60} y1={60} x2={60} y2={240} stroke="#d1d5db" strokeWidth="1.5" />
+                          <text x={24} y={150} textAnchor="middle" fontSize="11" fill="#6b7280" transform="rotate(-90 24 150)">
+                            احتمال مدل
+                          </text>
+
+                          {relationalPatternScoreEntries.map(([patternName, patternData], index) => {
+                            const barWidth = 58;
+                            const chartWidth = Math.max(760, relationalPatternScoreEntries.length * 170);
+                            const availableWidth = chartWidth - 120;
+                            const gap = availableWidth / Math.max(1, relationalPatternScoreEntries.length);
+                            const x = 60 + gap * index + (gap - barWidth) / 2;
+                            const barHeight = (patternData.score / 10) * 180;
+                            const y = 240 - barHeight;
+                            const color = chartColors[index % chartColors.length];
+                            const localizedName = relationalPatternPersianLabels[patternName] ?? patternName;
+                            const label = localizedName.length > 16 ? `${localizedName.slice(0, 16)}...` : localizedName;
+                            return (
+                              <g key={`svg-relation-${patternName}`}>
+                                <rect x={x} y={y} width={barWidth} height={barHeight} rx={8} ry={8} fill={color} />
+                                <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" fontSize="12" fill="#111827">
+                                  {patternData.score}
+                                </text>
+                                <text x={x + barWidth / 2} y={264} textAnchor="middle" fontSize="11" fill="#6b7280">
+                                  {label}
+                                </text>
+                              </g>
+                            );
+                          })}
+                          <text
+                            x={Math.max(760, relationalPatternScoreEntries.length * 170) / 2}
+                            y={292}
+                            textAnchor="middle"
+                            fontSize="12"
+                            fill="#6b7280"
+                          >
+                            الگوهای رابطه‌ای
+                          </text>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {relationalPatternEntries.map(([patternName, patternData]) => (
+                  <div key={`relation-card-${patternName}`} className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm">
+                        {relationalPatternPersianLabels[patternName] ?? patternName}
+                      </span>
+                      <span className="text-sm text-foreground">
+                        احتمال مدل: <span className="text-primary">{patternData.score}</span>/10
+                      </span>
+                    </div>
+                    <div className="mb-4">
+                      <h4 className="text-sm text-foreground mb-2 text-right">شواهد</h4>
+                      <ul className="space-y-2 list-disc pr-5 text-right text-sm text-muted-foreground leading-7">
+                        {patternData.evidence.map((evidence, index) => (
+                          <li key={`${patternName}-evidence-${index}`}>{evidence}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                      <h4 className="text-sm text-foreground mb-2 text-right">خلاصه</h4>
+                      <p className="text-sm text-muted-foreground text-right leading-8">{patternData.summary}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="p-5 rounded-xl bg-white border border-border">
+                  <h3 className="text-lg text-foreground text-right mb-2">تحلیل سطح عملکرد</h3>
+                  <p className="text-sm text-muted-foreground text-right">
+                    شدت هر شاخص عملکردی در بازه ۰ تا ۱۰ نمایش داده شده است.
+                  </p>
+                </div>
+
+                <div className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                  <h4 className="text-base text-foreground text-right mb-4">نمودار ستونی سطح عملکرد</h4>
+                  <div className="rounded-xl border border-border/60 bg-white p-4">
+                    <div className="h-80 w-full overflow-x-auto">
+                      <div className="w-full h-full flex justify-center">
+                        <svg
+                          width={Math.max(760, functionalLevelScoreEntries.length * 170)}
+                          height={300}
+                          viewBox={`0 0 ${Math.max(760, functionalLevelScoreEntries.length * 170)} 300`}
+                          role="img"
+                          aria-label="Functional level bar chart"
+                        >
+                          {([0, 2, 4, 6, 8, 10] as const).map((tick) => {
+                            const y = 240 - (tick / 10) * 180;
+                            return (
+                              <g key={`functional-tick-${tick}`}>
+                                <line
+                                  x1={60}
+                                  y1={y}
+                                  x2={Math.max(760, functionalLevelScoreEntries.length * 170) - 20}
+                                  y2={y}
+                                  stroke="#e5e7eb"
+                                  strokeWidth="1"
+                                />
+                                <text x={66} y={y + 4} textAnchor="start" fontSize="11" fill="#6b7280">
+                                  {tick}
+                                </text>
+                              </g>
+                            );
+                          })}
+                          <line
+                            x1={60}
+                            y1={240}
+                            x2={Math.max(760, functionalLevelScoreEntries.length * 170) - 20}
+                            y2={240}
+                            stroke="#d1d5db"
+                            strokeWidth="1.5"
+                          />
+                          <line x1={60} y1={60} x2={60} y2={240} stroke="#d1d5db" strokeWidth="1.5" />
+                          <text x={24} y={150} textAnchor="middle" fontSize="11" fill="#6b7280" transform="rotate(-90 24 150)">
+                            احتمال مدل
+                          </text>
+
+                          {functionalLevelScoreEntries.map(([metricName, metricData], index) => {
+                            const barWidth = 58;
+                            const chartWidth = Math.max(760, functionalLevelScoreEntries.length * 170);
+                            const availableWidth = chartWidth - 120;
+                            const gap = availableWidth / Math.max(1, functionalLevelScoreEntries.length);
+                            const x = 60 + gap * index + (gap - barWidth) / 2;
+                            const barHeight = (metricData.score / 10) * 180;
+                            const y = 240 - barHeight;
+                            const color = chartColors[index % chartColors.length];
+                            const localizedName = functionalLevelPersianLabels[metricName] ?? metricName;
+                            const label = localizedName.length > 16 ? `${localizedName.slice(0, 16)}...` : localizedName;
+                            return (
+                              <g key={`svg-functional-${metricName}`}>
+                                <rect x={x} y={y} width={barWidth} height={barHeight} rx={8} ry={8} fill={color} />
+                                <text x={x + barWidth / 2} y={y - 8} textAnchor="middle" fontSize="12" fill="#111827">
+                                  {metricData.score}
+                                </text>
+                                <text x={x + barWidth / 2} y={264} textAnchor="middle" fontSize="11" fill="#6b7280">
+                                  {label}
+                                </text>
+                              </g>
+                            );
+                          })}
+                          <text
+                            x={Math.max(760, functionalLevelScoreEntries.length * 170) / 2}
+                            y={292}
+                            textAnchor="middle"
+                            fontSize="12"
+                            fill="#6b7280"
+                          >
+                            شاخص‌های سطح عملکرد
+                          </text>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {functionalLevelEntries.map(([metricName, metricData]) => (
+                  <div key={`functional-card-${metricName}`} className="p-5 rounded-xl bg-white border border-border shadow-sm">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm">
+                        {functionalLevelPersianLabels[metricName] ?? metricName}
+                      </span>
+                      <span className="text-sm text-foreground">
+                        احتمال مدل: <span className="text-primary">{metricData.score}</span>/10
+                      </span>
+                    </div>
+                    <div className="mb-4">
+                      <h4 className="text-sm text-foreground mb-2 text-right">شواهد</h4>
+                      <ul className="space-y-2 list-disc pr-5 text-right text-sm text-muted-foreground leading-7">
+                        {metricData.evidence.map((evidence, index) => (
+                          <li key={`${metricName}-evidence-${index}`}>{evidence}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                      <h4 className="text-sm text-foreground mb-2 text-right">خلاصه</h4>
+                      <p className="text-sm text-muted-foreground text-right leading-8">{metricData.summary}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -23,3 +23,6 @@ Guidelines:
 
 Your overarching goal: help the user feel heard and safe, while subtly mapping their thoughts, feelings, and coping strategies through empathetic conversation.
 """
+
+
+# prompt = ""

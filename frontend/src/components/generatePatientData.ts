@@ -115,7 +115,57 @@ function generateMoodData() {
 }
 
 export function generatePatients(count: number = 100): PatientDetail[] {
-  const patients: PatientDetail[] = [];
+  const patients: PatientDetail[] = [
+    {
+      id: 'test-patient-1',
+      name: 'مراجع تست',
+      age: 29,
+      gender: 'زن',
+      phone: '۰۹۱۲ ۳۴۵ ۶۷۸۹',
+      status: 'attention',
+      overallScore: 58,
+      sessionsCount: 6,
+      lastSession: 'امروز',
+      schemas: [
+        {
+          name: 'رهاشدگی/بی‌ثباتی',
+          severity: 'medium',
+          frequency: 9,
+          lastDetected: 'دیروز',
+          description: 'ترس از ترک شدن یا از دست دادن رابطه ایمن در موقعیت های هیجانی.'
+        },
+        {
+          name: 'محرومیت هیجانی',
+          severity: 'medium',
+          frequency: 7,
+          lastDetected: 'هفته گذشته',
+          description: 'احساس نادیده گرفته شدن نیازهای عاطفی و دریافت ناکافی حمایت هیجانی.'
+        }
+      ],
+      behaviors: [
+        {
+          pattern: 'نشخوار فکری بعد از تعارض بین فردی',
+          occurrences: 11,
+          trend: 'increasing'
+        },
+        {
+          pattern: 'نوشتن احساسات پیش از خواب',
+          occurrences: 8,
+          trend: 'stable'
+        }
+      ],
+      monthlyMood: [
+        { date: 'هفته ۱', mood: 52, anxiety: 63, depression: 49 },
+        { date: 'هفته ۲', mood: 54, anxiety: 60, depression: 47 },
+        { date: 'هفته ۳', mood: 57, anxiety: 58, depression: 45 },
+        { date: 'هفته ۴', mood: 59, anxiety: 55, depression: 43 }
+      ],
+      aiInsights: [
+        'الگوی نگرانی بین فردی همچنان فعال است و نیاز به مداخله ساختاریافته دارد.',
+        'توانایی خودتنظیمی اولیه وجود دارد اما هنوز ناپایدار است.'
+      ]
+    }
+  ];
   const schemaKeys = Object.keys(SCHEMA_TYPES) as SchemaType[];
   
   // Track how many patients have been assigned to each schema to ensure all are represented

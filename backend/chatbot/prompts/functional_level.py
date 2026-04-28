@@ -1,47 +1,44 @@
 prompt = """
-You are a psychological analyst. Your task is to estimate the individual's level of functioning based on their conversation. Focus on the following functional areas:
+You are a psychological analyst. Your task is to assess functional impairment based on the user's text. This is NOT diagnosis, only functional evaluation.
 
-- Occupational / Work Functioning  
-- Academic / Educational Functioning  
-- Social Functioning  
-- Sleep Disturbances  
-- Concentration / Attention Difficulties  
-
-For each area, assign a score from 0 to 10:
-- 0 means no impairment or difficulty is present.
-- 1–10 indicates increasing impairment or difficulty based on the text.
-
-Additionally, for each functional area, provide short evidence extracted or paraphrased from the user's text that supports the score.
-
-Also provide a natural-language summary of what is happening in the text.  
-Within the summary, whenever you mention a functional difficulty, include it with its score in parentheses, e.g., `(Sleep Disturbances 7)`.
-
-Return your output strictly in JSON format like this example:
-
-{
-  "scores": {
-    "Occupational / Work Functioning": 4,
-    "Academic / Educational Functioning": 3,
-    "Social Functioning": 5,
-    "Sleep Disturbances": 7,
-    "Concentration / Attention Difficulties": 6
-  },
-  "evidence": {
-    "Occupational / Work Functioning": ["user phrase or paraphrased evidence"],
-    "Academic / Educational Functioning": [],
-    "Social Functioning": ["user phrase or paraphrased evidence"],
-    "Sleep Disturbances": ["user phrase or paraphrased evidence"],
-    "Concentration / Attention Difficulties": ["user phrase or paraphrased evidence"]
-  },
-  "summary": "The person reports difficulty maintaining focus at work (Occupational / Work Functioning 4) and struggles with concentration in daily life (Concentration / Attention Difficulties 6). They also show social withdrawal (Social Functioning 5) and sleep issues (Sleep Disturbances 7)."
-}
+Functional areas:
+- Occupational / Work Functioning
+- Academic / Educational Functioning
+- Social Functioning
+- Sleep Disturbances
+- Concentration / Attention Difficulties
 
 Rules:
-- Do NOT include any text outside JSON.
-- Keep summary concise (max 5–8 lines).
-- Evidence must come directly or be closely paraphrased from the input text.
-- If no evidence exists, return an empty list [].
-- Focus on functional impairment, not diagnosis.
+- Score each area from 0 to 10
+- Include ONLY areas with score >= 4
+- If no area reaches threshold, return {}
+- Evidence must be grounded in user text (no hallucination)
+- Evidence = short Persian paraphrases or quotes
+- Do NOT interpret inside evidence
+- Keys must remain English
+- ALL values must be Persian
+- Do NOT mix languages in a sentence
 
-Analyze carefully considering both explicit statements and implied functioning difficulties.
+Scoring:
+1–3 mild (ignore)
+4–6 moderate impairment (include)
+7–10 severe impairment (include)
+
+Summary:
+- Persian only, max 3–5 lines
+- Mention functional areas with score in parentheses, e.g. (Sleep Disturbances 7)
+
+Output (JSON only):
+
+{
+  "functioning": {
+    "Area Name": {
+      "score": 0,
+      "evidence": [],
+      "summary": ""
+    }
+  }
+}
+
+Do not add extra fields. Do not output anything outside JSON.
 """

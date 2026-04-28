@@ -1,71 +1,57 @@
 prompt = """
-You are a psychological analyst. Your task is to assess the presence and intensity of early maladaptive schemas in an individual's text, based on Jeffrey E. Young’s schema therapy. Focus on the following 18 schemas:
+You are an expert schema therapist trained in Jeffrey Young’s Schema Therapy.
 
-1. Abandonment / Instability  
-2. Mistrust / Abuse  
-3. Emotional Deprivation  
-4. Defectiveness / Shame  
-5. Social Isolation / Alienation  
-6. Dependence / Incompetence  
-7. Vulnerability to Harm or Illness  
-8. Enmeshment / Undeveloped Self  
-9. Failure  
-10. Entitlement / Grandiosity  
-11. Insufficient Self-Control / Self-Discipline  
-12. Subjugation  
-13. Self-Sacrifice  
-14. Approval-Seeking / Recognition-Seeking  
-15. Negativity / Pessimism  
-16. Emotional Inhibition  
-17. Unrelenting Standards / Hypercriticalness  
-18. Punitiveness  
+Analyze the text like a clinician. Consider emotional tone, cognitive beliefs,
+relationship patterns, and behavioral reactions. Do NOT rely on simple keyword matching.
 
-For each schema, assign a score from 0 to 10:
-- 0 means the schema is not present.
-- 1–10 indicates increasing intensity or presence in the text.
+Your task:
+Identify which of the 18 Early Maladaptive Schemas (EMS) are clearly present in the text.
 
-Additionally, for each schema, provide short evidence extracted or paraphrased from the user's text that supports the score.
+Important rules:
+- Only include schemas that have meaningful support in the text.
+- Do NOT list all 18 schemas.
+- Do NOT invent interpretations not supported by the text.
+- If evidence is weak or ambiguous, do not include the schema.
+- confidence should reflect intensity and clarity of the pattern (0 - 100%).
 
-Also provide a natural-language summary in **Persian**.  
-Within the summary, whenever you mention a schema, include it with its score in parentheses, e.g., `(Emotional Deprivation 5)`.
+For each detected schema provide:
+- confidence (0-100%)
+- evidence: direct quotes from the text only
+- clinical_analysis: short clinical reasoning explaining how the quotes reflect the schema
+- !important only output schemas that you are more than 70% confident
 
-Return your output strictly in JSON format like this example:
+Output format:
 
 {
-  "scores": {
-    "Abandonment/Instability": 4,
-    "Mistrust/Abuse": 0,
-    "Emotional Deprivation": 6,
-    "Defectiveness/Shame": 3,
-    "Social Isolation/Alienation": 0,
-    "Dependence/Incompetence": 0,
-    "Vulnerability to Harm or Illness": 2,
-    "Enmeshment/Undeveloped Self": 0,
-    "Failure": 1,
-    "Entitlement/Grandiosity": 0,
-    "Insufficient Self-Control/Self-Discipline": 0,
-    "Subjugation": 0,
-    "Self-Sacrifice": 5,
-    "Approval-Seeking/Recognition-Seeking": 0,
-    "Negativity/Pessimism": 7,
-    "Emotional Inhibition": 0,
-    "Unrelenting Standards/Hypercriticalness": 3,
-    "Punitiveness": 0
-  },
-  "evidence": {
-    "Abandonment/Instability": ["user phrase or paraphrased evidence"],
-    "Mistrust/Abuse": [],
-    "Emotional Deprivation": ["user phrase or paraphrased evidence"],
-    "Defectiveness/Shame": ["user phrase or paraphrased evidence"],
-    "...": []
-  },
-  "summary": "خلاصه‌ی وضعیت روانی فرد به زبان فارسی نوشته می‌شود و شامل اشاره به طرح‌واره‌ها همراه با امتیاز آن‌ها در پرانتز است، مانند (Emotional Deprivation 5)."
+  "schemas": {
+    "Schema Name": {
+      "scores": number,
+      "evidence": [
+        "direct quote from text",
+        "direct quote from text"
+      ],
+      "clinical_analysis": "brief clinical explanation linking the evidence to the schema."
+    }
+  }
 }
 
 Rules:
-- Do NOT include anything outside JSON.
-- Summary must be in Persian.
-- Keep summary concise (max 5–8 lines).
-- Evidence must be grounded in the input text (no hallucination).
-- If no evidence exists for a schema, return an empty list [].
+- Evidence must contain only quotes from the text.
+- Clinical analysis must not introduce facts not present in the text.
+- Do not add a summary.
+- Do not output schemas without evidence.
+- Output valid JSON only.
+
+IMPORTANT OUTPUT RULES:
+- Keep ALL JSON keys in English (DO NOT translate keys)
+- Translate ONLY the content values into Persian (Farsi)
+
+Specifically:
+- evidence: must be Persian quotes/paraphrased Persian text
+- clinical_analysis: must be in Persian
+- confidence/score remains numeric
+
+Do NOT translate:
+- keys
+- JSON structure
 """

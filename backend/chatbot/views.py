@@ -6,7 +6,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
-from asgiref.sync import sync_to_async
 
 from .prompts.interview import prompt as model_instruct
 from .models import ChatSession, ChatMessage
@@ -26,23 +25,25 @@ def _add_cors_headers(response: JsonResponse | StreamingHttpResponse) -> JsonRes
 # set up LangChain components once (non-streaming and streaming use the same chain)
 _api_key = os.environ.get("DEEPSEEK_API_KEY")
 llm = ChatOpenAI(
-    model="deepseek-chat",
+    model="deepseek-v4-flash",
     api_key=_api_key,
     base_url="https://api.deepseek.com",
-    temperature=0.7,
+    temperature=0.9,
     streaming=True,
 )
 
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", model_instruct),
-        MessagesPlaceholder("chat_history"),
+        # MessagesPlaceholder("chat_history"),
         ("human", "{input}"),
     ]
 )
 
 chain = prompt | llm
-
+print('*'*50)
+print(prompt)
+print('*'*50)
 
 def _offline_token_count(text: str) -> int:
     stripped = (text or "").strip()
@@ -155,12 +156,13 @@ def chat(request: HttpRequest):
     session.total_tokens += user_token_count
     session.save(update_fields=["total_tokens"])
 
-    # async streaming generator: avoids ASGI warning/slow wrapping.
-    async def stream_response():
+    # Use a synchronous iterator for StreamingHttpResponse under runserver/WSGI.
+    # Async iterators get consumed synchronously and can buffer whole responses.
+    def stream_response():
         full_reply_parts: list[str] = []
 
         # stream tokens/chunks from the model
-        async for chunk in chain.astream({"input": message, "chat_history": chat_history}):
+        for chunk in chain.stream({"input": message, "chat_history": chat_history}):
             token = chunk.content or ""
             if not token:
                 continue
@@ -170,7 +172,7 @@ def chat(request: HttpRequest):
 
         # after streaming is done, persist assistant message
         full_reply = "".join(full_reply_parts)
-        await sync_to_async(_persist_assistant_message)(session, full_reply)
+        _persist_assistant_message(session, full_reply)
 
     resp = StreamingHttpResponse(stream_response(), content_type="text/plain; charset=utf-8")
     # Help proxies/dev servers avoid buffering streamed chunks.

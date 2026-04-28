@@ -28,3 +28,7 @@ Conversation:
 Return only the summary text.
 
 """
+
+prompt = """
+summorize this text like a report of what user is talking about  in persian
+"""
