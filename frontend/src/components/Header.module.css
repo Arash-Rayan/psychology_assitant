@@ -9,6 +9,21 @@
   border-bottom: 1px solid var(--border);
 }
 
+/**
+ * هم‌ارتفاع با ردیف اصلی هدر (لوگو + دکمه‌ها) — اگر padding هدر را عوض کردید این را هم به‌روز کنید.
+ */
+.headerSpacer {
+  flex-shrink: 0;
+  width: 100%;
+  height: 4.75rem;
+}
+
+@media (min-width: 768px) {
+  .headerSpacer {
+    height: 5.35rem;
+  }
+}
+
 .headerContent {
   max-width: 1280px;
   margin: 0 auto;

@@ -2,7 +2,7 @@ import { useState, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Users, TrendingUp, AlertCircle, Activity, Brain, Sparkles, Network, X, 
+  Users, TrendingUp, AlertCircle, Activity, Brain, Network, X, 
   FileText, LayoutDashboard, ClipboardList, HeartPulse, UserCheck, 
   Calendar, Download, Plus, Search, Filter, ChevronRight, Target,
   Stethoscope, MessageSquare, BarChart3
@@ -10,26 +10,32 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { PatientCard, Patient } from './PatientCard';
 import { PatientDetailView, PatientDetail } from './PatientDetailView';
+import { NewIntakePatientView } from './NewIntakePatientView';
 import { PatientsOverviewChart } from './PatientsOverviewChart';
 import { UrgentPatientsPanel } from './UrgentPatientsPanel';
 import { SCHEMA_TYPES, SCHEMA_TYPE_KEYS, SchemaType } from './SchemaTypes';
 import { generatePatients } from './generatePatientData';
+import { patientDetailToPatient } from '@/utils/patientDetailToPatient';
 import { FormBuilderDialog } from './FormBuilderDialog';
 import { SessionNotesView } from './SessionNotesView';
+import { ClinicManagementView } from './ClinicManagementView';
 import styles from './TherapistDashboard.module.css';
 
 interface TherapistDashboardProps {
-  initialTab?: 'patients' | 'forms';
+  initialTab?: 'patients' | 'forms' | 'clinic-management';
   initialShowSessionNotes?: boolean;
 }
 
-export function TherapistDashboard({ initialTab = 'patients', initialShowSessionNotes = false }: TherapistDashboardProps) {
+export function TherapistDashboard({
+  initialTab = 'patients',
+  initialShowSessionNotes = false,
+}: TherapistDashboardProps) {
   const router = useRouter();
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [showUrgentPanel, setShowUrgentPanel] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'all' | 'safe' | 'attention' | 'urgent'>('all');
   const [filterSchema, setFilterSchema] = useState<SchemaType | 'all'>('all');
-  const [activeTab, setActiveTab] = useState<'patients' | 'forms'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'patients' | 'forms' | 'clinic-management'>(initialTab);
   const [showFormBuilder, setShowFormBuilder] = useState(false);
   const [showSessionNotes, setShowSessionNotes] = useState(initialShowSessionNotes);
   const patientsListRef = useRef<HTMLDivElement>(null);
@@ -37,47 +43,57 @@ export function TherapistDashboard({ initialTab = 'patients', initialShowSession
   // Generate 100 patients (client-side only to avoid hydration mismatch)
   const [patientsData, setPatientsData] = useState<PatientDetail[]>([]);
   
+  /** دادهٔ شبیه‌سازی با seed ثابت؛ هر بار ورود به این صفحه همان idها ↔ همان نام و نوع مراجع (جدید/پرونده). */
   useEffect(() => {
     setPatientsData(generatePatients(100));
   }, []);
 
-  // Basic patient info for cards
-  const patients: Patient[] = patientsData.map(p => ({
-    id: p.id,
-    name: p.name,
-    status: p.status,
-    lastActivity: p.lastSession,
-    moodTrend: p.monthlyMood[p.monthlyMood.length - 1].mood > p.monthlyMood[0].mood ? 'up' : 
-                p.monthlyMood[p.monthlyMood.length - 1].mood < p.monthlyMood[0].mood ? 'down' : 'stable',
-    sessionsCount: p.sessionsCount,
-    lastMood: p.overallScore
-  }));
-
-  // Chart data
-  const chartData = patientsData.map(p => ({
-    id: p.id,
-    name: p.name,
-    score: p.overallScore,
-    anxiety: p.monthlyMood[p.monthlyMood.length - 1].anxiety,
-    status: p.status
-  }));
-
-  // Urgent patients
-  const urgentPatientsData = patientsData
-    .filter(p => p.status === 'urgent')
-    .map(p => ({
-      id: p.id,
-      name: p.name,
-      score: p.overallScore,
-      reason: p.aiInsights[0],
-      lastContact: p.lastSession,
-      phone: p.phone,
-      priority: p.overallScore < 35 ? 'critical' as const : 'high' as const
-    }));
-
-  const averageScore = Math.round(
-    patientsData.reduce((sum, p) => sum + p.overallScore, 0) / patientsData.length
+  /** نمای کلی داشبورد: فقط مراجع با پروندهٔ قبلی؛ مراجع جدید (ورودی) اینجا نیستند. */
+  const establishedPatientsData = useMemo(
+    () => patientsData.filter((p) => p.clinicalEngagement === 'established'),
+    [patientsData],
   );
+
+  const patients: Patient[] = useMemo(
+    () => establishedPatientsData.map(patientDetailToPatient),
+    [establishedPatientsData],
+  );
+
+  const chartData = useMemo(
+    () =>
+      establishedPatientsData.map((p) => ({
+        id: p.id,
+        name: p.name,
+        score: p.overallScore,
+        anxiety: p.monthlyMood[p.monthlyMood.length - 1].anxiety,
+        status: p.status,
+      })),
+    [establishedPatientsData],
+  );
+
+  const urgentPatientsData = useMemo(
+    () =>
+      establishedPatientsData
+        .filter((p) => p.status === 'urgent')
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          score: p.overallScore,
+          reason: p.aiInsights[0],
+          lastContact: p.lastSession,
+          phone: p.phone,
+          priority: p.overallScore < 35 ? ('critical' as const) : ('high' as const),
+        })),
+    [establishedPatientsData],
+  );
+
+  const averageScore = useMemo(() => {
+    if (!establishedPatientsData.length) return 0;
+    return Math.round(
+      establishedPatientsData.reduce((sum, p) => sum + p.overallScore, 0) /
+        establishedPatientsData.length,
+    );
+  }, [establishedPatientsData]);
 
   // Filter by status AND/OR schema (simultaneous filtering)
   let filteredPatients = patients;
@@ -96,6 +112,24 @@ export function TherapistDashboard({ initialTab = 'patients', initialShowSession
   }
 
   const selectedPatient = patientsData.find(p => p.id === selectedPatientId);
+
+  const establishedPatientsForNotes = useMemo((): Patient[] => {
+    return establishedPatientsData.map(patientDetailToPatient);
+  }, [establishedPatientsData]);
+
+  const openEstablishedPatientNotes = (patientId: string) => {
+    router.push(`/dashboard/forms/patients/${encodeURIComponent(patientId)}`);
+  };
+
+  const handleClinicCalendarPatientClick = (patientId: string) => {
+    const p = patientsData.find((x) => x.id === patientId);
+    if (!p) return;
+    if (p.clinicalEngagement === 'new_intake') {
+      setSelectedPatientId(patientId);
+    } else {
+      openEstablishedPatientNotes(patientId);
+    }
+  };
 
   const handleStatClick = (status: 'all' | 'safe' | 'attention' | 'urgent') => {
     setFilterStatus(status);
@@ -170,7 +204,11 @@ export function TherapistDashboard({ initialTab = 'patients', initialShowSession
             <div>
               <h1 className={styles.headerTitle}>پنل درمانگر</h1>
               <p className={styles.headerSubtitle}>
-                {activeTab === 'patients' ? 'تحلیل جامع و پیشرفته بیماران' : 'مدیریت فرم‌ها و ارزیابی‌ها'}
+                {activeTab === 'patients'
+                  ? 'تحلیل جامع و پیشرفته بیماران'
+                  : activeTab === 'forms'
+                  ? 'مدیریت فرم‌ها و ارزیابی‌ها'
+                  : 'زمان‌بندی جلسات و پایش نتایج چت‌بات و آزمون‌ها'}
               </p>
             </div>
             
@@ -184,6 +222,16 @@ export function TherapistDashboard({ initialTab = 'patients', initialShowSession
               >
                 <FileText />
                 <span>فرم درمانگر</span>
+              </button>
+
+              <button
+                onClick={() => router.push('/dashboard/clinic-management')}
+                className={`${styles.navButton} ${
+                  activeTab === 'clinic-management' ? styles.navButtonActiveClinic : styles.navButtonInactive
+                }`}
+              >
+                <Calendar />
+                <span>مدیریت کلینیک</span>
               </button>
               
               <button
@@ -210,12 +258,19 @@ export function TherapistDashboard({ initialTab = 'patients', initialShowSession
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Tabs value={activeTab} onValueChange={setActiveTab} className={styles.tabsWrapper}>
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) =>
+              setActiveTab(v as 'patients' | 'forms' | 'clinic-management')
+            }
+            className={styles.tabsWrapper}
+          >
             {/* TabsList hidden since we have navigation buttons in header */}
             <div className={styles.srOnly}>
               <TabsList>
                 <TabsTrigger value="patients">داشبورد مراجعین</TabsTrigger>
                 <TabsTrigger value="forms">فرم‌های درمانگر</TabsTrigger>
+                <TabsTrigger value="clinic-management">مدیریت کلینیک</TabsTrigger>
               </TabsList>
             </div>
 
@@ -260,45 +315,12 @@ export function TherapistDashboard({ initialTab = 'patients', initialShowSession
                 />
               </motion.div>
 
-              {/* AI Insights */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className={styles.aiInsightsCard}
-              >
-                <div className={styles.aiInsightsHeader}>
-                  <div className={styles.aiInsightsIcon}>
-                    <Sparkles />
-                  </div>
-                  <div className={styles.aiInsightsContent}>
-                    <h3 className={styles.aiInsightsTitle}>پیشنهادات هوش مصنوعی</h3>
-                    <ul className={styles.aiInsightsList}>
-                      {urgentPatientsData.length > 0 && (
-                        <li className={styles.aiInsightItem}>
-                          <span className={`${styles.aiInsightDot} ${styles.aiInsightDotRed}`}></span>
-                          <span>بیمار "{urgentPatientsData[0].name}" نیاز به تماس فوری دارد - الگوهای رفتاری نگران‌کننده</span>
-                        </li>
-                      )}
-                      <li className={styles.aiInsightItem}>
-                        <span className={`${styles.aiInsightDot} ${styles.aiInsightDotPrimary}`}></span>
-                        <span>میانگین امتیاز کلی بیماران: {averageScore} - {averageScore > 65 ? 'وضعیت مطلوب' : 'نیاز به توجه بیشتر'}</span>
-                      </li>
-                      <li className={styles.aiInsightItem}>
-                        <span className={`${styles.aiInsightDot} ${styles.aiInsightDotPrimary}`}></span>
-                        <span>پیشنهاد جلسه گروهی برای بیماران با طرحواره‌های مشابه</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </motion.div>
-
               {/* Patients List */}
               <motion.div
                 ref={patientsListRef}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.5 }}
                 className={styles.patientsSection}
               >
                 <div className={styles.patientsHeader}>
@@ -484,12 +506,14 @@ export function TherapistDashboard({ initialTab = 'patients', initialShowSession
                             لیست مراجعین
                           </h3>
                           <p className={styles.sessionNotesDescription}>
-                            مشاهده و مدیریت لیست مراجعین
+                            یادداشت جلسات و تحلیل هوش مصنوعی هر مراجع دارای پرونده
                           </p>
                           <div className={styles.sessionNotesMeta}>
                             <div className={styles.metaBadge}>
                               <Users />
-                              <span className={styles.metaBadgeText}>{patients.length} مراجع</span>
+                              <span className={styles.metaBadgeText}>
+                                {establishedPatientsForNotes.length} مراجع با پرونده
+                              </span>
                             </div>
                             <div className={styles.metaBadge}>
                               <FileText />
@@ -556,22 +580,36 @@ export function TherapistDashboard({ initialTab = 'patients', initialShowSession
                     </div>
                   </motion.div>
                 ) : (
-                  <SessionNotesView 
+                  <SessionNotesView
                     key="session-notes"
-                    patients={patients}
+                    patients={establishedPatientsForNotes}
                     onBack={() => setShowSessionNotes(false)}
                   />
                 )}
               </AnimatePresence>
             </TabsContent>
+
+            <TabsContent value="clinic-management" className={styles.tabsContent}>
+              <ClinicManagementView
+                patients={patientsData}
+                onPatientClick={handleClinicCalendarPatientClick}
+              />
+            </TabsContent>
           </Tabs>
         </motion.div>
       </div>
 
-      {/* Patient Detail Modal */}
       <AnimatePresence>
-        {selectedPatient && (
+        {selectedPatient?.clinicalEngagement === 'new_intake' && (
+          <NewIntakePatientView
+            key={selectedPatient.id}
+            patient={selectedPatient}
+            onClose={() => setSelectedPatientId(null)}
+          />
+        )}
+        {selectedPatient?.clinicalEngagement === 'established' && (
           <PatientDetailView
+            key={selectedPatient.id}
             patient={selectedPatient}
             onClose={() => setSelectedPatientId(null)}
           />

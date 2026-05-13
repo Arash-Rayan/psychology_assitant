@@ -1,0 +1,26 @@
+1-> schema + core beliefe  -> done 
+2-> clinical disorder -> done 
+3-> persona trait new ...> new prompt big five theory  --> taghviat , tazif done 
+4-> relation pattern ...> attachment 
+
+5-> functional level remove
+
+-> الگو های هیجانی ..> 
+   attachment 
+
+##
+cbt method 
+اختلال
+cbt -> شناخت 
+رفتار 
+هیجان 
+بدن 
+
+
+fix the streaming problem while markdown applied after full text comes in
+
+
+## 
+سیستم فراخوان منشی و پیام به منشی 
+
+خلاصه ی روانپزشکی کاپلان و سادوک

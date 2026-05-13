@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { X, Brain, AlertTriangle, CheckCircle, TrendingUp, TrendingDown, Calendar, Activity, Phone, Sparkles, Target, Lightbulb } from 'lucide-react';
+import { X, Brain, AlertTriangle, CheckCircle, TrendingUp, TrendingDown, Calendar, Activity, Phone, Sparkles, Target, Lightbulb, MessageCircleMore, ClipboardList } from 'lucide-react';
 import styles from './PatientDetailView.module.css';
 
 export interface Schema {
@@ -18,12 +18,19 @@ export interface BehaviorPattern {
   trend: 'increasing' | 'decreasing' | 'stable';
 }
 
+/** مراجع تازه: فقط ارزیابی اولیه و آزمون؛ پرونده درمانی کامل هنوز باز نشده */
+export type ClinicalEngagement = 'new_intake' | 'established';
+
 export interface PatientDetail {
   id: string;
   name: string;
   age: number;
   gender: string;
   phone: string;
+  /** new_intake = تازه‌وار، established = پرونده فعال / جلسات قبلی */
+  clinicalEngagement: ClinicalEngagement;
+  /** درمانگر اصلی مراجع برای تقسیم نوبت‌ها در تقویم اتاق‌ها (دادهٔ نمونه) */
+  assignedDoctorId: string;
   status: 'safe' | 'attention' | 'urgent';
   overallScore: number; // 0-100
   schemas: Schema[];
@@ -35,6 +42,32 @@ export interface PatientDetail {
     depression: number;
   }>;
   aiInsights: string[];
+  chatbotSummary: {
+    mainTopic: 'ازدواج' | 'روابط' | 'فردی' | 'اضطراب' | 'خانواده';
+    confidence: number;
+    notes: string;
+  };
+  /**
+   * فقط برای `new_intake`: خلاصهٔ روایت‌گونهٔ گفت‌وگوی غربالگری با چت‌بات (نمونه).
+   */
+  intakeConversationSummary?: string;
+  /**
+   * فقط برای `new_intake`: نمونهٔ نکات استخراج‌شده از گفت‌وگوی غربالگری با چت‌بات
+   * (قبل از باز شدن پروندهٔ درمانی کامل).
+   */
+  intakeChatHighlights?: string[];
+  assessments: {
+    neo: {
+      neuroticism: number;
+      extraversion: number;
+      openness: number;
+      agreeableness: number;
+      conscientiousness: number;
+    };
+    depression: number;
+    anxiety: number;
+    stress: number;
+  };
   sessionsCount: number;
   lastSession: string;
 }
@@ -578,6 +611,36 @@ export function PatientDetailView({ patient, onClose }: PatientDetailViewProps) 
                 ))}
               </div>
             </motion.div>
+          </section>
+
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <MessageCircleMore />
+              <h3 className={styles.sectionTitle}>خلاصه نتیجه گفت‌وگو با چت‌بات</h3>
+            </div>
+            <div className={styles.aiSummaryCard}>
+              <p className={styles.aiSummaryText}>
+                موضوع غالب: <strong>{patient.chatbotSummary.mainTopic}</strong> (ضریب اطمینان: {patient.chatbotSummary.confidence}%)
+              </p>
+              <p className={styles.aiSummaryText}>{patient.chatbotSummary.notes}</p>
+            </div>
+          </section>
+
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <ClipboardList />
+              <h3 className={styles.sectionTitle}>نتایج آزمون‌ها (NEO و سایر تست‌ها)</h3>
+            </div>
+            <div className={styles.recommendationsCard}>
+              <ul className={styles.recommendationsList}>
+                <li className={styles.recommendationItem}><CheckCircle /><p className={styles.recommendationText}>NEO - روان‌رنجوری: {patient.assessments.neo.neuroticism}</p></li>
+                <li className={styles.recommendationItem}><CheckCircle /><p className={styles.recommendationText}>NEO - برون‌گرایی: {patient.assessments.neo.extraversion}</p></li>
+                <li className={styles.recommendationItem}><CheckCircle /><p className={styles.recommendationText}>NEO - گشودگی: {patient.assessments.neo.openness}</p></li>
+                <li className={styles.recommendationItem}><CheckCircle /><p className={styles.recommendationText}>NEO - توافق‌پذیری: {patient.assessments.neo.agreeableness}</p></li>
+                <li className={styles.recommendationItem}><CheckCircle /><p className={styles.recommendationText}>NEO - وظیفه‌شناسی: {patient.assessments.neo.conscientiousness}</p></li>
+                <li className={styles.recommendationItem}><CheckCircle /><p className={styles.recommendationText}>افسردگی: {patient.assessments.depression} | اضطراب: {patient.assessments.anxiety} | استرس: {patient.assessments.stress}</p></li>
+              </ul>
+            </div>
           </section>
         </div>
       </motion.div>

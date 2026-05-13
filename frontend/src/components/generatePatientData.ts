@@ -1,5 +1,9 @@
 import { PatientDetail } from './PatientDetailView';
 import { SCHEMA_TYPES, SchemaType } from './SchemaTypes';
+import { doctors } from '@/utils/mockClinicData';
+
+/** ثابت برای دادهٔ شبیه‌سازی؛ هر بار بارگذاری صفحه همان مراجع با همان id تولید می‌شوند و لینک تقویم ↔ لیست مراجعین هم‌خوان می‌ماند. */
+export const DEMO_THERAPIST_DATA_SEED = 0x706d6832; // 'pmh2'
 
 const persianFirstNames = [
   'علی', 'محمد', 'رضا', 'حسین', 'سارا', 'فاطمه', 'زهرا', 'مریم', 'نازنین', 'پریسا',
@@ -60,61 +64,109 @@ const aiInsightTemplates = [
   'نشانه‌های اولیه بهبود در تنظیم هیجانی'
 ];
 
+const chatbotTopics: Array<'ازدواج' | 'روابط' | 'فردی' | 'اضطراب' | 'خانواده'> = [
+  'ازدواج',
+  'روابط',
+  'فردی',
+  'اضطراب',
+  'خانواده'
+];
+
+const intakeConversationSummaries = [
+  'مراجع در چند پیام اول از خواب نامنظم، تپش قلب هنگام ورود به محیط کار و احساس «غرق شدن در فکر» صحبت کرد. تمایل به اجتناب از تماس‌های کاری را بیان کرد و هم‌زمان نگران قضاوت همکاران بود. در پاسخ به سوالات باز، اشاره کرد که از دو هفته پیش شدت علائم بیشتر شده و برای آرام شدن گاهی تا دیروقت در شبکه‌های اجتماعی می‌ماند.',
+  'گفت‌وگو حول تعارض با یکی از اعضای خانواده، احساس طرد شدن و ترس از قطع رابطه چرخید. مراجع چند بار تأکید کرد که «نمی‌داند انتخاب درست چیست» و هم احساس دلتنگی و هم نیاز به فاصله را هم‌زمان توصیف کرد. در بخش پایانی تمایل به مراجعه حضوری برای شروع فرایند درمان را اعلام کرد.',
+  'تمرکز اصلی بر اضطراب اجتماعی محدود به موقعیت‌های ارائه و صحبت در جمع بود. مراجع تکنیک تنفس را امتحان کرده اما می‌گفت در لحظه واقعی فراموش می‌کند. از سردردهای عصرگاهی و گرفتگی شانه‌ها هم نام برد. برای بار اول با پلتفرم آشنا بود و پاسخ‌ها کوتاه اما هم‌راستا با غربالگری بود.',
+];
+
+const intakeHighlightPools: string[][] = [
+  [
+    'علائم جسمی همراه با استرس (تپش، سفتی عضلانی) گزارش شد.',
+    'الگوی اجتناب از موقعیت‌های عملکردی محور کار بیان شد.',
+    'آستانه تحمل در هفتهٔ اخیر کاهش یافته است.',
+  ],
+  [
+    'تعارض بین‌فردی خانوادگی محور گفت‌وگو بود.',
+    'دوگانگی احساسی (دلتنگی در کنار نیاز به فاصله) مشخص بود.',
+    'مراجع آمادگی برای ادامهٔ مسیر درمانی را نشان داد.',
+  ],
+  [
+    'ترس از ارزیابی منفی دیگران در موقعیت‌های اجتماعی برجسته بود.',
+    'استفاده نامنظم از مهارت‌های تنظیم هیجان ذکر شد.',
+    'پیگیری خواب و فعالیت روزانه پیشنهاد شد؛ مراجع موافقت اولیه کرد.',
+  ],
+];
+
 const timeReferences = [
   'امروز', 'دیروز', 'پریروز', 'هفته گذشته', '۲ هفته پیش', '۳ هفته پیش',
   '۱ روز پیش', '۲ روز پیش', '۳ روز پیش', '۴ روز پیش', '۵ روز پیش',
   '۶ روز پیش', '۷ روز پیش', '۱۰ روز پیش', '۱۵ روز پیش'
 ];
 
-function getRandomElement<T>(array: T[]): T {
-  return array[Math.floor(Math.random() * array.length)];
+/** PRNG قطعی برای مراجع شبیه‌سازی‌شده (هر بار خروجی یکسان برای همان seed). */
+interface SeededRng {
+  next: () => number;
+  int: (min: number, max: number) => number;
+  element: <T>(arr: readonly T[]) => T;
 }
 
-function getRandomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+function createSeededRng(seed: number): SeededRng {
+  let state = seed >>> 0;
+  const next = () => {
+    state = (Math.imul(1664525, state) + 1013904223) >>> 0;
+    return state / 4294967296;
+  };
+  return {
+    next,
+    int: (min, max) => Math.floor(next() * (max - min + 1)) + min,
+    element: <T>(arr: readonly T[]) => arr[Math.floor(next() * arr.length)],
+  };
 }
 
-function generatePhoneNumber(): string {
+function generatePhoneNumber(rng: SeededRng): string {
   const prefixes = ['۰۹۱۲', '۰۹۱۳', '۰۹۱۴', '۰۹۱۵', '۰۹۱۶', '۰۹۱۷', '۰۹۱۸', '۰۹۱۹'];
-  const prefix = getRandomElement(prefixes);
-  const part1 = getRandomInt(100, 999).toString().split('').map(d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]).join('');
-  const part2 = getRandomInt(1000, 9999).toString().split('').map(d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]).join('');
+  const prefix = rng.element(prefixes);
+  const part1 = rng.int(100, 999).toString().split('').map(d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]).join('');
+  const part2 = rng.int(1000, 9999).toString().split('').map(d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]).join('');
   return `${prefix} ${part1} ${part2}`;
 }
 
-function generateMoodData() {
-  const baseScore = getRandomInt(30, 85);
-  const trend = Math.random() > 0.5 ? 1 : -1;
-  
+function generateMoodData(rng: SeededRng) {
+  const baseScore = rng.int(30, 85);
+  const trend = rng.next() > 0.5 ? 1 : -1;
+
   return [
     {
       date: 'هفته ۱',
       mood: baseScore,
-      anxiety: getRandomInt(20, 70),
-      depression: getRandomInt(15, 65)
+      anxiety: rng.int(20, 70),
+      depression: rng.int(15, 65)
     },
     {
       date: 'هفته ۲',
-      mood: Math.min(100, Math.max(0, baseScore + trend * getRandomInt(0, 8))),
-      anxiety: getRandomInt(20, 70),
-      depression: getRandomInt(15, 65)
+      mood: Math.min(100, Math.max(0, baseScore + trend * rng.int(0, 8))),
+      anxiety: rng.int(20, 70),
+      depression: rng.int(15, 65)
     },
     {
       date: 'هفته ۳',
-      mood: Math.min(100, Math.max(0, baseScore + trend * getRandomInt(5, 15))),
-      anxiety: getRandomInt(20, 70),
-      depression: getRandomInt(15, 65)
+      mood: Math.min(100, Math.max(0, baseScore + trend * rng.int(5, 15))),
+      anxiety: rng.int(20, 70),
+      depression: rng.int(15, 65)
     },
     {
       date: 'هفته ۴',
-      mood: Math.min(100, Math.max(0, baseScore + trend * getRandomInt(10, 20))),
-      anxiety: getRandomInt(20, 70),
-      depression: getRandomInt(15, 65)
+      mood: Math.min(100, Math.max(0, baseScore + trend * rng.int(10, 20))),
+      anxiety: rng.int(20, 70),
+      depression: rng.int(15, 65)
     }
   ];
 }
 
-export function generatePatients(count: number = 100): PatientDetail[] {
+export function generatePatients(
+  count: number = 100,
+  seed: number = DEMO_THERAPIST_DATA_SEED,
+): PatientDetail[] {
+  const rng = createSeededRng(seed);
   const patients: PatientDetail[] = [
     {
       id: 'test-patient-1',
@@ -122,6 +174,8 @@ export function generatePatients(count: number = 100): PatientDetail[] {
       age: 29,
       gender: 'زن',
       phone: '۰۹۱۲ ۳۴۵ ۶۷۸۹',
+      clinicalEngagement: 'established',
+      assignedDoctorId: doctors[0]?.id ?? 'd1',
       status: 'attention',
       overallScore: 58,
       sessionsCount: 6,
@@ -163,137 +217,196 @@ export function generatePatients(count: number = 100): PatientDetail[] {
       aiInsights: [
         'الگوی نگرانی بین فردی همچنان فعال است و نیاز به مداخله ساختاریافته دارد.',
         'توانایی خودتنظیمی اولیه وجود دارد اما هنوز ناپایدار است.'
-      ]
+      ],
+      chatbotSummary: {
+        mainTopic: 'روابط',
+        confidence: 82,
+        notes: 'در مکالمات اخیر تمرکز اصلی بر تعارض‌های رابطه‌ای، نیاز به مرزبندی و بهبود گفت‌وگوی زوجی بوده است.'
+      },
+      assessments: {
+        neo: {
+          neuroticism: 67,
+          extraversion: 41,
+          openness: 58,
+          agreeableness: 72,
+          conscientiousness: 54
+        },
+        depression: 48,
+        anxiety: 61,
+        stress: 55
+      }
     }
   ];
   const schemaKeys = Object.keys(SCHEMA_TYPES) as SchemaType[];
-  
-  // Track how many patients have been assigned to each schema to ensure all are represented
+
   const schemaAssignmentCount = new Map<SchemaType, number>();
   schemaKeys.forEach(key => schemaAssignmentCount.set(key, 0));
 
   for (let i = 0; i < count; i++) {
-    const firstName = getRandomElement(persianFirstNames);
-    const lastName = getRandomElement(persianLastNames);
-    const age = getRandomInt(18, 65);
-    const gender = getRandomElement(genders);
-    const sessionsCount = getRandomInt(1, 30);
-    
-    // Determine status based on probability
-    const statusRand = Math.random();
+    const firstName = rng.element(persianFirstNames);
+    const lastName = rng.element(persianLastNames);
+    const age = rng.int(18, 65);
+    const gender = rng.element(genders);
+    const isNewIntake = rng.next() < 0.28;
+    const clinicalEngagement = isNewIntake ? 'new_intake' : 'established';
+    const sessionsCount = isNewIntake ? 0 : rng.int(1, 30);
+    const assignedDoctorId = doctors[i % doctors.length]?.id ?? doctors[0]?.id ?? 'd1';
+
+    const statusRand = rng.next();
     let status: 'safe' | 'attention' | 'urgent';
     let overallScore: number;
-    
-    if (statusRand < 0.15) { // 15% urgent
+
+    if (statusRand < 0.15) {
       status = 'urgent';
-      overallScore = getRandomInt(20, 45);
-    } else if (statusRand < 0.40) { // 25% attention
+      overallScore = rng.int(20, 45);
+    } else if (statusRand < 0.40) {
       status = 'attention';
-      overallScore = getRandomInt(45, 65);
-    } else { // 60% safe
+      overallScore = rng.int(45, 65);
+    } else {
       status = 'safe';
-      overallScore = getRandomInt(65, 95);
+      overallScore = rng.int(65, 95);
     }
 
-    // Generate 1-4 schemas for this patient
-    const numSchemas = getRandomInt(1, 4);
+    const numSchemas = isNewIntake ? rng.int(0, 1) : rng.int(1, 4);
     const patientSchemas = [];
     const usedSchemas = new Set<string>();
-    
+
     for (let j = 0; j < numSchemas; j++) {
       let schemaKey: SchemaType;
-      
-      // For the first 18 patients, ensure each schema gets assigned at least once
+
       if (i < schemaKeys.length && j === 0) {
         schemaKey = schemaKeys[i];
       } else {
-        // Otherwise, pick randomly (with slight preference for underrepresented schemas)
-        const sortedByCount = [...schemaKeys].sort((a, b) => 
+        const sortedByCount = [...schemaKeys].sort((a, b) =>
           (schemaAssignmentCount.get(a) || 0) - (schemaAssignmentCount.get(b) || 0)
         );
-        
-        // 70% chance to pick from least represented half, 30% completely random
-        if (Math.random() < 0.7) {
+
+        if (rng.next() < 0.7) {
           const leastRepresented = sortedByCount.slice(0, Math.ceil(schemaKeys.length / 2));
           do {
-            schemaKey = getRandomElement(leastRepresented);
+            schemaKey = rng.element(leastRepresented);
           } while (usedSchemas.has(schemaKey));
         } else {
           do {
-            schemaKey = getRandomElement(schemaKeys);
+            schemaKey = rng.element(schemaKeys);
           } while (usedSchemas.has(schemaKey));
         }
       }
-      
+
       usedSchemas.add(schemaKey);
       schemaAssignmentCount.set(schemaKey, (schemaAssignmentCount.get(schemaKey) || 0) + 1);
-      
+
       const severities: Array<'low' | 'medium' | 'high'> = ['low', 'medium', 'high'];
-      const severity = status === 'urgent' 
-        ? getRandomElement(['medium', 'high'] as Array<'medium' | 'high'>)
+      const severity = status === 'urgent'
+        ? rng.element(['medium', 'high'] as Array<'medium' | 'high'>)
         : status === 'attention'
-        ? getRandomElement(severities)
-        : getRandomElement(['low', 'medium'] as Array<'low' | 'medium'>);
-      
+        ? rng.element(severities)
+        : rng.element(['low', 'medium'] as Array<'low' | 'medium'>);
+
       patientSchemas.push({
         name: schemaKey,
         severity,
-        frequency: getRandomInt(1, 25),
-        lastDetected: getRandomElement(timeReferences),
+        frequency: rng.int(1, 25),
+        lastDetected: rng.element(timeReferences),
         description: SCHEMA_TYPES[schemaKey].description
       });
     }
 
-    // Generate 2-4 behavior patterns
-    const numBehaviors = getRandomInt(2, 4);
+    const numBehaviors = isNewIntake ? rng.int(0, 2) : rng.int(2, 4);
     const patientBehaviors = [];
     const usedBehaviors = new Set<string>();
-    
+
     for (let j = 0; j < numBehaviors; j++) {
       let behavior: string;
       do {
-        behavior = getRandomElement(behaviorPatterns);
+        behavior = rng.element(behaviorPatterns);
       } while (usedBehaviors.has(behavior));
-      
+
       usedBehaviors.add(behavior);
-      
+
       const trends: Array<'increasing' | 'decreasing' | 'stable'> = ['increasing', 'decreasing', 'stable'];
       patientBehaviors.push({
         pattern: behavior,
-        occurrences: getRandomInt(1, 30),
-        trend: getRandomElement(trends)
+        occurrences: rng.int(1, 30),
+        trend: rng.element(trends)
       });
     }
 
-    // Generate 2-4 AI insights
-    const numInsights = getRandomInt(2, 4);
+    const numInsights = isNewIntake ? rng.int(1, 2) : rng.int(2, 4);
     const patientInsights = [];
     const usedInsights = new Set<string>();
-    
+
     for (let j = 0; j < numInsights; j++) {
       let insight: string;
       do {
-        insight = getRandomElement(aiInsightTemplates);
+        insight = rng.element(aiInsightTemplates);
       } while (usedInsights.has(insight));
-      
+
       usedInsights.add(insight);
       patientInsights.push(insight);
     }
 
+    const intakeNotes = isNewIntake
+      ? 'خلاصهٔ اولیه از گفت‌وگوی غربالگری: مراجع تازه‌وار؛ تمرکز روی علائم و زمینهٔ مراجعه. پروندهٔ درمانی کامل هنوز تشکیل نشده — فقط دادهٔ ارزیابی ورودی موجود است.'
+      : 'تحلیل چت‌بات نشان می‌دهد الگوی غالب در گفت‌وگوها نیاز به مداخله هدفمند در همین حوزه است.';
+
+    const intakeConversationSummary = isNewIntake
+      ? intakeConversationSummaries[
+          (firstName.charCodeAt(0) + lastName.charCodeAt(0) + i) %
+            intakeConversationSummaries.length
+        ]
+      : undefined;
+    const intakeChatHighlights = isNewIntake
+      ? intakeHighlightPools[
+          (lastName.charCodeAt(0) + i * 7) % intakeHighlightPools.length
+        ]
+      : undefined;
+
     patients.push({
-      id: (i + 1).toString(),
+      id: String(i + 1),
       name: `${firstName} ${lastName}`,
       age,
       gender,
-      phone: generatePhoneNumber(),
+      phone: generatePhoneNumber(rng),
+      clinicalEngagement,
+      assignedDoctorId,
       status,
       overallScore,
       sessionsCount,
-      lastSession: getRandomElement(timeReferences),
+      lastSession: isNewIntake ? '—' : rng.element(timeReferences),
       schemas: patientSchemas,
       behaviors: patientBehaviors,
-      monthlyMood: generateMoodData(),
-      aiInsights: patientInsights
+      monthlyMood: isNewIntake
+        ? [
+            {
+              date: 'ورود',
+              mood: overallScore,
+              anxiety: rng.int(25, 70),
+              depression: rng.int(20, 65),
+            },
+          ]
+        : generateMoodData(rng),
+      aiInsights: patientInsights,
+      chatbotSummary: {
+        mainTopic: rng.element(chatbotTopics),
+        confidence: isNewIntake ? rng.int(55, 78) : rng.int(62, 95),
+        notes: intakeNotes,
+      },
+      ...(isNewIntake
+        ? { intakeConversationSummary, intakeChatHighlights }
+        : {}),
+      assessments: {
+        neo: {
+          neuroticism: rng.int(25, 80),
+          extraversion: rng.int(25, 80),
+          openness: rng.int(25, 80),
+          agreeableness: rng.int(25, 80),
+          conscientiousness: rng.int(25, 80)
+        },
+        depression: rng.int(20, 75),
+        anxiety: rng.int(20, 75),
+        stress: rng.int(20, 75)
+      }
     });
   }
 

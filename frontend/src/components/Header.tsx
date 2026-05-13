@@ -16,6 +16,7 @@ export function Header() {
   const closeMobileMenu = () => setMobileMenuOpen(false);
   
   return (
+    <>
     <header className={styles.header}>
       <div className={styles.headerContent}>
         <div className={styles.navContainer} dir="rtl">
@@ -150,5 +151,8 @@ export function Header() {
         )}
       </div>
     </header>
+    {/* جبران ارتفاع هدر ثابت تا محتوا زیر نوار بالا نرود */}
+    <div className={styles.headerSpacer} aria-hidden />
+    </>
   );
 }

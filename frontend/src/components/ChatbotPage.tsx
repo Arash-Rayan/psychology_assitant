@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Smile, Meh, Frown, Heart, Brain, Angry, SmilePlus } from 'lucide-react';
+import { Send, Smile, Meh, Frown, Heart, Brain, ClipboardList } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import styles from './ChatbotPage.module.css';
+
+export type ChatbotVariant = 'assistant' | 'pre_consult';
 
 interface Message {
   id: string;
@@ -15,19 +17,50 @@ interface Message {
 
 type MoodType = 'very_sad' | 'sad' | 'normal' | 'good' | 'amazing';
 
-export function ChatbotPage() {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000';
+function resolveChatEndpoint(variant: ChatbotVariant): string {
+  const base = (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000').replace(/\/$/, '');
+  if (variant === 'pre_consult') {
+    const override = process.env.NEXT_PUBLIC_PRE_CONSULT_CHAT_URL?.trim();
+    if (override) return override;
+    return `${base}/chat/pre-consult`;
+  }
+  return `${base}/chat`;
+}
 
-  const [messages, setMessages] = useState<Message[]>([
+function createInitialMessages(variant: ChatbotVariant): Message[] {
+  if (variant === 'pre_consult') {
+    return [
+      {
+        id: '1',
+        text:
+          'سلام، به بخش پیش‌مشاوره خوش آمدید.\n\nاین بخش برای کسانی است که هنوز ویزیت حضوری یا آنلاین با درمانگر نداشته‌اند. می‌توانید در یک فضای امن، نگرانی‌ها و سوالات اولیه‌تان را مرور کنید. دوست دارید از چه موضوعی شروع کنیم؟',
+        sender: 'bot',
+        emotion: 'positive',
+        timestamp: new Date(),
+        showMoodEmojis: false,
+      },
+    ];
+  }
+  return [
     {
       id: '1',
       text: 'سلام! امروز چطور بود؟ 🌟',
       sender: 'bot',
       emotion: 'positive',
       timestamp: new Date(),
-      showMoodEmojis: true
-    }
-  ]);
+      showMoodEmojis: true,
+    },
+  ];
+}
+
+interface ChatbotPageProps {
+  variant?: ChatbotVariant;
+}
+
+export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
+  const chatEndpoint = useMemo(() => resolveChatEndpoint(variant), [variant]);
+
+  const [messages, setMessages] = useState<Message[]>(() => createInitialMessages(variant));
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [moodSelected, setMoodSelected] = useState(false);
@@ -58,8 +91,16 @@ export function ChatbotPage() {
     scrollToBottom();
   }, [messages, isTyping]);
 
+  useEffect(() => {
+    setMessages(createInitialMessages(variant));
+    setMoodSelected(false);
+    setInputValue('');
+    setStreamingBotId(null);
+    setIsTyping(false);
+  }, [variant]);
+
   const handleMoodSelect = (mood: MoodType) => {
-    if (moodSelected) return;
+    if (moodSelected || variant === 'pre_consult') return;
     
     setMoodSelected(true);
     
@@ -137,7 +178,7 @@ export function ChatbotPage() {
     setIsTyping(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/chat`, {
+      const res = await fetch(chatEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -220,14 +261,20 @@ export function ChatbotPage() {
           className={styles.chatCard}
         >
           {/* Chat Header */}
-          <div className={styles.chatHeader}>
+          <div
+            className={`${styles.chatHeader} ${variant === 'pre_consult' ? styles.chatHeaderPreConsult : ''}`}
+          >
             <div className={styles.headerContent}>
               <div className={styles.headerIcon}>
-                <Brain />
+                {variant === 'pre_consult' ? <ClipboardList /> : <Brain />}
               </div>
               <div className={styles.headerText}>
-                <h2>روانصد</h2>
-                <p>دستیار هوشمند سلامت روان</p>
+                <h2>{variant === 'pre_consult' ? 'پیش‌مشاوره' : 'روانصد'}</h2>
+                <p>
+                  {variant === 'pre_consult'
+                    ? 'قبل از ویزیت — راهنما و سوالات اولیه'
+                    : 'دستیار هوشمند سلامت روان'}
+                </p>
               </div>
               <div className={styles.statusContainer}>
                 <div className={styles.statusIndicator}>

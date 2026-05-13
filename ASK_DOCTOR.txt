@@ -1,0 +1,26 @@
+1 ask doctor in 3 line chart what should i upt 
+2 ask doctor when to ask and converastion with person where to do a test
+
+
+
+1-> 
+add seperate room selection beside the doctors 
+
+2-> 
+call to action for practices therapis gave
+
+
+3-> 
+addd precitice add option predifined 
+
+4-> 
+add pause button 
+
+5->
+create better ui for the note taker
+
+6-> 
+find a solution for filling the fields 
+
+7-> 
+add mood inside emotional state

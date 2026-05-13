@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, FileText, Calendar, Clock, Smile, Target, BookOpen, Home, Save, ChevronRight, ChevronLeft, ChevronDown, Check, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
@@ -7,6 +7,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Checkbox } from './ui/checkbox';
 import { toast } from 'sonner';
+import { cn } from './ui/utils';
 
 interface FormItem {
   id: string;
@@ -503,15 +504,21 @@ interface AddSessionNoteDialogProps {
 }
 
 export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber }: AddSessionNoteDialogProps) {
+  const [ratePerMinute, setRatePerMinute] = useState('30000');
   const [step, setStep] = useState<'category' | 'form'>('category');
   const [selectedCategory, setSelectedCategory] = useState<FormCategory | null>(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<Set<string>>(new Set());
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [openSubcategories, setOpenSubcategories] = useState<Set<string>>(new Set());
+  const [sessionStartedAt, setSessionStartedAt] = useState('');
+  const [sessionEndedAt, setSessionEndedAt] = useState('');
+  const [isSessionRunning, setIsSessionRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
-    duration: '45',
+    duration: '0',
     mood: '',
     mainTopics: '',
     chiefComplaint: '',
@@ -523,6 +530,64 @@ export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber
     homework: '',
     nextSessionGoals: ''
   });
+
+  const nowDateTimeLocal = () => {
+    const now = new Date();
+    const offsetMs = now.getTimezoneOffset() * 60 * 1000;
+    return new Date(now.getTime() - offsetMs).toISOString().slice(0, 16);
+  };
+
+  const msToLocalDateTimeInput = (ms: number) => {
+    const d = new Date(ms);
+    const offsetMs = d.getTimezoneOffset() * 60 * 1000;
+    return new Date(d.getTime() - offsetMs).toISOString().slice(0, 16);
+  };
+
+  const computeDurationMinutes = (startValue: string, endValue: string): number => {
+    if (!startValue || !endValue) return 0;
+    const startMs = new Date(startValue).getTime();
+    const endMs = new Date(endValue).getTime();
+    if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return 0;
+    return Math.max(0, Math.round((endMs - startMs) / 60000));
+  };
+
+  const computeDurationSeconds = (startValue: string, endValue: string): number => {
+    if (!startValue || !endValue) return 0;
+    const startMs = new Date(startValue).getTime();
+    const endMs = new Date(endValue).getTime();
+    if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return 0;
+    return Math.floor((endMs - startMs) / 1000);
+  };
+
+  const formatElapsed = (seconds: number): string => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h, m, s].map((n) => String(n).padStart(2, '0')).join(':');
+  };
+
+  useEffect(() => {
+    if (!sessionStartedAt) {
+      setFormData((prev) => ({ ...prev, duration: '0' }));
+      setElapsedSeconds(0);
+      return;
+    }
+    const effectiveEnd = isSessionRunning ? nowDateTimeLocal() : sessionEndedAt;
+    const totalSeconds = computeDurationSeconds(sessionStartedAt, effectiveEnd);
+    setElapsedSeconds(totalSeconds);
+    const minutes = computeDurationMinutes(sessionStartedAt, effectiveEnd);
+    setFormData((prev) => ({ ...prev, duration: String(minutes) }));
+    if (!isSessionRunning) return;
+
+    const timer = window.setInterval(() => {
+      const liveSeconds = computeDurationSeconds(sessionStartedAt, nowDateTimeLocal());
+      const liveMinutes = computeDurationMinutes(sessionStartedAt, nowDateTimeLocal());
+      setElapsedSeconds(liveSeconds);
+      setFormData((prev) => ({ ...prev, duration: String(liveMinutes) }));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [sessionStartedAt, sessionEndedAt, isSessionRunning]);
 
   const handleCategorySelect = (category: FormCategory) => {
     setSelectedCategory(category);
@@ -632,7 +697,7 @@ export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber
       setOpenSubcategories(new Set());
       setFormData({
         date: new Date().toISOString().split('T')[0],
-        duration: '45',
+        duration: '0',
         mood: '',
         mainTopics: '',
         chiefComplaint: '',
@@ -644,6 +709,11 @@ export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber
         homework: '',
         nextSessionGoals: ''
       });
+      setSessionStartedAt('');
+      setSessionEndedAt('');
+      setIsSessionRunning(false);
+      setIsPaused(false);
+      setElapsedSeconds(0);
     }, 300);
   };
 
@@ -933,13 +1003,188 @@ export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber
                     <Input
                       type="number"
                       value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                      readOnly
                       placeholder="45"
                       className="w-full"
                       dir="rtl"
                     />
                   </motion.div>
                 </div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.18 }}
+                  className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.1] via-white to-primary/[0.04] p-4 sm:p-5 space-y-4 shadow-[0_10px_30px_-16px_rgba(60,199,217,0.45)]"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-foreground">زمان‌سنج جلسه</p>
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ring-1",
+                        isSessionRunning
+                          ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+                          : isPaused
+                            ? "bg-amber-50 text-amber-800 ring-amber-200"
+                            : "bg-slate-50 text-slate-600 ring-slate-200",
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "size-1.5 rounded-full",
+                          isSessionRunning
+                            ? "animate-pulse bg-emerald-500"
+                            : isPaused
+                              ? "bg-amber-500"
+                              : "bg-slate-400",
+                        )}
+                      />
+                      {isSessionRunning ? "در حال اجرا" : isPaused ? "مکث" : "متوقف"}
+                    </span>
+                  </div>
+
+                  <div className="rounded-xl border border-primary/30 bg-white p-5 text-center">
+                    <p className="text-xs text-muted-foreground mb-2">تایمر زنده جلسه</p>
+                    <p className="text-5xl sm:text-6xl font-bold tracking-widest text-primary tabular-nums leading-none">
+                      {formatElapsed(elapsedSeconds)}
+                    </p>
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      {isPaused
+                        ? "زمان مکث در مدت جلسه حساب نمی‌شود؛ «ادامه» را بزنید یا «توقف جلسه» برای پایان نهایی."
+                        : "هر ثانیه به‌صورت زنده به‌روزرسانی می‌شود"}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="mb-2 block text-xs text-muted-foreground">شروع جلسه (دستی)</Label>
+                      <Input
+                        type="datetime-local"
+                        value={sessionStartedAt}
+                        onChange={(e) => {
+                          setSessionStartedAt(e.target.value);
+                          if (!e.target.value) {
+                            setIsSessionRunning(false);
+                            setIsPaused(false);
+                          }
+                        }}
+                        dir="ltr"
+                      />
+                    </div>
+                    <div>
+                      <Label className="mb-2 block text-xs text-muted-foreground">پایان جلسه (دستی)</Label>
+                      <Input
+                        type="datetime-local"
+                        value={sessionEndedAt}
+                        onChange={(e) => {
+                          setSessionEndedAt(e.target.value);
+                          if (e.target.value) {
+                            setIsSessionRunning(false);
+                            setIsPaused(false);
+                          }
+                        }}
+                        dir="ltr"
+                      />
+                    </div>
+                    <div>
+                      <Label className="mb-2 block text-xs text-muted-foreground">تعرفه هر دقیقه (تومان)</Label>
+                      <Input
+                        type="number"
+                        value={ratePerMinute}
+                        onChange={(e) => setRatePerMinute(e.target.value)}
+                        dir="rtl"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSessionStartedAt(nowDateTimeLocal());
+                        setSessionEndedAt('');
+                        setIsSessionRunning(true);
+                        setIsPaused(false);
+                      }}
+                      disabled={isSessionRunning || isPaused}
+                      className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm hover:bg-primary-hover transition-colors disabled:opacity-45 disabled:pointer-events-none"
+                    >
+                      شروع جلسه
+                    </button>
+                    {isSessionRunning ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSessionEndedAt(nowDateTimeLocal());
+                          setIsSessionRunning(false);
+                          setIsPaused(true);
+                        }}
+                        className="px-4 py-2 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-sm hover:bg-amber-100 transition-colors"
+                      >
+                        مکث
+                      </button>
+                    ) : null}
+                    {isPaused ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const frozen = computeDurationSeconds(
+                            sessionStartedAt,
+                            sessionEndedAt,
+                          );
+                          if (!sessionStartedAt || !sessionEndedAt || frozen < 0) {
+                            toast.error('ادامه ممکن نیست؛ زمان شروع یا پایان مکث را بررسی کنید');
+                            return;
+                          }
+                          setSessionStartedAt(
+                            msToLocalDateTimeInput(Date.now() - frozen * 1000),
+                          );
+                          setSessionEndedAt('');
+                          setIsSessionRunning(true);
+                          setIsPaused(false);
+                        }}
+                        className="px-4 py-2 rounded-xl border border-primary/40 bg-primary/10 text-primary text-sm hover:bg-primary/15 transition-colors"
+                      >
+                        ادامه
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (isPaused) {
+                          setIsPaused(false);
+                          return;
+                        }
+                        if (!sessionStartedAt) {
+                          toast.error('ابتدا زمان شروع را ثبت کنید');
+                          return;
+                        }
+                        setSessionEndedAt(nowDateTimeLocal());
+                        setIsSessionRunning(false);
+                        setIsPaused(false);
+                      }}
+                      disabled={!isSessionRunning && !isPaused}
+                      className="px-4 py-2 rounded-xl border border-border bg-white hover:bg-muted text-sm transition-colors disabled:opacity-45 disabled:pointer-events-none"
+                    >
+                      توقف جلسه
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="rounded-lg border border-border bg-white p-3">
+                      <p className="text-xs text-muted-foreground mb-1">مدت محاسبه‌شده</p>
+                      <p className="text-sm text-foreground">
+                        {Number(formData.duration || 0).toLocaleString('fa-IR')} دقیقه
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-border bg-white p-3">
+                      <p className="text-xs text-muted-foreground mb-1">هزینه جلسه</p>
+                      <p className="text-sm text-foreground">
+                        {(Number(formData.duration || 0) * Number(ratePerMinute || 0)).toLocaleString('fa-IR')} تومان
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
 
                 {/* Mood Selection */}
                 <motion.div

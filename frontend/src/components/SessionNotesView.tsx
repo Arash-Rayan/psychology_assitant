@@ -1,61 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, FileText, Calendar, User, ArrowRight, Plus, Edit, Trash2, Brain } from 'lucide-react';
 import { Patient } from './PatientCard';
 import { AddSessionNoteDialog } from './AddSessionNoteDialog';
+import { cn } from '@/components/ui/utils';
 
 interface SchemaAnalysisItem {
   نمره: number;
   شواهد: string[];
+  /** باور خودکار‌شناسی طرحواره (جدا از تحلیل بالینی در UI) */
+  باور_بنیادین: string;
   تحلیل_بالینی: string;
 }
 
+/** خروجی تحلیل طرحواره برای مراجع تست (هم‌راستا با `frontend/test_output.json`) */
 const schemaAnalysisData: Record<string, SchemaAnalysisItem> = {
   'نقص/شرم': {
-    نمره: 95,
-    شواهد: [
-      'چه مشکلی دارم من ؟ نکنه واقعا آدمیم که هیچ تعهد اخلاقی نداره؟',
-      'بهش گفتم اگه من انقدر خراب و بدم تو چرا میخوای منو ببینی؟',
-      'هیچوقت کافی بودم ؟',
-      'دوباره باید به اون اثبات کنم دوباره آشفتم نا امنم'
-    ],
-    تحلیل_بالینی:
-      'فرد مکرراً یکپارچگی اخلاقی و ارزش خود را زیر سوال می‌برد و خود را ذاتاً «بد» یا «معیوب» می‌بیند. احساس می‌کند باید دائماً خود را به شریک زندگی‌اش اثبات کند، که نشان‌دهنده باور عمیقی مبنی بر معیوب بودن بنیادین و بی‌ارزش بودن برای عشق ورزیدن است مگر اینکه جبران کند.'
-  },
-  'بدبینی/سوءاستفاده': {
-    نمره: 90,
-    شواهد: [
-      'تو دنبال یه نکته برای تحقیر و توهین من میگردی این نکته رو بهت نمیدم چون لایق این نیستم انقدر بخوای تحقیرم کنی یا توهین کنی یا تهمت بزنی',
-      'چرا انقدر دروغ میگه ؟ چرا نمیخواد احساس کنم دوست داشتنی و ارزشمندم ؟',
-      'همش بازی بود ؟',
-      'میدونم میخواد احساس گناه بهم بده بعدا که پیاماش و جواب ندادم',
-      'اون پریشب داشت با همکارش جلوی من لاس میزد'
-    ],
-    تحلیل_بالینی:
-      'فرد شریک زندگی خود را عمداً فریبکار، دستکاری‌گر و تحقیرکننده درک می‌کند. او انتظار خیانت دارد و معتقد است شریک به دنبال تخریب اوست، که منجر به محافظه‌کاری و اعتقاد به ناامن بودن بنیادین رابطه می‌شود.'
-  },
-  'محرومیت هیجانی': {
-    نمره: 75,
-    شواهد: [
-      'میدونم هرگز امنیت نداشتم توی این رابطه میدونم شنیده نشدم',
-      'چرا نمیخواد احساس کنم دوست داشتنی و ارزشمندم؟',
-      'حس میکنم دوباره برگشتم ۱۸ سالگی دوباره باید به اون اثبات کنم'
-    ],
-    تحلیل_بالینی:
-      'فرد کمبود مزمن حمایت عاطفی را بیان می‌کند و می‌گوید هرگز شنیده نشده یا امنیت نداشته است. نیاز مداوم به اثبات خود نشان‌دهنده محرومیت از تأیید و پذیرش بی‌قید و شرط است که او را از نظر عاطفی بدون حمایت رها کرده است.'
-  },
-  'درهم‌تنیدگی/خود تحول‌نیافته': {
     نمره: 85,
     شواهد: [
-      'حس خفگی دارم حس میکنم با همدیگهایم و باید بهش متعهد باشم',
-      'نمیخوام بهش متعهد باشم و نمیخوام تعهد رو خراب کنم',
-      'بهش گفتم ... این ایده ... بهم احساس خفگی میده دلم میخواد آزاد تر زندگی کنم و رها باشم',
-      'همه ی خواسته ها درونم دو وجهین',
-      'ثبات میخوام آزادی میخوام'
+      'نکنه واقعا آدمیم که هیچ تعهد اخلاقی نداره ؟',
+      'چه مشکلی دارم من ؟',
+      'چرا نمیخواد احساس کنم دوست داشتنی و ارزشمندم ؟',
+      'چرا اشتباهشو قبول نمیکنه که من آدم بدی نیستم ؟'
     ],
+    باور_بنیادین: 'من آدم بد، بی‌تعهد و بی‌ارزشی هستم.',
     تحلیل_بالینی:
-      'فرد در رابطه احساس خفگی و به دام افتادن می‌کند و نوعی ادغام هویت‌ها را تجربه می‌کند که مانع استقلال او می‌شود. او همزمان صمیمیت و آزادی را می‌خواهد که نشان‌دهنده عدم وجود خود متمایز و تفکیک‌شده است. تردید مداوم و نیاز همزمان به ارتباط و رهایی، منعکس‌کننده درهم‌تنیدگی است.'
+      'مراجع در مواجهه با احساس گناه عادی، دچار تردید بنیادین در مورد «خوب بودن» خود می‌شود و تصور می‌کند شاید ذاتاً فردی بی‌اخلاق است. این خودشکاوی شدید و ترس از طرد شدن به دلیل «بدی درونی»، نشانه بارز طرحواره نقص/شرم است.'
+  },
+  'درهم‌تنیدگی/خود تحول‌نیافته': {
+    نمره: 80,
+    شواهد: [
+      'دلم میخواد آزاد تر زندگی کنم و رها باشم',
+      'حس خفگی دارم',
+      'این از همین الان نفسم و میگیره',
+      'حس میکنم با همدیگهایم و باید بهش متعهد باشم',
+      'دوباره برگشتم ۱۸ سالگی'
+    ],
+    باور_بنیادین:
+      'من نمی‌توانم بدون از دست دادن هویت خود، آزاد و جدا از دیگری زندگی کنم. خفه می‌شوم.',
+    تحلیل_بالینی:
+      'مراجع حس می‌کند در رابطه گرفتار شده و هرگونه تعهد یا وابستگی، نفسش را می‌بَرَد. آرزوی رهایی و آزادی دارد اما همزمان خود را در چرخه تکرار می‌بیند و به سنین نوجوانی پسرفت می‌کند که نشانه درهم‌تنیدگی و فقدان خود تفکیک‌یافته است.'
+  },
+  'بدبینی/سوءاستفاده': {
+    نمره: 75,
+    شواهد: [
+      'تو دنبال یه نکته برای تحقیر و توهین من میگردی',
+      'چرا انقدر دروغ میگه ؟',
+      'میدونم میخواد احساس گناه بهم بده',
+      'بهم دیشب گفت خیلی مهمه اشتباه نریم ! ... خیلی مهمه کسی دستش به تن و بدنت نخوره',
+      'اون پریشب داشت با همکارش جلوی من لاس میزد'
+    ],
+    باور_بنیادین: 'دیگران عمداً مرا تحقیر، فریب و کنترل می‌کنند و به من آسیب می‌زنند.',
+    تحلیل_بالینی:
+      'مراجع رفتارهای طرف مقابل را عمداً تحقیرآمیز، دروغین و کنترل‌گرانه تعبیر می‌کند. حرف‌هایی مانند «نکند اشتباه برویم» و لاس زدن جلوی او، همراه با احساس گناه‌دهی عمدی، الگوی سوءاستفاده روانی و بی‌اعتمادی پایدار را نشان می‌دهد.'
   }
 };
 
@@ -187,37 +186,44 @@ const cognitiveDistortionPersianLabels: Record<string, string> = {
   Labeling: 'برچسب‌زنی'
 };
 
+/** خروجی پنج عامل بزرگ شخصیت برای مراجع تست (هم‌راستا با `frontend/test_output.json`) */
 const personalTraitAnalysisData = {
   traits: {
-    'Borderline traits': {
-      score: 8,
+    Neuroticism: {
+      score: 95 / 10,
       evidence: [
-        'دوست دارم باشه ولی عمیقا دلم نمیخواد باشه',
-        'همش بازی بود؟ همش چرخه است انگار',
-        'قهر و دعوا بعد خوشحالی عمیق',
-        'همه خواسته ها درونم دو وجهین',
-        'از دیشب که دیدمش حس میکنم دوباره برگشتم ۱۸ سالگی',
-        'حس خفگی دارم'
+        'احساس گناه و عذاب وجدان شدیدی داشتم و دارم',
+        'اعصابم خورد میشه ببینمشون',
+        'آشفتم / نا امنم / حس خفگی دارم',
+        'خیلی گیجم / خیلی آشفتم',
+        'میدونم هرگز امنیت نداشتم توی این رابطه',
+        'دوباره آشفتم / نا امنم'
       ],
-      summary: 'نوسانات شدید عاطفی، ترس از رها شدن، هویت ناپایدار، روابط متضاد'
+      summary:
+        'قطب: بالا — اطمینان مدل: ۹۵٪\n\nگزارش مکرر احساس گناه، عذاب وجدان، آشفتگی، ناامنی، خفگی عاطفی و سردرگمی نشان‌دهنده نمره بالای روان‌رنجوری است. مؤلفه‌هایی مانند اضطراب (نگرانی از اشتباهات اخلاقی)، افسردگی (بی‌حالی و عدم حمام گرفتن به مدت یک هفته)، آسیب‌پذیری (احساس عدم امنیت در رابطه) و خودآگاهی منفی (شک به ارزشمندی خود) به وضوح در متن حضور دارند.'
     },
-    'Dependent traits': {
-      score: 5,
+    Conscientiousness: {
+      score: 80 / 10,
       evidence: [
-        'نمیدونم کار درست چیه',
-        'میگم بعدا چون انگار میدونم دوباره با همین آدمی که تغییر نکرده برمیگردم',
-        'نمیخوام بهش متعهد باشم ولی نمیخوام تعهد رو خراب کنم'
+        '۱ هفته اس حموم نرفتم به جز اون روزی که قرار بود برم خونشون',
+        'کاری نمیکنم',
+        'خونه ام اجمالی تمیز کردم',
+        'همش فکر'
       ],
-      summary: 'وابستگی عاطفی و مشکل در قطع رابطه، نیاز به تایید'
+      summary:
+        'قطب: پایین — اطمینان مدل: ۸۰٪\n\nنشانه‌های پایین بودن وظیفه‌شناسی شامل غفلت از بهداشت شخصی (یک هفته حمام نرفتن)، فقدان انضباط روزانه (کاری نمیکنم)، نظافت سطحی و ناقص منزل، و گرایش به سرگردانی ذهنی بدون اقدام عملی است. این الگو حاکی از پایینی مسئولیت‌پذیری، نظم و پشتکار است.'
     },
-    'Paranoid traits': {
-      score: 6,
+    'Openness to Experience': {
+      score: 75 / 10,
       evidence: [
-        'چرا نمیخواد احساس کنم دوست داشتنی و ارزشمندم؟',
-        'چرا انقدر دروغ میگه؟',
-        'تو دنبال یه نکته برای تحقیر و توهین من میگردی'
+        'دلم میخواد آزاد تر زندگی کنم و رها باشم',
+        'انسانها عاشق طرف میشن یا لحظاتشون ؟',
+        'عشقه ؟ وابستگی عاطفی نا امنه ؟',
+        'همه ی خواسته ها درونم دو وجهین',
+        'کتاب / نوشتن / فکر'
       ],
-      summary: 'بدبینی و سوءظن به نیت دیگران، احساس تحقیر شدن'
+      summary:
+        'قطب: بالا — اطمینان مدل: ۷۵٪\n\nتجربه‌گری بالا از طریق کنجکاوی فلسفی (پرسش در مورد ماهیت عشق و وابستگی)، پذیرش تضادهای درونی (دووجهی بودن خواسته‌ها)، تمایل به آزادی و رهایی از قیدوبندها، و درگیری با فعالیت‌های تأملی مانند کتاب خواندن و نوشتن آشکار است. فرد به ارزش‌های غیرمتعارف و احساسات پیچیده خود گشودگی نشان می‌دهد.'
     }
   }
 };
@@ -281,9 +287,9 @@ const relationalPatternPersianLabels: Record<string, string> = {
 };
 
 const personalTraitPersianLabels: Record<string, string> = {
-  'Borderline traits': 'ویژگی‌های مرزی',
-  'Dependent traits': 'ویژگی‌های وابسته',
-  'Paranoid traits': 'ویژگی‌های پارانوئید'
+  Neuroticism: 'روان‌رنجوری (NEO)',
+  Conscientiousness: 'وجدان‌کاری (NEO)',
+  'Openness to Experience': 'تجربه‌گری (NEO)'
 };
 
 const clinicalSummaryIntro =
@@ -337,24 +343,68 @@ interface SessionNote {
 interface SessionNotesViewProps {
   patients: Patient[];
   onBack: () => void;
+  /** باز کردن مستقیم منوی یک مراجع دارای پرونده (از تقویم کلینیک یا لینک عمیق) */
+  initialPatientId?: string | null;
+  /** صفحهٔ اختصاصی `/dashboard/forms/patients/[id]` — بدون شبکهٔ انتخاب مراجع؛ بازگشت همیشه به `onBack` */
+  standalonePatientId?: string | null;
 }
 
-export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
+type AnalysisMode =
+  | 'clinical'
+  | 'schema'
+  | 'attachment'
+  | 'clinical_disorder'
+  | 'cognitive_distortion'
+  | 'personal_train'
+  | 'relational_pattern'
+  | 'functional_level';
+
+const ANALYSIS_TABS: { mode: AnalysisMode; label: string }[] = [
+  { mode: 'clinical', label: 'خلاصه بالینی مکالمه' },
+  { mode: 'schema', label: 'طرحواره' },
+  { mode: 'attachment', label: 'دلبستگی' },
+  { mode: 'clinical_disorder', label: 'اختلالات بالینی' },
+  { mode: 'cognitive_distortion', label: 'تحریف‌های شناختی' },
+  { mode: 'personal_train', label: 'ویژگی‌های شخصیتی' },
+  { mode: 'relational_pattern', label: 'الگوهای رابطه‌ای' },
+  { mode: 'functional_level', label: 'سطح عملکرد' },
+];
+
+function resolveInitialPatientId(
+  patientsList: Patient[],
+  initialPatientId: string | null | undefined,
+  standalonePatientId: string | null | undefined,
+): string | null {
+  const target = standalonePatientId ?? initialPatientId;
+  if (target && patientsList.some((p) => p.id === target)) return target;
+  return null;
+}
+
+export function SessionNotesView({
+  patients,
+  onBack,
+  initialPatientId = null,
+  standalonePatientId = null,
+}: SessionNotesViewProps) {
   const router = useRouter();
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(() =>
+    resolveInitialPatientId(patients, initialPatientId, standalonePatientId),
+  );
   const [selectedView, setSelectedView] = useState<'menu' | 'notes' | 'analysis'>('menu');
-  const [analysisMode, setAnalysisMode] = useState<
-    | 'clinical'
-    | 'schema'
-    | 'attachment'
-    | 'clinical_disorder'
-    | 'cognitive_distortion'
-    | 'personal_train'
-    | 'relational_pattern'
-    | 'functional_level'
-  >('clinical');
+  const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('clinical');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddNote, setShowAddNote] = useState(false);
+
+  useEffect(() => {
+    const target = standalonePatientId ?? initialPatientId;
+    if (!target || patients.length === 0) return;
+    const exists = patients.some((p) => p.id === target);
+    if (exists) {
+      setSelectedPatientId(target);
+      setSelectedView('menu');
+      setAnalysisMode('clinical');
+    }
+  }, [initialPatientId, standalonePatientId, patients]);
 
   // Mock session notes data
   const getSessionNotes = (patientId: string): SessionNote[] => {
@@ -387,8 +437,15 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
     patient.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const selectedPatient = patients.find(p => p.id === selectedPatientId);
-  const sessionNotes = selectedPatientId ? getSessionNotes(selectedPatientId) : [];
+  const effectiveSelectedId =
+    selectedPatientId ??
+    (standalonePatientId &&
+    patients.some((p) => p.id === standalonePatientId)
+      ? standalonePatientId
+      : null);
+
+  const selectedPatient = patients.find((p) => p.id === effectiveSelectedId);
+  const sessionNotes = effectiveSelectedId ? getSessionNotes(effectiveSelectedId) : [];
   const schemaEntries = Object.entries(schemaAnalysisData).sort((a, b) => b[1].نمره - a[1].نمره);
   const attachmentEntries = Object.entries(attachmentAnalysisData);
   const attachmentScoreEntries = [...attachmentEntries].sort((a, b) => b[1].نمره - a[1].نمره);
@@ -416,6 +473,10 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
         <div className="flex items-center gap-4">
           <button
             onClick={() => {
+              if (standalonePatientId) {
+                onBack();
+                return;
+              }
               if (selectedPatientId && selectedView !== 'menu') {
                 setSelectedView('menu');
               } else if (selectedPatientId) {
@@ -434,7 +495,7 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f2c94c] to-[#e0b73c] flex items-center justify-center shadow-md">
                 <FileText className="w-5 h-5 text-white" />
               </div>
-              {!selectedPatient
+              {!effectiveSelectedId || !selectedPatient
                 ? 'یادداشت‌های جلسات'
                 : selectedView === 'menu'
                 ? `انتخاب نوع مشاهده - ${selectedPatient.name}`
@@ -443,8 +504,10 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
                 : `تحلیل هوش مصنوعی - ${selectedPatient.name}`}
             </h2>
             <p className="text-muted-foreground mt-1 mr-14">
-              {!selectedPatient
-                ? 'انتخاب مراجع برای مشاهده یادداشت‌ها'
+              {!effectiveSelectedId || !selectedPatient
+                ? standalonePatientId
+                  ? 'بارگذاری…'
+                  : 'انتخاب مراجع برای مشاهده یادداشت‌ها'
                 : selectedView === 'menu'
                 ? 'یکی از گزینه‌های زیر را انتخاب کنید'
                 : selectedView === 'notes'
@@ -465,7 +528,7 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
       </motion.div>
 
       <AnimatePresence mode="wait">
-        {!selectedPatientId ? (
+        {!standalonePatientId && !effectiveSelectedId ? (
           // Patients List
           <motion.div
             key="patients-list"
@@ -494,18 +557,17 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
                 const lastSession = new Date(Date.now() - Math.floor(Math.random() * 14) * 24 * 60 * 60 * 1000);
                 
                 return (
-                  <motion.div
+                  <Link
                     key={patient.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.02 }}
-                    onClick={() => {
-                      setSelectedPatientId(patient.id);
-                      setSelectedView('menu');
-                      setAnalysisMode('clinical');
-                    }}
-                    className="group p-5 rounded-xl bg-white border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                    href={`/dashboard/forms/patients/${encodeURIComponent(patient.id)}`}
+                    className="block"
                   >
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.02 }}
+                      className="group p-5 rounded-xl bg-white border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                    >
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h3 className="text-foreground mb-1 group-hover:text-primary transition-colors">{patient.name}</h3>
@@ -530,7 +592,8 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
                         {patient.status === 'safe' ? 'ایمن' : patient.status === 'attention' ? 'نیاز به توجه' : 'فوری'}
                       </div>
                     </div>
-                  </motion.div>
+                    </motion.div>
+                  </Link>
                 );
               })}
             </div>
@@ -544,7 +607,7 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
               </div>
             )}
           </motion.div>
-        ) : selectedView === 'menu' ? (
+        ) : effectiveSelectedId && selectedView === 'menu' ? (
           <motion.div
             key="patient-view-menu"
             initial={{ opacity: 0, x: 20 }}
@@ -574,7 +637,7 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
               <p className="mt-3 text-sm text-muted-foreground">مشاهده تحلیل خلاصه مراجع</p>
             </button>
           </motion.div>
-        ) : selectedView === 'notes' ? (
+        ) : effectiveSelectedId && selectedView === 'notes' ? (
           // Session Notes List
           <motion.div
             key="notes-list"
@@ -698,95 +761,34 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
             exit={{ opacity: 0, x: -20 }}
             className="space-y-4"
           >
-            <div className="flex items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setAnalysisMode('clinical')}
-                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
-                  analysisMode === 'clinical'
-                    ? 'bg-primary/10 border-primary text-primary'
-                    : 'bg-white border-border text-foreground hover:border-primary/30'
-                }`}
+            <div className="w-full rounded-2xl border border-border/60 bg-muted/20 p-2 sm:p-3">
+              <div
+                className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8 lg:gap-2.5"
+                dir="rtl"
+                role="tablist"
+                aria-label="انواع تحلیل"
               >
-                خلاصه بالینی مکالمه
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalysisMode('schema')}
-                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
-                  analysisMode === 'schema'
-                    ? 'bg-primary/10 border-primary text-primary'
-                    : 'bg-white border-border text-foreground hover:border-primary/30'
-                }`}
-              >
-                طرحواره
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalysisMode('attachment')}
-                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
-                  analysisMode === 'attachment'
-                    ? 'bg-primary/10 border-primary text-primary'
-                    : 'bg-white border-border text-foreground hover:border-primary/30'
-                }`}
-              >
-                دلبستگی
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalysisMode('clinical_disorder')}
-                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
-                  analysisMode === 'clinical_disorder'
-                    ? 'bg-primary/10 border-primary text-primary'
-                    : 'bg-white border-border text-foreground hover:border-primary/30'
-                }`}
-              >
-                اختلالات بالینی
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalysisMode('cognitive_distortion')}
-                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
-                  analysisMode === 'cognitive_distortion'
-                    ? 'bg-primary/10 border-primary text-primary'
-                    : 'bg-white border-border text-foreground hover:border-primary/30'
-                }`}
-              >
-                تحریف‌های شناختی
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalysisMode('personal_train')}
-                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
-                  analysisMode === 'personal_train'
-                    ? 'bg-primary/10 border-primary text-primary'
-                    : 'bg-white border-border text-foreground hover:border-primary/30'
-                }`}
-              >
-                ویژگی‌های شخصیتی
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalysisMode('relational_pattern')}
-                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
-                  analysisMode === 'relational_pattern'
-                    ? 'bg-primary/10 border-primary text-primary'
-                    : 'bg-white border-border text-foreground hover:border-primary/30'
-                }`}
-              >
-                الگوهای رابطه‌ای
-              </button>
-              <button
-                type="button"
-                onClick={() => setAnalysisMode('functional_level')}
-                className={`px-4 py-2 rounded-xl border transition-all duration-200 ${
-                  analysisMode === 'functional_level'
-                    ? 'bg-primary/10 border-primary text-primary'
-                    : 'bg-white border-border text-foreground hover:border-primary/30'
-                }`}
-              >
-                سطح عملکرد
-              </button>
+                {ANALYSIS_TABS.map(({ mode, label }) => {
+                  const active = analysisMode === mode;
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setAnalysisMode(mode)}
+                      className={cn(
+                        'flex min-h-[3.75rem] w-full items-center justify-center rounded-xl border px-2 py-2.5 text-center text-[11px] font-medium leading-snug transition-all duration-200 sm:min-h-[3.5rem] sm:px-2.5 sm:text-xs sm:leading-tight',
+                        active
+                          ? 'border-primary bg-primary/12 text-primary shadow-sm ring-1 ring-primary/15'
+                          : 'border-border bg-white text-foreground hover:border-primary/35 hover:bg-muted/30',
+                      )}
+                    >
+                      <span className="line-clamp-3">{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {analysisMode === 'clinical' ? (
@@ -917,11 +919,23 @@ export function SessionNotesView({ patients, onBack }: SessionNotesViewProps) {
                       </ul>
                     </div>
 
-                    <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
-                      <h4 className="text-sm text-foreground mb-2 text-right">تحلیل بالینی</h4>
-                      <p className="text-sm text-muted-foreground text-right leading-8">
-                        {schema.تحلیل_بالینی}
-                      </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 rounded-lg bg-muted/40 border border-border">
+                        <h4 className="text-sm font-medium text-foreground mb-2 text-right">
+                          باور بنیادین
+                        </h4>
+                        <p className="text-sm text-muted-foreground text-right leading-8">
+                          {schema.باور_بنیادین}
+                        </p>
+                      </div>
+                      <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                        <h4 className="text-sm font-medium text-foreground mb-2 text-right">
+                          تحلیل بالینی
+                        </h4>
+                        <p className="text-sm text-muted-foreground text-right leading-8">
+                          {schema.تحلیل_بالینی}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ))}

@@ -8,6 +8,7 @@ from django.db.models import Max
 from django.shortcuts import get_object_or_404
 
 from .prompts.interview import prompt as model_instruct
+from .prompts.pre_consult import prompt as pre_consult_instruct
 from .models import ChatSession, ChatMessage
 
 from langchain_openai import ChatOpenAI
@@ -32,18 +33,32 @@ llm = ChatOpenAI(
     streaming=True,
 )
 
+# llm = ChatOpenAI(
+#     base_url="https://api.gapgpt.app/v1",
+#     api_key="sk-maGdVnAynciq7MyrhlnX6NrVYcPirPgNR1y8N5CcxglcEVWG",
+#     model="gpt-5.4",
+#     temperature=0.9
+# )
+print(model_instruct)
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", model_instruct),
-        # MessagesPlaceholder("chat_history"),
+        MessagesPlaceholder("chat_history"),
         ("human", "{input}"),
     ]
 )
 
 chain = prompt | llm
-print('*'*50)
-print(prompt)
-print('*'*50)
+
+prompt_pre_consult = ChatPromptTemplate.from_messages(
+    [
+        ("system", pre_consult_instruct),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{input}"),
+    ]
+)
+chain_pre_consult = prompt_pre_consult | llm
+
 
 def _offline_token_count(text: str) -> int:
     stripped = (text or "").strip()
@@ -83,13 +98,11 @@ def _persist_assistant_message(session: ChatSession, full_reply: str) -> None:
         session.total_tokens += assistant_token_count
         session.save(update_fields=["total_tokens"])
 
-@csrf_exempt
-def chat(request: HttpRequest):
+
+def _chat_stream_response(request: HttpRequest, llm_chain, user_name_prefix: str = "") -> JsonResponse | StreamingHttpResponse:
     """
-    Simple JSON API:
-    POST /chat
-    Body: { "message": "user prompt" }
-    Response: { "reply": "model answer" }
+    Shared POST handler: validate body, attach session, stream assistant tokens.
+    user_name_prefix keeps pre-consult sessions separate from the main /chat flow.
     """
     # Handle CORS preflight
     if request.method == "OPTIONS":
@@ -113,6 +126,8 @@ def chat(request: HttpRequest):
 
     session_id = data.get("session_id")
     user_name = data.get("user_name") or "anonymous"
+    if user_name_prefix:
+        user_name = f"{user_name_prefix}{user_name}"
     initial_mood = data.get("initial_mood")
     new_session = bool(data.get("new_session"))
 
@@ -143,6 +158,9 @@ def chat(request: HttpRequest):
             )
 
     chat_history = _build_langchain_history(session.id)
+    print('/'*50)
+    print(chat_history)
+    print('/'*50)
 
     user_token_count = _offline_token_count(message)
     user_seq = _next_seq(session.id)
@@ -162,7 +180,7 @@ def chat(request: HttpRequest):
         full_reply_parts: list[str] = []
 
         # stream tokens/chunks from the model
-        for chunk in chain.stream({"input": message, "chat_history": chat_history}):
+        for chunk in llm_chain.stream({"input": message, "chat_history": chat_history}):
             token = chunk.content or ""
             if not token:
                 continue
@@ -180,3 +198,22 @@ def chat(request: HttpRequest):
     resp["X-Accel-Buffering"] = "no"
     resp["X-Session-Id"] = str(session.id)
     return _add_cors_headers(resp)
+
+
+@csrf_exempt
+def chat(request: HttpRequest):
+    """
+    POST /chat
+    Body: { "message": "..." }
+    Response: streamed text/plain chunks.
+    """
+    return _chat_stream_response(request, chain)
+
+
+@csrf_exempt
+def pre_consult_chat(request: HttpRequest):
+    """
+    POST /chat/pre-consult — پیش‌مشاوره (before first clinical visit).
+    Same contract as /chat; separate session namespace via user_name prefix.
+    """
+    return _chat_stream_response(request, chain_pre_consult, user_name_prefix="pre_consult:")
