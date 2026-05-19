@@ -1,11 +1,72 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronRight, FileText, Calendar, User, ArrowRight, Plus, Edit, Trash2, Brain } from 'lucide-react';
+import { ChevronRight, FileText, Calendar, User, ArrowRight, Plus, Edit, Trash2, Brain, Sparkles } from 'lucide-react';
 import { Patient } from './PatientCard';
 import { AddSessionNoteDialog } from './AddSessionNoteDialog';
+import { SessionNotesAiSummaryDialog } from './SessionNotesAiSummaryDialog';
 import { cn } from '@/components/ui/utils';
+
+interface SessionNote {
+  id: string;
+  date: string;
+  dateMs: number;
+  sessionNumber: number;
+  duration: string;
+  mood: string;
+  mainTopics: string[];
+  chiefComplaint: string;
+  historyBackground: string;
+  sessionObjective: string;
+  summary: string;
+  formulation: string;
+  treatmentPlan: string;
+  homework: string;
+  nextSessionGoals: string;
+}
+
+function stableNoteCount(patientId: string): number {
+  let hash = 0;
+  for (let i = 0; i < patientId.length; i++) {
+    hash = (hash << 5) - hash + patientId.charCodeAt(i);
+    hash |= 0;
+  }
+  return 3 + (Math.abs(hash) % 5);
+}
+
+function buildSessionNotes(patientId: string): SessionNote[] {
+  const noteCount = stableNoteCount(patientId);
+  return Array.from({ length: noteCount }, (_, i) => {
+    const dateMs = Date.now() - (noteCount - i - 1) * 7 * 24 * 60 * 60 * 1000;
+    return {
+      id: `${patientId}-note-${i}`,
+      date: new Date(dateMs).toLocaleDateString('fa-IR'),
+      dateMs,
+      sessionNumber: i + 1,
+      duration: '۴۵ دقیقه',
+      mood: ['آرام', 'مضطرب', 'غمگین', 'امیدوار', 'خوشحال'][i % 5],
+      mainTopics: [
+        'بررسی احساسات هفته گذشته',
+        'تمرین‌های ذهن‌آگاهی',
+        'چالش‌های محیط کار',
+        'روابط خانوادگی',
+        'مدیریت استرس',
+      ].slice(0, 2 + (i % 2)),
+      chiefComplaint: 'مراجع به دلیل اضطراب مداوم در محیط کار و اختلال در خواب مراجعه کرده است.',
+      historyBackground: 'علائم از حدود شش ماه پیش تشدید شده؛ سابقه خانوادگی اضطراب ذکر شده است.',
+      sessionObjective: 'کاهش شدت اضطراب هنگام ارائه در جلسات کاری و آموزش تکنیک‌های تنظیم هیجان.',
+      summary:
+        'مراجع در این جلسه پیشرفت خوبی در مدیریت احساسات خود نشان داد. مشکلات مربوط به محیط کار به تفصیل بررسی شد و راهکارهای عملی ارائه گردید.',
+      formulation:
+        'الگوی اجتناب از موقعیت‌های ارائه، با باورهای ناکارآمد درباره قضاوت دیگران تقویت می‌شود.',
+      treatmentPlan: 'ادامه درمان شناختی–رفتاری با تمرین مواجهه تدریجی و بازسازی باورها.',
+      homework: 'انجام تمرینات تنفسی روزانه، ثبت احساسات در دفترچه یادداشت، تمرین گفتگوی مثبت با خود',
+      nextSessionGoals:
+        'بررسی پیشرفت در تمرینات خانگی، کار روی طرحواره‌های شناختی، تمرکز بر روابط بین‌فردی',
+    };
+  });
+}
 
 interface SchemaAnalysisItem {
   نمره: number;
@@ -323,23 +384,6 @@ const clinicalSummarySections = [
       'در پایان، کاربر بیان می‌کند که خواهان «ثبات» و «آزادی» است، هنوز نمی‌داند انتخاب درست چیست، و همچنان احساس گیجی و آشفتگی دارد. با این حال، از اینکه در برابر فشار رابطه‌ای، از تن دادن به خواسته‌های فیزیکی طرف مقابل خودداری کرده، احساس رضایت دارد.'
   }
 ];
-interface SessionNote {
-  id: string;
-  date: string;
-  sessionNumber: number;
-  duration: string;
-  mood: string;
-  mainTopics: string[];
-  chiefComplaint: string;
-  historyBackground: string;
-  sessionObjective: string;
-  summary: string;
-  formulation: string;
-  treatmentPlan: string;
-  homework: string;
-  nextSessionGoals: string;
-}
-
 interface SessionNotesViewProps {
   patients: Patient[];
   onBack: () => void;
@@ -394,6 +438,7 @@ export function SessionNotesView({
   const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('clinical');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddNote, setShowAddNote] = useState(false);
+  const [showAiSummary, setShowAiSummary] = useState(false);
 
   useEffect(() => {
     const target = standalonePatientId ?? initialPatientId;
@@ -405,33 +450,6 @@ export function SessionNotesView({
       setAnalysisMode('clinical');
     }
   }, [initialPatientId, standalonePatientId, patients]);
-
-  // Mock session notes data
-  const getSessionNotes = (patientId: string): SessionNote[] => {
-    const noteCount = Math.floor(Math.random() * 5) + 3; // 3-7 sessions
-    return Array.from({ length: noteCount }, (_, i) => ({
-      id: `${patientId}-note-${i}`,
-      date: new Date(Date.now() - (noteCount - i - 1) * 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fa-IR'),
-      sessionNumber: i + 1,
-      duration: '۴۵ دقیقه',
-      mood: ['آرام', 'مضطرب', 'غمگین', 'امیدوار', 'خوشحال'][Math.floor(Math.random() * 5)],
-      mainTopics: [
-        'بررسی احساسات هفته گذشته',
-        'تمرین‌های ذهن‌آگاهی',
-        'چالش‌های محیط کار',
-        'روابط خانوادگی',
-        'مدیریت استرس'
-      ].slice(0, Math.floor(Math.random() * 3) + 2),
-      chiefComplaint: 'مراجع به دلیل اضطراب مداوم در محیط کار و اختلال در خواب مراجعه کرده است.',
-      historyBackground: 'علائم از حدود شش ماه پیش تشدید شده؛ سابقه خانوادگی اضطراب ذکر شده است.',
-      sessionObjective: 'کاهش شدت اضطراب هنگام ارائه در جلسات کاری و آموزش تکنیک‌های تنظیم هیجان.',
-      summary: 'مراجع در این جلسه پیشرفت خوبی در مدیریت احساسات خود نشان داد. مشکلات مربوط به محیط کار به تفصیل بررسی شد و راهکارهای عملی ارائه گردید.',
-      formulation: 'الگوی اجتناب از موقعیت‌های ارائه، با باورهای ناکارآمد درباره قضاوت دیگران تقویت می‌شود.',
-      treatmentPlan: 'ادامه درمان شناختی–رفتاری با تمرین مواجهه تدریجی و بازسازی باورها.',
-      homework: 'انجام تمرینات تنفسی روزانه، ثبت احساسات در دفترچه یادداشت، تمرین گفتگوی مثبت با خود',
-      nextSessionGoals: 'بررسی پیشرفت در تمرینات خانگی، کار روی طرحواره‌های شناختی، تمرکز بر روابط بین‌فردی'
-    }));
-  };
 
   const filteredPatients = patients.filter(patient =>
     patient.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -445,7 +463,10 @@ export function SessionNotesView({
       : null);
 
   const selectedPatient = patients.find((p) => p.id === effectiveSelectedId);
-  const sessionNotes = effectiveSelectedId ? getSessionNotes(effectiveSelectedId) : [];
+  const sessionNotes = useMemo(
+    () => (effectiveSelectedId ? buildSessionNotes(effectiveSelectedId) : []),
+    [effectiveSelectedId],
+  );
   const schemaEntries = Object.entries(schemaAnalysisData).sort((a, b) => b[1].نمره - a[1].نمره);
   const attachmentEntries = Object.entries(attachmentAnalysisData);
   const attachmentScoreEntries = [...attachmentEntries].sort((a, b) => b[1].نمره - a[1].نمره);
@@ -517,15 +538,51 @@ export function SessionNotesView({
           </div>
         </div>
         {selectedPatient && selectedView === 'notes' && (
-          <button 
-            onClick={() => router.push('/dashboard/new-note')}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-l from-[#f2c94c] to-[#e0b73c] text-white hover:shadow-lg transition-all duration-300"
-          >
-            <Plus className="w-4 h-4" />
-            <span>یادداشت جدید</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowAiSummary(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-primary/30 bg-white text-primary hover:bg-primary/5 hover:shadow-md transition-all duration-300"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-semibold">خلاصه با هوش مصنوعی</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push('/dashboard/new-note')}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-l from-[#f2c94c] to-[#e0b73c] text-white hover:shadow-lg transition-all duration-300"
+            >
+              <Plus className="w-4 h-4" />
+              <span>یادداشت جدید</span>
+            </button>
+          </div>
         )}
       </motion.div>
+
+      {selectedPatient && (
+        <SessionNotesAiSummaryDialog
+          open={showAiSummary}
+          onOpenChange={setShowAiSummary}
+          patientName={selectedPatient.name}
+          notes={sessionNotes.map((n) => ({
+            id: n.id,
+            date: n.date,
+            dateMs: n.dateMs,
+            sessionNumber: n.sessionNumber,
+            duration: n.duration,
+            mood: n.mood,
+            mainTopics: n.mainTopics,
+            chiefComplaint: n.chiefComplaint,
+            historyBackground: n.historyBackground,
+            sessionObjective: n.sessionObjective,
+            summary: n.summary,
+            formulation: n.formulation,
+            treatmentPlan: n.treatmentPlan,
+            homework: n.homework,
+            nextSessionGoals: n.nextSessionGoals,
+          }))}
+        />
+      )}
 
       <AnimatePresence mode="wait">
         {!standalonePatientId && !effectiveSelectedId ? (

@@ -13,9 +13,22 @@ interface Message {
   emotion?: 'positive' | 'neutral' | 'negative';
   timestamp: Date;
   showMoodEmojis?: boolean;
+  showSubjectOptions?: boolean;
 }
 
 type MoodType = 'very_sad' | 'sad' | 'normal' | 'good' | 'amazing';
+
+export type PreConsultSubject = 'couples' | 'individual' | 'pre_marriage';
+
+const PRE_CONSULT_SUBJECTS: {
+  id: PreConsultSubject;
+  label: string;
+  description: string;
+}[] = [
+  { id: 'couples', label: 'زوجین', description: 'روابط زناشویی و زوج‌درمانی' },
+  { id: 'individual', label: 'فردی', description: 'نگرانی‌ها و سلامت روان شخصی' },
+  { id: 'pre_marriage', label: 'پیش از ازدواج', description: 'آمادگی و سوالات قبل از ازدواج' },
+];
 
 function resolveChatEndpoint(variant: ChatbotVariant): string {
   const base = (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000').replace(/\/$/, '');
@@ -33,11 +46,12 @@ function createInitialMessages(variant: ChatbotVariant): Message[] {
       {
         id: '1',
         text:
-          'سلام، به بخش پیش‌مشاوره خوش آمدید.\n\nاین بخش برای کسانی است که هنوز ویزیت حضوری یا آنلاین با درمانگر نداشته‌اند. می‌توانید در یک فضای امن، نگرانی‌ها و سوالات اولیه‌تان را مرور کنید. دوست دارید از چه موضوعی شروع کنیم؟',
+          'سلام، به بخش **پیش‌مشاوره** خوش آمدید.\n\nاین بخش برای کسانی است که هنوز ویزیت با درمانگر نداشته‌اند. لطفاً ابتدا موضوع پیش‌مشاوره خود را انتخاب کنید:',
         sender: 'bot',
         emotion: 'positive',
         timestamp: new Date(),
         showMoodEmojis: false,
+        showSubjectOptions: true,
       },
     ];
   }
@@ -64,6 +78,8 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [moodSelected, setMoodSelected] = useState(false);
+  const [subjectSelected, setSubjectSelected] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState<PreConsultSubject | null>(null);
   const [streamingBotId, setStreamingBotId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
@@ -94,6 +110,8 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
   useEffect(() => {
     setMessages(createInitialMessages(variant));
     setMoodSelected(false);
+    setSubjectSelected(false);
+    setSelectedSubject(null);
     setInputValue('');
     setStreamingBotId(null);
     setIsTyping(false);
@@ -162,28 +180,23 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
     }, 1500);
   };
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputValue,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    const currentInput = inputValue;
-    setInputValue('');
+  const streamChatReply = async (
+    userText: string,
+    options?: { newSession?: boolean; consultationSubject?: PreConsultSubject },
+  ) => {
     setIsTyping(true);
 
     try {
+      const payload: Record<string, unknown> = { message: userText };
+      if (options?.newSession) payload.new_session = true;
+      if (options?.consultationSubject) {
+        payload.consultation_subject = options.consultationSubject;
+      }
+
       const res = await fetch(chatEndpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: currentInput }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok || !res.body) {
@@ -191,17 +204,15 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       }
 
       const botId = (Date.now() + 1).toString();
-
-      // Start with an empty bot message to be filled as chunks arrive
       const botMessage: Message = {
         id: botId,
         text: '',
         sender: 'bot',
         emotion: 'neutral',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, botMessage]);
+      setMessages((prev) => [...prev, botMessage]);
       setStreamingBotId(botId);
 
       const reader = res.body.getReader();
@@ -218,32 +229,73 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
           if (!chunk) continue;
 
           accumulated += chunk;
-
-          setMessages(prev =>
-            prev.map(m => (m.id === botId ? { ...m, text: accumulated } : m))
+          setMessages((prev) =>
+            prev.map((m) => (m.id === botId ? { ...m, text: accumulated } : m)),
           );
-
-          // Scroll to bottom during streaming
           scrollToBottom();
         }
       }
 
       setIsTyping(false);
       setStreamingBotId(null);
-      // Final scroll after streaming completes
       setTimeout(() => scrollToBottom(), 100);
-    } catch (error) {
+    } catch {
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
         text: 'خطا در ارتباط با سرور. لطفاً بعداً دوباره امتحان کنید.',
         sender: 'bot',
-        timestamp: new Date()
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
       setIsTyping(false);
       setStreamingBotId(null);
     }
   };
+
+  const handleSubjectSelect = async (subject: (typeof PRE_CONSULT_SUBJECTS)[number]) => {
+    if (subjectSelected || variant !== 'pre_consult' || isTyping) return;
+
+    setSubjectSelected(true);
+    setSelectedSubject(subject.id);
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: `پیش‌مشاوره برای: ${subject.label}`,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) =>
+      prev
+        .map((msg) => (msg.showSubjectOptions ? { ...msg, showSubjectOptions: false } : msg))
+        .concat(userMessage),
+    );
+
+    await streamChatReply(
+      `کاربر موضوع «${subject.label}» را انتخاب کرد (${subject.description}). لطفاً کوتاه خوش‌آمد بگو و یک سوال متمرکز دربارهٔ همین موضوع بپرس.`,
+      { newSession: true, consultationSubject: subject.id },
+    );
+  };
+
+  const handleSend = async () => {
+    if (!inputValue.trim()) return;
+    if (variant === 'pre_consult' && !subjectSelected) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: inputValue,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    const currentInput = inputValue;
+    setInputValue('');
+
+    await streamChatReply(currentInput);
+  };
+
+  const inputDisabled = variant === 'pre_consult' && !subjectSelected;
 
   const getEmotionClass = (emotion?: string) => {
     if (emotion === 'positive') return styles.emotionPositive;
@@ -319,6 +371,31 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
                         <p className={styles.messageText}>{message.text}</p>
                       )}
                       
+                      {/* Pre-consult subject selection */}
+                      {message.showSubjectOptions && !subjectSelected && variant === 'pre_consult' && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2 }}
+                          className={styles.subjectOptionsContainer}
+                        >
+                          {PRE_CONSULT_SUBJECTS.map((subject) => (
+                            <motion.button
+                              key={subject.id}
+                              type="button"
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => handleSubjectSelect(subject)}
+                              disabled={isTyping}
+                              className={styles.subjectOptionButton}
+                            >
+                              <span className={styles.subjectOptionLabel}>{subject.label}</span>
+                              <span className={styles.subjectOptionDescription}>{subject.description}</span>
+                            </motion.button>
+                          ))}
+                        </motion.div>
+                      )}
+
                       {/* Mood emoji buttons */}
                       {message.showMoodEmojis && !moodSelected && (
                         <motion.div 
@@ -402,14 +479,19 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="پیام خود را بنویسید..."
+                onKeyPress={(e) => e.key === 'Enter' && !inputDisabled && handleSend()}
+                placeholder={
+                  inputDisabled
+                    ? 'ابتدا موضوع پیش‌مشاوره را از بالا انتخاب کنید...'
+                    : 'پیام خود را بنویسید...'
+                }
                 className={styles.input}
                 dir="rtl"
+                disabled={inputDisabled || isTyping}
               />
               <button
                 onClick={handleSend}
-                disabled={!inputValue.trim()}
+                disabled={!inputValue.trim() || inputDisabled || isTyping}
                 className={styles.sendButton}
               >
                 <Send />

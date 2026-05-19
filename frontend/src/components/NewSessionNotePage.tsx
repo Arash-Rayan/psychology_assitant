@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import {
@@ -14,6 +14,9 @@ import {
   Image as ImageIcon,
   Pause,
   Play,
+  Clock,
+  Banknote,
+  Square,
 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Input } from './ui/input';
@@ -126,17 +129,44 @@ const formCategories: FormCategory[] = [
 /** Shared styles for accordion headers (collapsed + open). */
 function sessionPanelTriggerClasses(open: boolean) {
   return cn(
-    'flex min-h-[5.75rem] w-full cursor-pointer select-none items-center gap-5 bg-gradient-to-l from-slate-50 to-white px-7 py-6 text-right transition-colors sm:min-h-[6.25rem] sm:gap-6 sm:px-9 sm:py-7',
+    'flex min-h-[5.75rem] w-full cursor-pointer select-none items-center gap-6 bg-gradient-to-l from-slate-50 to-white px-8 py-6 text-right transition-colors sm:min-h-[6.25rem] sm:gap-6 sm:px-10 sm:py-7',
     'hover:from-slate-50 hover:to-slate-50/80',
     open ? 'border-b border-slate-200/80' : 'border-b border-transparent',
   );
 }
 
+const sessionFieldControlClass =
+  'h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-right text-sm text-slate-900 shadow-sm placeholder:text-slate-400 transition-colors focus-visible:border-primary/40 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/15 focus-visible:outline-none';
+
+const sessionControlBtnClass =
+  'flex h-12 flex-1 items-center justify-center gap-2 overflow-visible rounded-xl px-3 text-sm font-bold leading-none whitespace-nowrap';
+
+const timerPanelClass = 'w-full text-start';
+const timerCardPadding =
+  'rounded-2xl border border-slate-200/90 bg-white px-5 py-6 shadow-[0_1px_3px_rgba(15,23,42,0.04)] sm:px-7 sm:py-7';
+
+function SessionFormField({
+  id,
+  label,
+  children,
+}: {
+  id: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col space-y-3">
+      <Label htmlFor={id} className="block text-right text-[13px] font-semibold leading-normal text-slate-700">
+        {label}
+      </Label>
+      {children}
+    </div>
+  );
+}
+
 function ClinicalField({
   id,
-  n,
   title,
-  hint,
   placeholder,
   value,
   onChange,
@@ -144,9 +174,7 @@ function ClinicalField({
   optional,
 }: {
   id: string;
-  n: string;
   title: string;
-  hint: string;
   placeholder: string;
   value: string;
   onChange: (v: string) => void;
@@ -154,7 +182,6 @@ function ClinicalField({
   optional?: boolean;
 }) {
   const [open, setOpen] = useState(() => value.trim().length > 0);
-  const hintText = hint.trim() !== '' ? hint : optional ? 'در صورت نیاز، برنامه جلسه بعد را بنویسید.' : '';
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -173,48 +200,53 @@ function ClinicalField({
             type="button"
             dir="rtl"
             className={cn(
-              'flex w-full min-h-[5.5rem] select-none items-center justify-between gap-4 px-6 py-5 sm:min-h-[6rem] sm:px-8 sm:py-6',
+              'flex w-full select-none items-center gap-4 py-4',
               'transition-colors hover:bg-slate-50/80',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/25',
             )}
+            style={{
+              paddingInlineStart: '1.5rem',
+              paddingInlineEnd: '1.25rem',
+              minHeight: '3.5rem',
+            }}
           >
-            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-5">
-              <span className="min-w-0 flex-1 text-right text-base font-semibold leading-relaxed text-slate-900 sm:text-[1.05rem]">
+            <span
+              className={cn(
+                'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-200/90 bg-white text-slate-600 transition-colors',
+                open && 'border-primary/30 bg-primary/[0.07] text-primary',
+              )}
+              style={{ marginInlineStart: '0.375rem' }}
+            >
+              <ChevronDown
+                className={cn('h-4 w-4 transition-transform duration-200', open && '-rotate-180')}
+                strokeWidth={2}
+              />
+            </span>
+
+            <div className="flex min-w-0 flex-1 flex-col gap-1 text-right">
+              <span className="text-base font-semibold leading-relaxed text-slate-900 sm:text-[1.05rem]">
                 {title}
               </span>
-
-              {!optional ? (
-                <span className="flex h-10 min-w-10 shrink-0 items-center justify-center rounded-lg border border-primary/20 bg-primary/5 px-2.5 text-sm font-bold tabular-nums text-primary">
-                  {n}
-                </span>
-              ) : null}
-
-              {optional && (
-                <span className="shrink-0 rounded-md border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                  اختیاری
-                </span>
-              )}
-
               {!open && value.trim() !== '' && (
-                <span className="max-w-full shrink truncate text-xs leading-relaxed text-slate-500 sm:max-w-[min(100%,20rem)]">
+                <span className="truncate text-xs leading-relaxed text-slate-500">
                   {value.trim()}
                 </span>
               )}
             </div>
 
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 transition-colors group-hover:bg-white group-hover:text-slate-900">
-              <ChevronDown
-                className={cn('h-4 w-4 transition-transform duration-200', open && '-rotate-180')}
-              />
-            </span>
+            {optional ? (
+              <span className="shrink-0 rounded-md border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                اختیاری
+              </span>
+            ) : null}
           </button>
         </CollapsibleTrigger>
 
         <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0">
-          <div className="border-t border-slate-100 bg-slate-50/30 px-6 pb-8 pt-6 sm:px-8 sm:pb-10 sm:pt-8">
-            {hintText ? (
-              <p className="mb-3 text-right text-xs leading-relaxed text-slate-500 sm:text-sm">{hintText}</p>
-            ) : null}
+          <div
+            className="border-t border-slate-100 bg-slate-50/30"
+            style={{ padding: '1.5rem 1.25rem 1.5rem' }}
+          >
             <Textarea
               id={id}
               aria-label={title}
@@ -322,6 +354,41 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
     return [h, m, s].map((n) => String(n).padStart(2, '0')).join(':');
   };
 
+  const sessionActive = isSessionRunning || isPaused;
+
+  const startSession = () => {
+    setSessionStartedAt(nowDateTimeLocal());
+    setSessionEndedAt('');
+    setIsSessionRunning(true);
+    setIsPaused(false);
+    setTargetNotified(false);
+  };
+
+  const endSession = () => {
+    setSessionEndedAt((prev) => prev || nowDateTimeLocal());
+    setIsSessionRunning(false);
+    setIsPaused(false);
+  };
+
+  const togglePauseSession = () => {
+    if (!isSessionRunning && !isPaused) return;
+    if (isPaused) {
+      const frozen = computeDurationSeconds(sessionStartedAt, sessionEndedAt);
+      if (!sessionStartedAt || !sessionEndedAt || frozen < 0) {
+        toast.error('ادامه ممکن نیست؛ زمان شروع یا پایان مکث را بررسی کنید');
+        return;
+      }
+      setSessionStartedAt(msToLocalDateTimeInput(Date.now() - frozen * 1000));
+      setSessionEndedAt('');
+      setIsSessionRunning(true);
+      setIsPaused(false);
+      return;
+    }
+    setSessionEndedAt(nowDateTimeLocal());
+    setIsSessionRunning(false);
+    setIsPaused(true);
+  };
+
   useEffect(() => {
     if (!sessionStartedAt) {
       return;
@@ -421,10 +488,10 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
 
   return (
     <div className="min-h-screen overflow-y-auto bg-[#eceef4]" dir="rtl">
-      <div className="sticky top-0 z-30 border-b border-slate-200/90 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85">
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 py-5 sm:py-6">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-            <div className="flex items-start gap-4 text-right">
+      <div className="sticky top-0 z-30 mb-6 border-b border-slate-200/90 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85">
+        <div className="mx-auto w-full max-w-6xl px-4 px-8 py-6">
+          <div className="flex flex-wrap items-center justify-between gap-6">
+            <div className="flex min-w-0 flex-1 items-start gap-4 text-right">
               <button
                 type="button"
                 onClick={handleBack}
@@ -433,11 +500,11 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
               >
                 <ArrowRight className="h-5 w-5" />
               </button>
-              <div className="min-w-0">
-                <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+              <div className="min-w-0 space-y-2">
+                <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-900">
                   افزودن یادداشت جلسه جدید
                 </h1>
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
+                <p className="max-w-xl text-sm leading-relaxed text-slate-600">
                   ثبت ساختاریافتهٔ جلسه درمانی، زمان‌سنج و گزارش بالینی
                 </p>
               </div>
@@ -445,7 +512,8 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
             <button
               type="button"
               onClick={handleSave}
-              className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-7 text-sm font-semibold text-primary-foreground shadow-sm ring-1 ring-primary/20 transition-all hover:bg-primary/92 hover:shadow-md sm:min-w-[11rem]"
+              className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-8 text-sm font-semibold text-primary-foreground shadow-sm ring-1 ring-primary/20 transition-all hover:bg-primary/92 hover:shadow-md"
+              style={{ minWidth: '11rem' }}
             >
               <Save className="h-4 w-4 opacity-90" />
               ذخیره یادداشت
@@ -454,11 +522,11 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 py-10 sm:py-14">
-        <div className="flex flex-col gap-12 sm:gap-14 lg:gap-16">
-          {/* Top row: categories + basic info */}
-          <div className="grid grid-cols-1 items-start gap-8 pb-2 lg:grid-cols-12 lg:gap-10 lg:pb-4">
-
+      <div className="mx-auto w-full max-w-6xl px-4 px-8 py-6" style={{ paddingTop: '1.5rem' }}>
+        <div
+          className="grid grid-cols-1 items-start lg:grid-cols-12"
+          style={{ gap: '1.25rem' }}
+        >
           {/* ── Categories ── */}
           <div className="lg:col-span-4">
             <Collapsible open={categoriesOpen} onOpenChange={setCategoriesOpen}>
@@ -477,7 +545,7 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                 )}>
                   <ChevronDown className={cn('h-[1.125rem] w-[1.125rem] transition-transform duration-200', categoriesOpen && '-rotate-180')} strokeWidth={2.5} />
                 </div>
-                <div className="min-w-0 flex-1 pr-1 text-right sm:pr-2">
+                <div className="min-w-0 flex-1 text-right">
                   <h2 className="text-xl font-bold tracking-tight text-slate-900">دسته‌بندی موضوعات جلسه</h2>
                   <p className="mt-2 text-sm leading-relaxed text-slate-500">موضوعات مطرح‌شده را علامت بزنید</p>
                 </div>
@@ -597,7 +665,7 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                 )}>
                   <ChevronDown className={cn('h-[1.125rem] w-[1.125rem] transition-transform duration-200', basicInfoOpen && '-rotate-180')} strokeWidth={2.5} />
                 </div>
-                <div className="min-w-0 flex-1 pr-1 text-right sm:pr-2">
+                <div className="min-w-0 flex-1 text-right">
                   <h2 className="text-xl font-bold tracking-tight text-slate-900">اطلاعات اولیه جلسه</h2>
                   <p className="mt-2 text-sm leading-relaxed text-slate-500">مشخصات مراجع و این جلسه</p>
                 </div>
@@ -606,55 +674,60 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
 
               {/* body */}
               <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0">
-              <div className="px-5 py-6 sm:px-8 sm:py-8" dir="rtl">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 sm:gap-6">
-                    <div className="sm:col-span-2 space-y-2.5">
-                      <Label htmlFor="patientName" className="block text-right text-sm font-medium text-slate-700">نام و نام خانوادگی مراجع</Label>
-                      <Input
-                        id="patientName"
-                        type="text"
-                        placeholder="مثال: علی رضایی"
-                        dir="rtl"
-                        value={formData.patientName}
-                        onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
-                        className="h-11 rounded-xl border-slate-200 bg-slate-50/80 text-right text-sm text-slate-900 placeholder:text-slate-400 focus-visible:border-primary/40 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/15"
-                      />
+              <div className="border-t border-slate-100" style={{ padding: '0.75rem 1rem 1.25rem' }}>
+                <div
+                  className="rounded-xl bg-slate-50/40 px-6 py-8"
+                  dir="rtl"
+                  style={{ paddingBottom: '2rem' }}
+                >
+                <div className="space-y-8">
+                  <div className="flex flex-col gap-6" style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    <div style={{ flex: '2 1 14rem', minWidth: '14rem' }}>
+                      <SessionFormField id="patientName" label="نام و نام خانوادگی مراجع">
+                        <Input
+                          id="patientName"
+                          type="text"
+                          placeholder="مثال: علی رضایی"
+                          dir="rtl"
+                          value={formData.patientName}
+                          onChange={(e) => setFormData({ ...formData, patientName: e.target.value })}
+                          className={sessionFieldControlClass}
+                        />
+                      </SessionFormField>
                     </div>
-                    <div className="space-y-2.5">
-                      <Label htmlFor="age" className="block text-right text-sm font-medium text-slate-700">سن</Label>
-                      <Input
-                        id="age"
-                        type="number"
-                        min={0}
-                        max={120}
-                        placeholder="مثال: ۳۲"
-                        dir="rtl"
-                        value={formData.age}
-                        onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                        className="h-11 rounded-xl border-slate-200 bg-slate-50/80 text-right text-sm text-slate-900 placeholder:text-slate-400 focus-visible:border-primary/40 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/15"
-                      />
+                    <div style={{ flex: '1 1 9rem', minWidth: '9rem' }}>
+                      <SessionFormField id="age" label="سن">
+                        <Input
+                          id="age"
+                          type="number"
+                          min={0}
+                          max={120}
+                          placeholder="مثال: ۳۲"
+                          dir="rtl"
+                          value={formData.age}
+                          onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                          className={sessionFieldControlClass}
+                        />
+                      </SessionFormField>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
-                    <div className="space-y-2.5">
-                      <Label htmlFor="gender" className="block text-right text-sm font-medium text-slate-700">جنسیت</Label>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <SessionFormField id="gender" label="جنسیت">
                       <select
                         id="gender"
                         dir="rtl"
                         value={formData.gender}
                         onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 text-right text-sm text-slate-900 outline-none transition-all focus:border-primary/40 focus:bg-white focus:ring-2 focus:ring-primary/15"
+                        className={sessionFieldControlClass}
                       >
                         <option value="">انتخاب کنید</option>
                         <option value="female">زن</option>
                         <option value="male">مرد</option>
                         <option value="other">سایر</option>
                       </select>
-                    </div>
-                    <div className="space-y-2.5">
-                      <Label htmlFor="date" className="block text-right text-sm font-medium text-slate-700">تاریخ جلسه</Label>
+                    </SessionFormField>
+                    <SessionFormField id="date" label="تاریخ جلسه">
                       <Input
                         id="date"
                         type="text"
@@ -662,14 +735,13 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                         dir="rtl"
                         value={formData.date}
                         onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                        className="h-11 rounded-xl border-slate-200 bg-slate-50/80 text-right text-sm text-slate-900 placeholder:text-slate-400 focus-visible:border-primary/40 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/15"
+                        className={sessionFieldControlClass}
                       />
-                    </div>
+                    </SessionFormField>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
-                    <div className="space-y-2.5">
-                      <Label htmlFor="duration" className="block text-right text-sm font-medium text-slate-700">مدت جلسه</Label>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <SessionFormField id="duration" label="مدت جلسه">
                       <Input
                         id="duration"
                         type="number"
@@ -690,11 +762,10 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                             }
                           }
                         }}
-                        className="h-11 rounded-xl border-slate-200 bg-slate-50/80 text-right text-sm text-slate-900 placeholder:text-slate-400 focus-visible:border-primary/40 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/15"
+                        className={sessionFieldControlClass}
                       />
-                    </div>
-                    <div className="space-y-2.5">
-                      <Label htmlFor="mood" className="block text-right text-sm font-medium text-slate-700">حال عمومی مراجع</Label>
+                    </SessionFormField>
+                    <SessionFormField id="mood" label="حال عمومی مراجع">
                       <Input
                         id="mood"
                         type="text"
@@ -702,20 +773,21 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                         dir="rtl"
                         value={formData.mood}
                         onChange={(e) => setFormData({ ...formData, mood: e.target.value })}
-                        className="h-11 rounded-xl border-slate-200 bg-slate-50/80 text-right text-sm text-slate-900 placeholder:text-slate-400 focus-visible:border-primary/40 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/15"
+                        className={sessionFieldControlClass}
                       />
-                    </div>
+                    </SessionFormField>
                   </div>
 
+                </div>
                 </div>
               </div>
               </CollapsibleContent>
             </div>
             </Collapsible>
           </div>
-          </div>
 
           {/* Clinical report */}
+          <div className="lg:col-span-12">
           <Collapsible open={clinicalReportOpen} onOpenChange={setClinicalReportOpen}>
             <section
               className={cn(
@@ -746,7 +818,7 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                       strokeWidth={2.2}
                     />
                   </div>
-                  <div className="min-w-0 flex-1 pr-1 text-right sm:pr-2">
+                  <div className="min-w-0 flex-1 text-right">
                     <h2 className="text-xl font-bold tracking-tight text-slate-900">گزارش بالینی جلسه</h2>
                     <p className="mt-2 text-sm leading-relaxed text-slate-500">
                       هر بخش را باز کنید و پر کنید.
@@ -757,39 +829,31 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
 
               <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0">
                 <div className="border-t border-slate-100 bg-slate-50/40 px-5 py-8 sm:px-8 sm:py-10">
-                  <div className="mx-auto flex w-full max-w-[980px] flex-col gap-8 sm:gap-10">
+                  <div className="mx-auto flex w-full max-w-[980px] flex-col gap-6">
                     <ClinicalField
                       id="chiefComplaint"
-                      n="۱"
                       title="شکایت اصلی مراجع"
-                      hint="علت مراجعه به‌صورت خلاصه."
                       placeholder="مثال: اضطراب اجتماعی، بی‌خوابی، ..."
                       value={formData.chiefComplaint}
                       onChange={(v) => setFormData({ ...formData, chiefComplaint: v })}
                     />
                     <ClinicalField
                       id="historyBackground"
-                      n="۲"
                       title="پیشینه و سابقه مشکل"
-                      hint="شروع، زمینه و روند."
                       placeholder="زمان شروع، سوابق، خانواده..."
                       value={formData.historyBackground}
                       onChange={(v) => setFormData({ ...formData, historyBackground: v })}
                     />
                     <ClinicalField
                       id="sessionObjective"
-                      n="۳"
                       title="دستور و هدف جلسه فعلی"
-                      hint="هدف همین جلسه از دید شما."
                       placeholder="مثال: آموزش تنفس، کار روی باورها..."
                       value={formData.sessionObjective}
                       onChange={(v) => setFormData({ ...formData, sessionObjective: v })}
                     />
                     <ClinicalField
                       id="summary"
-                      n="۴"
                       title="خلاصه جلسه"
-                      hint="آنچه در جلسه انجام و گفته شد."
                       placeholder="رویدادها، مباحث اصلی، مشاهدات..."
                       value={formData.summary}
                       onChange={(v) => setFormData({ ...formData, summary: v })}
@@ -797,36 +861,28 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                     />
                     <ClinicalField
                       id="formulation"
-                      n="۵"
                       title="فرمولاسیون و تحلیل بالینی"
-                      hint="برداشت بالینی، الگوها، فرضیه‌ها."
                       placeholder="تحلیل شناختی–عاطفی، طرحواره..."
                       value={formData.formulation}
                       onChange={(v) => setFormData({ ...formData, formulation: v })}
                     />
                     <ClinicalField
                       id="treatmentPlan"
-                      n="۶"
                       title="طرح درمان"
-                      hint="مسیر و تمرکز مداخله."
                       placeholder="رویکرد، گام بعدی، اولویت‌ها..."
                       value={formData.treatmentPlan}
                       onChange={(v) => setFormData({ ...formData, treatmentPlan: v })}
                     />
                     <ClinicalField
                       id="homework"
-                      n="۷"
                       title="تکالیف و تمرین‌های خانگی"
-                      hint="تا جلسه بعد."
                       placeholder="تمرین یا تکلیف محول‌شده..."
                       value={formData.homework}
                       onChange={(v) => setFormData({ ...formData, homework: v })}
                     />
                     <ClinicalField
                       id="nextSessionGoals"
-                      n=""
                       title="اهداف جلسه بعد"
-                      hint=""
                       placeholder="موضوعات یا اهداف جلسه آینده..."
                       value={formData.nextSessionGoals}
                       onChange={(v) => setFormData({ ...formData, nextSessionGoals: v })}
@@ -837,8 +893,10 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
               </CollapsibleContent>
             </section>
           </Collapsible>
+          </div>
 
           {/* Input method */}
+          <div className="lg:col-span-12">
           <Collapsible open={supplementInputOpen} onOpenChange={setSupplementInputOpen}>
             <section
               className={cn(
@@ -869,7 +927,7 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                       strokeWidth={2.2}
                     />
                   </div>
-                  <div className="min-w-0 flex-1 pr-1 text-right sm:pr-2">
+                  <div className="min-w-0 flex-1 text-right">
                     <h2 className="text-xl font-bold tracking-tight text-slate-900">روش ثبت مکمل</h2>
                     <p className="mt-2 text-sm leading-relaxed text-slate-500">
                       متن اصلی در بلوک بالا؛ اینجا صدا یا تصویر در صورت نیاز.
@@ -1045,8 +1103,10 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
               </CollapsibleContent>
             </section>
           </Collapsible>
+          </div>
 
           {/* Session timer */}
+          <div className="lg:col-span-12">
           <Collapsible open={timerOpen} onOpenChange={setTimerOpen}>
             <section
               className={cn(
@@ -1071,7 +1131,7 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                   >
                     <ChevronDown className={cn('h-[1.125rem] w-[1.125rem] transition-transform duration-200', timerOpen && '-rotate-180')} strokeWidth={2.2} />
                   </div>
-                  <div className="min-w-0 flex-1 pr-1 text-right sm:pr-2">
+                  <div className="min-w-0 flex-1 text-right">
                     <h2 className="text-xl font-bold tracking-tight text-slate-900">تایمر جلسه</h2>
                     <p className="mt-2 text-sm leading-relaxed text-slate-500">مدیریت زمان و محاسبهٔ هزینهٔ جلسه</p>
                   </div>
@@ -1080,196 +1140,246 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
 
               <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0">
               <div className="overflow-hidden" dir="rtl">
-              <div className="flex flex-col gap-6 px-5 py-6 sm:px-8 sm:py-8">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-                <span className="text-sm font-semibold text-slate-800">وضعیت تایمر</span>
-                <span className={cn(
-                  'inline-flex w-fit items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold sm:self-auto',
+              <motion.div className={cn('flex flex-col gap-8 px-5 py-6 sm:px-8 sm:py-8', timerPanelClass)} dir="rtl">
+              <motion.div
+                className={cn(
+                  'relative overflow-hidden rounded-2xl border shadow-[inset_0_1px_0_0_rgba(255,255,255,0.6)]',
                   isSessionRunning
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                    ? 'border-primary/25 bg-gradient-to-br from-primary/[0.06] via-white to-slate-50/80'
                     : isPaused
-                      ? 'border-amber-200 bg-amber-50 text-amber-900'
-                      : 'border-slate-200 bg-slate-100 text-slate-600',
-                )}>
-                  <span className={cn(
-                    'h-2 w-2 shrink-0 rounded-full',
-                    isSessionRunning ? 'animate-pulse bg-emerald-500' : isPaused ? 'bg-amber-500' : 'bg-slate-400',
-                  )} />
-                  {isSessionRunning ? 'در حال اجرا' : isPaused ? 'مکث' : 'متوقف'}
-                </span>
-              </div>
-
-              <div className="rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50/90 px-4 py-8 text-center sm:px-8 sm:py-10">
-                <motion.p
-                  key={`${isSessionRunning}-${isPaused}`}
-                  initial={{ scale: 0.99, opacity: 0.92 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.2 }}
-                  className={cn(
-                    'font-mono text-[3.25rem] font-bold leading-none tabular-nums tracking-widest transition-colors duration-300 sm:text-5xl md:text-6xl',
-                    isSessionRunning ? 'text-primary' : isPaused ? 'text-amber-600' : 'text-slate-400',
-                  )}
-                >
-                  {formatElapsed(elapsedSeconds)}
-                </motion.p>
-                <p className="mt-3 text-xs font-medium text-slate-500 sm:text-sm">ساعت · دقیقه · ثانیه</p>
-                <div className="mx-auto mt-4 flex min-h-[2.75rem] max-w-lg items-center justify-center px-2 text-center">
-                  <p className="text-xs leading-relaxed text-slate-600 sm:text-sm">
-                    {isSessionRunning
-                      ? 'زمان جلسه در حال ثبت است؛ با «مکث» می‌توانید بدون بستن جلسه توقف کنید.'
-                      : isPaused
-                        ? 'مدت مکث در محاسبه لحاظ نمی‌شود. برای ادامه «ادامه» را بزنید.'
-                        : 'برای شمارش، «شروع جلسه» را بزنید.'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-medium text-slate-500 sm:text-sm">
-                  <span>{Math.round(progressPct)}٪ از هدف</span>
-                  <span>{Number(targetMinutes || 0)} دقیقه</span>
-                </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className={cn(
-                      'h-full rounded-full transition-[width] duration-700 ease-out',
-                      progressPct >= 100 ? 'bg-red-500' : 'bg-primary',
-                    )}
-                    style={{ width: `${Math.min(100, progressPct)}%` }}
+                      ? 'border-amber-200/80 bg-gradient-to-br from-amber-50/50 via-white to-slate-50/80'
+                      : 'border-slate-200/90 bg-gradient-to-br from-slate-50/40 via-white to-white',
+                )}
+              >
+                {isSessionRunning && (
+                  <motion.div
+                    className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-primary/10 blur-3xl"
+                    aria-hidden
                   />
-                </div>
-              </div>
+                )}
+                <div className="relative px-6 pb-8 pt-7 sm:px-10 sm:pb-10 sm:pt-9">
+                  <div className={cn('mb-8 w-full', timerPanelClass)}>
+                    <p className="text-sm font-semibold text-slate-800">وضعیت تایمر</p>
+                    <p className="mt-3 w-full text-xs leading-relaxed text-slate-500">
+                      {isSessionRunning
+                        ? 'زمان جلسه در حال ثبت است؛ با «مکث» می‌توانید بدون بستن جلسه توقف کنید.'
+                        : isPaused
+                          ? 'مدت مکث در محاسبه لحاظ نمی‌شود. «ادامه» یا «توقف جلسه» را بزنید.'
+                          : 'برای شمارش، «شروع جلسه» را بزنید.'}
+                    </p>
+                  </div>
 
-              <div className="grid grid-cols-3 divide-x divide-slate-200/90 rounded-xl border border-slate-200/90 bg-slate-50/50" style={{ direction: 'ltr' }}>
-                <div className="px-3 py-4 text-center sm:px-4 sm:py-5">
-                  <p className="mb-1 text-xs text-slate-500">دقیقه</p>
-                  <p className="text-xl font-bold tabular-nums text-slate-800 sm:text-2xl">{Number(formData.duration || 0)}</p>
-                </div>
-                <div className="px-3 py-4 text-center sm:px-4 sm:py-5">
-                  <p className="mb-1 text-xs text-slate-500">نرخ / دقیقه</p>
-                  <p className="text-xl font-bold tabular-nums text-slate-800 sm:text-2xl">{Number(ratePerMinute || 0).toLocaleString('fa-IR')}</p>
-                </div>
-                <div className="px-3 py-4 text-center sm:px-4 sm:py-5">
-                  <p className="mb-1 text-xs text-slate-500">هزینه (تومان)</p>
-                  <p className="text-xl font-bold tabular-nums text-primary sm:text-2xl">{liveCost.toLocaleString('fa-IR')}</p>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSessionStartedAt(nowDateTimeLocal());
-                      setSessionEndedAt('');
-                      setIsSessionRunning(true);
-                      setIsPaused(false);
-                      setTargetNotified(false);
-                    }}
-                    disabled={isSessionRunning || isPaused}
-                    className={cn(
-                      'inline-flex h-12 items-center justify-center gap-2 rounded-xl text-sm font-semibold shadow-sm transition-all',
-                      isSessionRunning || isPaused
-                        ? 'cursor-not-allowed bg-slate-200 text-slate-500'
-                        : 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-md',
-                    )}
+                  <div
+                    className="mx-auto flex w-full max-w-xl flex-wrap items-center justify-center gap-2 px-2 py-3 sm:gap-4 sm:px-5 sm:py-5"
+                    dir="ltr"
                   >
-                    شروع جلسه
-                  </button>
-                  {isPaused ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const frozen = computeDurationSeconds(sessionStartedAt, sessionEndedAt);
-                        if (!sessionStartedAt || !sessionEndedAt || frozen < 0) {
-                          toast.error('ادامه ممکن نیست؛ زمان شروع یا پایان مکث را بررسی کنید');
-                          return;
-                        }
-                        setSessionStartedAt(msToLocalDateTimeInput(Date.now() - frozen * 1000));
-                        setSessionEndedAt('');
-                        setIsSessionRunning(true);
-                        setIsPaused(false);
-                      }}
-                      className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-primary/35 bg-primary/10 text-sm font-semibold text-primary transition-colors hover:bg-primary/15"
-                    >
-                      <Play className="h-4 w-4 shrink-0" aria-hidden />
-                      ادامه
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSessionEndedAt(nowDateTimeLocal());
-                        setIsSessionRunning(false);
-                        setIsPaused(true);
-                      }}
-                      disabled={!isSessionRunning}
+                    {[
+                      { value: Math.floor(elapsedSeconds / 3600), label: 'ساعت' },
+                      { value: Math.floor((elapsedSeconds % 3600) / 60), label: 'دقیقه' },
+                      { value: elapsedSeconds % 60, label: 'ثانیه' },
+                    ].map((seg, i, arr) => (
+                      <div key={seg.label} className="flex items-center gap-2 sm:gap-4">
+                        <div className="flex min-w-[4.25rem] flex-1 flex-col items-center justify-center rounded-xl border border-slate-200/90 bg-white px-3 py-3.5 shadow-sm sm:min-w-[5.5rem] sm:flex-none sm:px-6 sm:py-6 md:min-w-[6rem]">
+                          <span
+                            className={cn(
+                              'text-center font-mono text-2xl font-bold tabular-nums leading-none sm:text-3xl md:text-4xl',
+                              isSessionRunning ? 'text-primary' : isPaused ? 'text-[#f2c94c]' : 'text-slate-800',
+                            )}
+                          >
+                            {String(seg.value).padStart(2, '0')}
+                          </span>
+                          <span className="mt-1.5 text-center text-[10px] font-medium leading-tight text-slate-500 sm:mt-2.5 sm:text-xs">
+                            {seg.label}
+                          </span>
+                        </div>
+                        {i < arr.length - 1 && (
+                          <span
+                            aria-hidden
+                            className={cn(
+                              'self-center font-mono text-2xl font-light leading-none tabular-nums sm:text-3xl md:text-4xl',
+                              isSessionRunning ? 'text-primary/50' : 'text-slate-300',
+                            )}
+                          >
+                            :
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-200/70 bg-white/60 px-5 py-4 sm:px-8">
+                  <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                    <div
                       className={cn(
-                        'inline-flex h-12 items-center justify-center gap-2 rounded-xl border text-sm font-semibold transition-all',
-                        isSessionRunning
-                          ? 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100'
-                          : 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400',
+                        'h-full rounded-full transition-[width] duration-700 ease-out',
+                        progressPct >= 100
+                          ? 'bg-gradient-to-l from-red-500 to-red-400'
+                          : 'bg-gradient-to-l from-primary to-primary/75',
                       )}
-                    >
-                      <Pause className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
-                      مکث
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (isPaused) {
-                        setIsPaused(false);
-                        return;
-                      }
-                      setSessionEndedAt(nowDateTimeLocal());
-                      setIsSessionRunning(false);
-                      setIsPaused(false);
-                    }}
-                    disabled={!isSessionRunning && !isPaused}
+                      style={{ width: `${Math.min(100, progressPct)}%` }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" dir="rtl">
+                {[
+                  {
+                    icon: Clock,
+                    label: 'مدت جلسه',
+                    sub: 'دقیقه',
+                    value: Number(formData.duration || 0).toLocaleString('fa-IR'),
+                    card: 'border-slate-200/80 bg-gradient-to-bl from-slate-50/90 via-white to-white',
+                    iconWrap: 'border-slate-200/80 bg-white text-slate-600 shadow-sm',
+                    valueClass: 'text-slate-900',
+                  },
+                  {
+                    icon: Banknote,
+                    label: 'نرخ هر دقیقه',
+                    sub: 'تومان',
+                    value: Number(ratePerMinute || 0).toLocaleString('fa-IR'),
+                    card: 'border-[#f2c94c]/25 bg-gradient-to-bl from-[#fffbeb]/80 via-white to-white',
+                    iconWrap: 'border-[#f2c94c]/30 bg-[#fff9e6] text-[#b8860b] shadow-sm',
+                    valueClass: 'text-slate-900',
+                  },
+                  {
+                    icon: Banknote,
+                    label: 'هزینه جلسه',
+                    sub: 'تومان',
+                    value: liveCost.toLocaleString('fa-IR'),
+                    card: 'border-primary/25 bg-gradient-to-bl from-primary/[0.08] via-white to-white ring-1 ring-primary/10',
+                    iconWrap: 'border-primary/25 bg-primary/10 text-primary shadow-sm',
+                    valueClass: 'text-primary',
+                  },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
                     className={cn(
-                      'inline-flex h-12 items-center justify-center gap-2 rounded-xl text-sm font-semibold shadow-sm transition-all',
-                      !isSessionRunning && !isPaused
-                        ? 'cursor-not-allowed bg-slate-200 text-slate-500'
-                        : 'bg-red-600 text-white hover:bg-red-700 hover:shadow-md',
+                      'relative overflow-hidden rounded-2xl border p-5 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.08)] sm:p-6',
+                      stat.card,
                     )}
                   >
-                    توقف جلسه
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSessionStartedAt('');
-                    setSessionEndedAt('');
-                    setIsSessionRunning(false);
-                    setIsPaused(false);
-                    setElapsedSeconds(0);
-                    setTargetNotified(false);
-                    setFormData((prev) => ({ ...prev, duration: '' }));
-                  }}
-                  className="h-11 w-full rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto sm:self-center sm:px-10"
-                >
-                  ریست تایمر
-                </button>
+                    <div
+                      className="pointer-events-none absolute -left-6 -top-6 h-24 w-24 rounded-full bg-white/40 blur-2xl"
+                      aria-hidden
+                    />
+                    <div className={cn('relative flex w-full flex-col items-start gap-4', timerPanelClass)} dir="rtl">
+                      <div className="flex w-full items-center justify-start gap-4 sm:gap-5">
+                        <p className="text-sm font-semibold text-slate-600">{stat.label}</p>
+                        <div
+                          className={cn(
+                            'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border',
+                            stat.iconWrap,
+                          )}
+                        >
+                          <stat.icon className="h-5 w-5" strokeWidth={2.2} aria-hidden />
+                        </div>
+                      </div>
+                      <div className="w-full space-y-2">
+                        <p
+                          className={cn(
+                            'text-2xl font-bold tabular-nums leading-none tracking-tight sm:text-[1.75rem]',
+                            stat.valueClass,
+                          )}
+                        >
+                          {stat.value}
+                        </p>
+                        <p className="text-xs font-medium text-slate-400">{stat.sub}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              <div className="rounded-xl border border-slate-200/90 bg-slate-50/60 px-4 py-5 sm:px-5 sm:py-6">
-                <p className="mb-4 text-right text-sm font-semibold text-slate-800">تنظیمات زمان و تعرفه</p>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-                  <div className="space-y-2">
-                    <label className="block text-right text-xs font-medium text-slate-600 sm:text-sm">تعرفه هر دقیقه (تومان)</label>
+              <div className={timerCardPadding}>
+                <p className={cn('mb-8 w-full text-sm font-semibold text-slate-800 sm:mb-9', timerPanelClass)}>
+                  کنترل جلسه
+                </p>
+                <div
+                  role="group"
+                  aria-label="کنترل جلسه"
+                  className="flex gap-2.5 rounded-2xl border border-slate-200 bg-slate-100 p-3 sm:gap-3 sm:p-3.5"
+                >
+                  <button
+                    type="button"
+                    aria-disabled={sessionActive}
+                    tabIndex={sessionActive ? -1 : 0}
+                    onClick={() => {
+                      if (sessionActive) return;
+                      startSession();
+                    }}
+                    className={cn(
+                      sessionControlBtnClass,
+                      sessionActive
+                        ? 'pointer-events-none bg-slate-200 text-slate-600'
+                        : 'bg-primary text-white shadow-sm hover:bg-primary/90',
+                    )}
+                  >
+                    <span className="shrink-0">شروع</span>
+                    <Play className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    aria-disabled={!isSessionRunning && !isPaused}
+                    tabIndex={!isSessionRunning && !isPaused ? -1 : 0}
+                    onClick={togglePauseSession}
+                    className={cn(
+                      sessionControlBtnClass,
+                      !isSessionRunning && !isPaused
+                        ? 'pointer-events-none bg-slate-200 text-slate-600'
+                        : isPaused
+                          ? 'bg-primary text-white shadow-sm hover:bg-primary/90'
+                          : 'bg-[#f2c94c] text-[#1f2933] shadow-sm hover:brightness-95',
+                    )}
+                  >
+                    <span className="shrink-0">{isPaused ? 'ادامه' : 'مکث'}</span>
+                    {isPaused ? (
+                      <Play className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
+                    ) : (
+                      <Pause className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    aria-disabled={!sessionActive}
+                    tabIndex={!sessionActive ? -1 : 0}
+                    onClick={() => {
+                      if (!sessionActive) return;
+                      endSession();
+                    }}
+                    className={cn(
+                      sessionControlBtnClass,
+                      !sessionActive
+                        ? 'pointer-events-none bg-slate-200 text-slate-600'
+                        : 'bg-[#eb5757] text-white shadow-sm hover:bg-[#d94848]',
+                    )}
+                  >
+                    <span className="shrink-0">توقف</span>
+                    <Square className="h-3.5 w-3.5 shrink-0 fill-current" aria-hidden />
+                  </button>
+                </div>
+              </div>
+
+              <div className={timerCardPadding}>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-8">
+                  <div className="space-y-2.5">
+                    <label className={cn('block w-full text-xs font-medium text-slate-600 sm:text-sm', timerPanelClass)}>
+                      تعرفه هر دقیقه (تومان)
+                    </label>
                     <Input
                       type="number"
                       dir="rtl"
                       value={ratePerMinute}
                       onChange={(e) => setRatePerMinute(e.target.value)}
-                      placeholder="30000"
-                      className="h-11 rounded-xl border-slate-200 bg-white text-sm"
+                      placeholder="۳۰٬۰۰۰"
+                      className="h-11 rounded-xl border-slate-200 bg-slate-50/50 text-start text-sm focus:bg-white"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="block text-right text-xs font-medium text-slate-600 sm:text-sm">هدف جلسه (دقیقه)</label>
+                  <div className="space-y-2.5">
+                    <label className={cn('block w-full text-xs font-medium text-slate-600 sm:text-sm', timerPanelClass)}>
+                      هدف جلسه (دقیقه)
+                    </label>
                     <Input
                       type="number"
                       dir="rtl"
@@ -1278,17 +1388,18 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                         setTargetMinutes(e.target.value);
                         setTargetNotified(false);
                       }}
-                      placeholder="45"
-                      className="h-11 rounded-xl border-slate-200 bg-white text-sm"
+                      placeholder="۴۵"
+                      className="h-11 rounded-xl border-slate-200 bg-slate-50/50 text-start text-sm focus:bg-white"
                     />
                   </div>
                 </div>
               </div>
-              </div>
+              </motion.div>
               </div>
               </CollapsibleContent>
             </section>
           </Collapsible>
+          </div>
         </div>
       </div>
     </div>

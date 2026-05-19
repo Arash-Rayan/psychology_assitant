@@ -448,7 +448,8 @@ export function TherapistDashboard({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+                    className={styles.formsTabStack}
+                    dir="rtl"
                   >
                     {/* Info Card */}
                     <div className={styles.infoCard}>

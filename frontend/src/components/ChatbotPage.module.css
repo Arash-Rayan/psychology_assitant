@@ -461,6 +461,53 @@
   }
 }
 
+.subjectOptionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(14, 165, 233, 0.15);
+}
+
+.subjectOptionButton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border-radius: 0.875rem;
+  border: 2px solid rgba(14, 165, 233, 0.25);
+  background: linear-gradient(to left, rgba(14, 165, 233, 0.06), white);
+  cursor: pointer;
+  text-align: right;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.subjectOptionButton:hover:not(:disabled) {
+  border-color: rgba(14, 165, 233, 0.5);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.12);
+}
+
+.subjectOptionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.subjectOptionLabel {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0c4a6e;
+}
+
+.subjectOptionDescription {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1.4;
+}
+
 .messageMeta {
   display: flex;
   align-items: center;

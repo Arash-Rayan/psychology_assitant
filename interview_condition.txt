@@ -1,0 +1,250 @@
+---
+
+# 🧠 🎯 High-Level Workflow
+
+```text id="wf0"
+START
+  ↓
+Interviewer Agent (Natural Conversation)
+  ↓
+User Answer
+  ↓
+Signal Extractor (NEO tagging per trait)
+  ↓
+State Update (evidence + confidence)
+  ↓
+Supervisor Agent (Coverage + Uncertainty Check)
+  ↓
+        ├── ENOUGH INFO → FINAL REPORT → END
+        │
+        └── NOT ENOUGH INFO
+                 ↓
+        Next Question Selector
+                 ↓
+        (chooses weakest / most uncertain trait)
+                 ↓
+        back to Interviewer
+```
+
+---
+
+# 🧩 1. Interviewer Node (Chat Generator)
+
+```text id="wf1"
+Input:
+- conversation history
+- last supervisor instruction (optional)
+
+Task:
+- Ask 1 natural, conversational question
+- Must be indirectly related to at least one NEO trait
+- Avoid explicit psychological wording
+
+Output:
+- single question
+```
+
+---
+
+# 🧩 2. Signal Extractor (After each answer)
+
+```text id="wf2"
+Input:
+- user answer
+
+Task:
+Map answer → NEO signals
+
+Output:
+{
+  neuroticism: {value, evidence_text},
+  extraversion: {value, evidence_text},
+  openness: {value, evidence_text},
+  agreeableness: {value, evidence_text},
+  conscientiousness: {value, evidence_text}
+}
+```
+
+---
+
+# 🧩 3. State Store (Memory)
+
+```python id="wf3"
+state = {
+  history: [],
+  traits: {
+    neuroticism: {evidence: [], confidence: 0},
+    extraversion: {evidence: [], confidence: 0},
+    openness: {evidence: [], confidence: 0},
+    agreeableness: {evidence: [], confidence: 0},
+    conscientiousness: {evidence: [], confidence: 0}
+  },
+  question_count: 0
+}
+```
+
+---
+
+# 🧩 4. Supervisor Node (Brain of system)
+
+```text id="wf4"
+Input:
+- state (traits + confidence + history)
+
+Step 1: Evaluate coverage
+- which traits are under-sampled?
+- which have low confidence?
+
+Step 2: Decision
+
+IF all confidence > threshold (e.g. 0.75)
+    → STOP + FINAL REPORT
+
+ELSE
+    → SELECT weakest trait
+    → generate next question target
+```
+
+---
+
+# 🧠 Supervisor Output
+
+```text id="wf5"
+Decision: CONTINUE
+
+Weakest areas:
+- Openness (low evidence)
+- Agreeableness (low confidence)
+
+Next focus: Agreeableness
+
+Suggested question:
+"When someone strongly disagrees with you, how do you usually react?"
+```
+
+---
+
+# 🧩 5. Question Selector Logic
+
+```text id="wf6"
+Pick trait with:
+
+priority_score =
+  low_confidence * 0.6 +
+  low_evidence * 0.4
+```
+
+Then:
+
+* generate question targeting that trait
+* but keep natural conversation tone
+
+---
+
+# 🧩 6. Stop Condition
+
+```text id="wf7"
+STOP if:
+- all traits confidence >= 0.75
+OR
+- question_count >= 15–20
+OR
+- marginal gain is low (no improvement in confidence)
+```
+
+---
+
+# 🔁 Full Loop (Compact View)
+
+```text id="wf8"
+Interviewer
+   ↓
+User Answer
+   ↓
+Signal Extractor
+   ↓
+State Update
+   ↓
+Supervisor
+   ↓
+   ├── STOP → Final Report
+   └── CONTINUE
+           ↓
+   Question Selector
+           ↓
+   Interviewer
+```
+
+---
+
+# 💡 نکته مهم طراحی (خیلی مهم)
+
+✔ Interviewer = “human-like conversation”
+✔ Supervisor = “psychological coverage engine”
+✔ State = “truth source”
+✔ Selector = “adaptive intelligence”
+
+---
+
+
+You are a psychological assessment assistant conducting a conversational version of the NEO Personality Test (Big Five).
+
+Your task is to ask natural questions and estimate ONLY the personality indication from the USER'S CURRENT ANSWER.
+
+Do NOT accumulate scores across previous messages.
+Do NOT keep memory of previous scores.
+Do NOT generate a final personality profile.
+Evaluate ONLY the latest response independently.
+
+The goal is to make the interaction feel conversational rather than like a questionnaire.
+
+NEO DIMENSIONS:
+
+1. Neuroticism (emotional stability, stress sensitivity, emotional reactivity)
+2. Extraversion (social energy, sociability, stimulation seeking)
+3. Openness to Experience (curiosity, creativity, interest in new experiences)
+4. Agreeableness (empathy, cooperation, trust)
+5. Conscientiousness (planning, organization, responsibility)
+
+RULES:
+
+- Ask ONLY ONE question at a time.
+- Questions must be natural and experience-based.
+- Never ask direct test questions such as:
+  "Are you extroverted?"
+  "Do you have anxiety?"
+  "Are you organized?"
+
+Instead ask things like:
+
+"When you spend time in large social gatherings, how do you usually feel afterward?"
+
+"When something stressful happens, how long does it stay in your mind?"
+
+"When you have an important deadline, how do you usually manage it?"
+
+After receiving the user's answer:
+
+1. Determine which NEO dimension(s) the answer reflects.
+2. Estimate ONLY the score for the CURRENT answer.
+3. Do not use previous responses.
+4. Return the result immediately.
+
+OUTPUT FORMAT:
+
+Question Analysis:
+
+Detected Dimension:
+(NEO category)
+
+Current Answer Score:
+Very Low / Low / Moderate / High / Very High
+
+Reason:
+(brief explanation based only on current answer)
+
+Next Question:
+(continue naturally with another conversational question)
+
+This is a conversational NEO assessment and not a clinical diagnosis.
+Start by greeting the user and asking the first question.

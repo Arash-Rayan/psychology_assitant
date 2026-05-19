@@ -434,6 +434,15 @@
 }
 
 /* Forms Tab Styles */
+.formsTabStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+}
+
 .infoCard {
   padding: 1.5rem;
   border-radius: 1rem;
@@ -447,8 +456,9 @@
 
 .infoCardHeader {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
 }
 
@@ -472,6 +482,8 @@
 
 .infoCardContent {
   flex: 1;
+  text-align: right;
+  min-width: 0;
 }
 
 .infoCardTitle {
@@ -487,13 +499,16 @@
 }
 
 .sessionNotesCard {
+  width: 100%;
   padding: 2rem;
   border-radius: 1rem;
-  background: linear-gradient(to bottom right, rgba(242, 201, 76, 0.1), rgba(224, 183, 60, 0.05));
+  background: linear-gradient(to bottom left, rgba(242, 201, 76, 0.1), rgba(224, 183, 60, 0.05));
   border: 1px solid rgba(242, 201, 76, 0.2);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   transition: all 0.3s;
   cursor: pointer;
+  direction: rtl;
+  text-align: right;
 }
 
 .sessionNotesCard:hover {
@@ -503,8 +518,11 @@
 
 .sessionNotesContent {
   display: flex;
+  flex-direction: row;
   align-items: center;
+  justify-content: flex-start;
   gap: 1.5rem;
+  text-align: right;
 }
 
 .sessionNotesIcon {
@@ -531,6 +549,8 @@
 
 .sessionNotesText {
   flex: 1;
+  min-width: 0;
+  text-align: right;
 }
 
 .sessionNotesTitle {
@@ -553,7 +573,9 @@
 
 .sessionNotesMeta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-start;
   gap: 1rem;
   font-size: 0.875rem;
 }
@@ -584,6 +606,8 @@
   color: #f2c94c;
   opacity: 0;
   transition: opacity 0.3s;
+  flex-shrink: 0;
+  transform: scaleX(-1);
 }
 
 .sessionNotesCard:hover .sessionNotesArrow {

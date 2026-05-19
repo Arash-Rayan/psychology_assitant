@@ -26,7 +26,7 @@ def _add_cors_headers(response: JsonResponse | StreamingHttpResponse) -> JsonRes
 # set up LangChain components once (non-streaming and streaming use the same chain)
 _api_key = os.environ.get("DEEPSEEK_API_KEY")
 llm = ChatOpenAI(
-    model="deepseek-v4-flash",
+    model="deepseek-v4-pro",
     api_key=_api_key,
     base_url="https://api.deepseek.com",
     temperature=0.9,
@@ -39,6 +39,7 @@ llm = ChatOpenAI(
 #     model="gpt-5.4",
 #     temperature=0.9
 # )
+
 print(model_instruct)
 prompt = ChatPromptTemplate.from_messages(
     [
@@ -123,6 +124,16 @@ def _chat_stream_response(request: HttpRequest, llm_chain, user_name_prefix: str
     if not isinstance(message, str) or not message.strip():
         resp = JsonResponse({"error": "Field 'message' is required"}, status=400)
         return _add_cors_headers(resp)
+
+    consultation_subject = data.get("consultation_subject")
+    subject_labels = {
+        "couples": "زوجین",
+        "individual": "فردی",
+        "pre_marriage": "پیش از ازدواج",
+    }
+    if isinstance(consultation_subject, str) and consultation_subject in subject_labels:
+        label = subject_labels[consultation_subject]
+        message = f"[موضوع پیش‌مشاوره: {label}]\n\n{message.strip()}"
 
     session_id = data.get("session_id")
     user_name = data.get("user_name") or "anonymous"
