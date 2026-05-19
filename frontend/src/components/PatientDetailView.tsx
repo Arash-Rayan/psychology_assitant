@@ -1,7 +1,8 @@
 import { motion } from 'motion/react';
-import { useState, useEffect, useRef } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { X, Brain, AlertTriangle, CheckCircle, TrendingUp, TrendingDown, Calendar, Activity, Phone, Sparkles, Target, Lightbulb, MessageCircleMore, ClipboardList } from 'lucide-react';
+import { useMemo } from 'react';
+import { X, Brain, CheckCircle, TrendingUp, TrendingDown, Calendar, Activity, Phone, Sparkles, Target, Lightbulb, MessageCircleMore, ClipboardList, Heart } from 'lucide-react';
+import { PatientAgentIntensityPanel } from './PatientAgentIntensityPanel';
+import { buildEmotionalStateLine } from '@/utils/patientAgentTimeline';
 import styles from './PatientDetailView.module.css';
 
 export interface Schema {
@@ -215,60 +216,10 @@ function generateAIAnalysis(patient: PatientDetail): {
 }
 
 export function PatientDetailView({ patient, onClose }: PatientDetailViewProps) {
-  const [chartKey, setChartKey] = useState(0);
-  const chartRef = useRef<HTMLDivElement>(null);
-  
-  // Force chart to remount and replay animation when patient changes
-  useEffect(() => {
-    setChartKey(prev => prev + 1);
-    
-    // Apply line drawing animation to SVG paths after render
-    const applyAnimation = () => {
-      if (chartRef.current) {
-        const paths = chartRef.current.querySelectorAll('.recharts-line-curve');
-        
-        if (paths.length > 0) {
-          paths.forEach((path, index) => {
-            const pathElement = path as SVGPathElement;
-            const length = pathElement.getTotalLength();
-            
-            // Clear any existing animation first
-            pathElement.style.animation = '';
-            pathElement.style.strokeDasharray = '';
-            pathElement.style.strokeDashoffset = '';
-            pathElement.style.opacity = '1';
-            
-            // Force reflow
-            void pathElement.getBoundingClientRect();
-            
-            // Set up the line to be fully hidden at start
-            pathElement.style.strokeDasharray = `${length} ${length}`;
-            pathElement.style.strokeDashoffset = `${length}`;
-            pathElement.style.opacity = '1';
-            
-            // Force another reflow
-            void pathElement.getBoundingClientRect();
-            
-            // Apply smooth drawing animation (faster)
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => {
-                pathElement.style.transition = `stroke-dashoffset ${1 + index * 0.05}s ease-in-out ${index * 0.15}s`;
-                pathElement.style.strokeDashoffset = '0';
-              });
-            });
-          });
-        } else {
-          // Retry if paths not found yet
-          setTimeout(applyAnimation, 50);
-        }
-      }
-    };
-    
-    // Wait for chart to fully render, then apply animation
-    const timer = setTimeout(applyAnimation, 100);
-    
-    return () => clearTimeout(timer);
-  }, [patient.id]);
+  const emotionalLine = useMemo(
+    () => buildEmotionalStateLine(patient.id, patient.sessionsCount),
+    [patient.id, patient.sessionsCount],
+  );
 
   const statusConfig = {
     safe: { color: '#6fcf97', label: 'وضعیت پایدار' },
@@ -301,149 +252,51 @@ export function PatientDetailView({ patient, onClose }: PatientDetailViewProps) 
         className={styles.modal}
         dir="rtl"
       >
-        {/* Header */}
+        {/* Header — compact */}
         <div className={styles.header}>
           <div className={styles.headerContent}>
             <div className={styles.headerLeft}>
-              <div 
+              <div
                 className={styles.headerIcon}
-                style={{ background: `linear-gradient(to bottom right, ${config.color}, ${config.color}dd)` }}
+                style={{
+                  background: `linear-gradient(to bottom right, ${config.color}, ${config.color}dd)`,
+                }}
               >
                 <Brain />
               </div>
               <div className={styles.headerInfo}>
-                <h2>{patient.name}</h2>
-                <div className={styles.headerMeta}>
-                  <span>{patient.age} ساله</span>
-                  <span>•</span>
-                  <span>{patient.gender}</span>
-                  <span>•</span>
-                  <span>{patient.sessionsCount} جلسه</span>
-                </div>
-                <div className={styles.headerTags}>
+                <div className={styles.headerTopRow}>
+                  <h2>{patient.name}</h2>
                   <span
                     className={styles.statusBadge}
                     style={{ backgroundColor: config.color }}
                   >
                     {config.label}
                   </span>
-                  <span className={styles.lastSession}>
-                    آخرین جلسه: {patient.lastSession}
-                  </span>
-                  <a
-                    href={`tel:${patient.phone.replace(/[^\d+]/g, '')}`}
-                    className={styles.phoneLink}
-                    dir="ltr"
-                  >
-                    <span>{patient.phone}</span>
-                    <Phone />
-                  </a>
+                </div>
+                <p className={styles.headerMetaCompact}>
+                  {patient.age} ساله · {patient.gender} · {patient.sessionsCount} جلسه · آخرین
+                  جلسه: {patient.lastSession} · امتیاز کلی:{' '}
+                  <strong>{patient.overallScore}/100</strong>
+                </p>
+                <div className={styles.emotionalStateLine}>
+                  <Heart className={styles.emotionalIcon} aria-hidden />
+                  <span>{emotionalLine.summary}</span>
                 </div>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className={styles.closeButton}
-            >
+            <button type="button" onClick={onClose} className={styles.closeButton}>
               <X />
             </button>
-          </div>
-
-          {/* Overall Score */}
-          <div className={styles.scoreSection}>
-            <div className={styles.scoreHeader}>
-              <span className={styles.scoreLabel}>امتیاز کلی سلامت روان</span>
-              <span className={styles.scoreValue}>{patient.overallScore}/100</span>
-            </div>
-            <div className={styles.scoreBar}>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${patient.overallScore}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                className={styles.scoreBarFill}
-                style={{ 
-                  background: `linear-gradient(to right, ${
-                    patient.overallScore > 70 ? '#6fcf97' : 
-                    patient.overallScore > 40 ? '#f2c94c' : '#eb5757'
-                  }, ${
-                    patient.overallScore > 70 ? '#5fb587' : 
-                    patient.overallScore > 40 ? '#e0b73c' : '#d84747'
-                  })` 
-                }}
-              />
-            </div>
           </div>
         </div>
 
         {/* Content */}
         <div className={styles.content}>
-          {/* Monthly Mood Trend */}
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <Calendar />
-              <h3 className={styles.sectionTitle}>روند خلقی ماهانه</h3>
-            </div>
-              <div className={styles.chartContainer}>
-                <div className={styles.chartWrapper} ref={chartRef}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart 
-                      data={patient.monthlyMood} 
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                      key={chartKey}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.3} />
-                      <XAxis 
-                        dataKey="date" 
-                        stroke="#6B7280"
-                        style={{ fontFamily: 'inherit', fontSize: '12px' }}
-                      />
-                      <YAxis 
-                        stroke="#6B7280"
-                        style={{ fontFamily: 'inherit', fontSize: '12px' }}
-                      />
-                      <Tooltip 
-                        contentStyle={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.98)',
-                          border: '1px solid rgba(139, 92, 246, 0.2)',
-                          borderRadius: '12px',
-                          padding: '12px',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                          fontFamily: 'inherit',
-                          direction: 'rtl'
-                        }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="mood" 
-                        stroke="#8B5CF6" 
-                        strokeWidth={3}
-                        dot={{ fill: '#8B5CF6', r: 4 }}
-                        name="خلق"
-                        isAnimationActive={false}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="anxiety" 
-                        stroke="#f2c94c" 
-                        strokeWidth={2}
-                        dot={{ fill: '#f2c94c', r: 3 }}
-                        name="اضطراب"
-                        isAnimationActive={false}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="depression" 
-                        stroke="#eb5757" 
-                        strokeWidth={2}
-                        dot={{ fill: '#eb5757', r: 3 }}
-                        name="افسردگی"
-                        isAnimationActive={false}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-          </section>
+          <PatientAgentIntensityPanel
+            patientId={patient.id}
+            sessionCount={patient.sessionsCount}
+          />
 
           {/* Detected Schemas */}
           <section className={styles.section}>
