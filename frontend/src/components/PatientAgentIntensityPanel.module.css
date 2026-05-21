@@ -87,8 +87,13 @@
 
 .chip,
 .chipActive {
-  padding: 0.375rem 0.75rem;
-  border-radius: 9999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  min-width: 7rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
   font-size: 0.8125rem;
   font-weight: 600;
   border: 1px solid #e2e8f0;
@@ -96,6 +101,18 @@
   color: #475569;
   cursor: pointer;
   transition: all 0.15s;
+  text-align: center;
+}
+
+.chipLabel {
+  line-height: 1.35;
+}
+
+.chipTopBadge {
+  margin-top: 0.125rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #7c3aed;
 }
 
 .chip:hover {
@@ -106,6 +123,154 @@
   border-color: #7c3aed;
   background: rgba(124, 58, 237, 0.1);
   color: #6d28d9;
+}
+
+.chipScore {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  opacity: 0.85;
+  margin-top: 0.125rem;
+}
+
+.otherItemsBlock {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.otherItemsTitle {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-align: right;
+}
+
+.otherItemsList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.otherItemBtn {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.625rem;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  text-align: right;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.otherItemBtn:hover {
+  border-color: #c4b5fd;
+  background: rgba(124, 58, 237, 0.05);
+}
+
+.otherItemLabel {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 0.25rem;
+}
+
+.otherItemMeta {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.emptyState {
+  margin: 1rem 0;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  font-size: 0.875rem;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.selectorBlock {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 0.875rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.selectorLabel {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #475569;
+  text-align: right;
+}
+
+.detailPanel {
+  margin-top: 1rem;
+  padding: 1.125rem 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: linear-gradient(to left, rgba(124, 58, 237, 0.04), white);
+}
+
+.detailHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.detailTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.detailScore {
+  font-size: 0.8125rem;
+  color: #6d28d9;
+  font-weight: 600;
+}
+
+.detailSummary {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #475569;
+  text-align: right;
+}
+
+.detailBlock {
+  margin-top: 0.875rem;
+}
+
+.detailBlockTitle {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #7c3aed;
+  text-align: right;
+}
+
+.detailBlockText {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: #475569;
+  text-align: right;
 }
 
 .trendRow {
@@ -149,4 +314,368 @@
   width: 100%;
   height: 260px;
   direction: ltr;
+}
+
+.chartHint {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  color: #64748b;
+  text-align: right;
+}
+
+.analysisSection {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.analysisSectionTitle {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: right;
+}
+
+.analysisSectionDesc {
+  margin: 0 0 1rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  text-align: right;
+  line-height: 1.6;
+}
+
+.analysisList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.analysisCard {
+  border-radius: 0.875rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.analysisCardTop {
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+.analysisCardFocused {
+  border-color: #7c3aed;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.12);
+}
+
+.analysisCardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: right;
+}
+
+.analysisCardTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.analysisCardLabel {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.topBadge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(124, 58, 237, 0.12);
+  color: #6d28d9;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.onChartBadge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.analysisScore {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.scoreBarTrack {
+  height: 4px;
+  margin: 0 1rem 0.5rem;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.scoreBarFill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(to left, #7c3aed, #6366f1);
+}
+
+.analysisCardBody {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.analysisSummary {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #475569;
+  text-align: right;
+}
+
+.analysisBlock {
+  margin-top: 0.875rem;
+}
+
+.analysisBlockTitle {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #7c3aed;
+  text-align: right;
+}
+
+.analysisBlockText {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: #475569;
+  text-align: right;
+}
+
+.evidenceList {
+  margin: 0;
+  padding: 0 1.125rem 0 0;
+  list-style: disc;
+}
+
+.evidenceList li {
+  margin-bottom: 0.35rem;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: #64748b;
+  text-align: right;
+}
+
+.addChartBtn {
+  margin-top: 0.875rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  background: rgba(124, 58, 237, 0.06);
+  color: #6d28d9;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+.addChartBtn:hover {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.chartHint {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  color: #64748b;
+  text-align: right;
+}
+
+.analysisSection {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.analysisSectionTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: right;
+}
+
+.analysisSectionDesc {
+  margin: 0 0 1rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  text-align: right;
+  line-height: 1.6;
+}
+
+.analysisList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.analysisCard {
+  border-radius: 0.875rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.analysisCardTop {
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+.analysisCardFocused {
+  border-color: #7c3aed;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.12);
+}
+
+.analysisCardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: right;
+}
+
+.analysisCardTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.analysisCardLabel {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.topBadge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(124, 58, 237, 0.12);
+  color: #6d28d9;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.onChartBadge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.analysisScore {
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.scoreBarTrack {
+  height: 6px;
+  margin: 0 1rem 0.5rem;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.scoreBarFill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(to left, #7c3aed, #a78bfa);
+}
+
+.analysisCardBody {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.analysisSummary {
+  margin: 0.75rem 0;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #475569;
+  text-align: right;
+}
+
+.analysisBlock {
+  margin-bottom: 0.875rem;
+}
+
+.analysisBlockTitle {
+  margin: 0 0 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #7c3aed;
+  text-align: right;
+}
+
+.analysisBlockText {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: #475569;
+  text-align: right;
+}
+
+.evidenceList {
+  margin: 0;
+  padding: 0 1.125rem 0 0;
+  list-style: disc;
+}
+
+.evidenceList li {
+  margin-bottom: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: #64748b;
+  text-align: right;
+}
+
+.addChartBtn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  background: rgba(124, 58, 237, 0.06);
+  color: #6d28d9;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addChartBtn:hover {
+  background: rgba(124, 58, 237, 0.12);
 }

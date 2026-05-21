@@ -5,7 +5,7 @@ import {
   Users, TrendingUp, AlertCircle, Activity, Brain, Network, X, 
   FileText, LayoutDashboard, ClipboardList, HeartPulse, UserCheck, 
   Calendar, Download, Plus, Search, Filter, ChevronRight, Target,
-  Stethoscope, MessageSquare, BarChart3
+  Stethoscope, MessageSquare, BarChart3, Megaphone
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { PatientCard, Patient } from './PatientCard';
@@ -19,10 +19,13 @@ import { patientDetailToPatient } from '@/utils/patientDetailToPatient';
 import { FormBuilderDialog } from './FormBuilderDialog';
 import { SessionNotesView } from './SessionNotesView';
 import { ClinicManagementView } from './ClinicManagementView';
+import { BrandAmbassadorsView } from './BrandAmbassadorsView';
 import styles from './TherapistDashboard.module.css';
 
+type DashboardTab = 'patients' | 'forms' | 'clinic-management' | 'brand-ambassadors';
+
 interface TherapistDashboardProps {
-  initialTab?: 'patients' | 'forms' | 'clinic-management';
+  initialTab?: DashboardTab;
   initialShowSessionNotes?: boolean;
 }
 
@@ -35,7 +38,7 @@ export function TherapistDashboard({
   const [showUrgentPanel, setShowUrgentPanel] = useState(false);
   const [filterStatus, setFilterStatus] = useState<'all' | 'safe' | 'attention' | 'urgent'>('all');
   const [filterSchema, setFilterSchema] = useState<SchemaType | 'all'>('all');
-  const [activeTab, setActiveTab] = useState<'patients' | 'forms' | 'clinic-management'>(initialTab);
+  const [activeTab, setActiveTab] = useState<DashboardTab>(initialTab);
   const [showFormBuilder, setShowFormBuilder] = useState(false);
   const [showSessionNotes, setShowSessionNotes] = useState(initialShowSessionNotes);
   const patientsListRef = useRef<HTMLDivElement>(null);
@@ -208,6 +211,8 @@ export function TherapistDashboard({
                   ? 'تحلیل جامع و پیشرفته بیماران'
                   : activeTab === 'forms'
                   ? 'مدیریت فرم‌ها و ارزیابی‌ها'
+                  : activeTab === 'brand-ambassadors'
+                  ? 'مدیریت سفیران برند، پورسانت و رتبه‌بندی عملکرد'
                   : 'زمان‌بندی جلسات و پایش نتایج چت‌بات و آزمون‌ها'}
               </p>
             </div>
@@ -232,6 +237,18 @@ export function TherapistDashboard({
               >
                 <Calendar />
                 <span>مدیریت کلینیک</span>
+              </button>
+
+              <button
+                onClick={() => router.push('/dashboard/brand-ambassadors')}
+                className={`${styles.navButton} ${
+                  activeTab === 'brand-ambassadors'
+                    ? styles.navButtonActiveAmbassadors
+                    : styles.navButtonInactive
+                }`}
+              >
+                <Megaphone />
+                <span>سفیران برند</span>
               </button>
               
               <button
@@ -260,9 +277,7 @@ export function TherapistDashboard({
         >
           <Tabs
             value={activeTab}
-            onValueChange={(v) =>
-              setActiveTab(v as 'patients' | 'forms' | 'clinic-management')
-            }
+            onValueChange={(v) => setActiveTab(v as DashboardTab)}
             className={styles.tabsWrapper}
           >
             {/* TabsList hidden since we have navigation buttons in header */}
@@ -271,6 +286,7 @@ export function TherapistDashboard({
                 <TabsTrigger value="patients">داشبورد مراجعین</TabsTrigger>
                 <TabsTrigger value="forms">فرم‌های درمانگر</TabsTrigger>
                 <TabsTrigger value="clinic-management">مدیریت کلینیک</TabsTrigger>
+                <TabsTrigger value="brand-ambassadors">سفیران برند</TabsTrigger>
               </TabsList>
             </div>
 
@@ -595,6 +611,10 @@ export function TherapistDashboard({
                 patients={patientsData}
                 onPatientClick={handleClinicCalendarPatientClick}
               />
+            </TabsContent>
+
+            <TabsContent value="brand-ambassadors" className={styles.tabsContent}>
+              <BrandAmbassadorsView />
             </TabsContent>
           </Tabs>
         </motion.div>

@@ -39,6 +39,7 @@ export const ANALYSIS_AGENTS: AnalysisAgentDef[] = [
     scaleMax: 100,
     outputs: [
       { key: 'defectiveness_shame', label: 'نقص / شرم' },
+      { key: 'emotional_deprivation', label: 'محرومیت هیجانی' },
       { key: 'enmeshment', label: 'درهم‌تنیدگی / خود تحول‌نیافته' },
       { key: 'mistrust_abuse', label: 'بدبینی / سوءاستفاده' },
     ],

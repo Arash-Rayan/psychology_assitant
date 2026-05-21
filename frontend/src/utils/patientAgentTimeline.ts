@@ -35,6 +35,7 @@ export function buildAgentTimeline(
   sessionCount: number,
   agentId: AnalysisAgentId,
   outputKeys: string[],
+  scoreByKey?: Record<string, number>,
 ): TimelinePoint[] {
   const agent = getAnalysisAgent(agentId);
   const seed = hashPatient(patientId);
@@ -42,8 +43,19 @@ export function buildAgentTimeline(
 
   return Array.from({ length: weeks }, (_, i) => {
     const values: Record<string, number> = {};
+    const progress = weeks <= 1 ? 1 : i / (weeks - 1);
+
     for (const key of outputKeys) {
+      const target = scoreByKey?.[key];
       const raw = seededValue(seed, i, `${agentId}-${key}`);
+
+      if (target !== undefined) {
+        const start = Math.max(0, target - (agent.scaleMax > 10 ? 18 : 2));
+        const v = Math.round(start + (target - start) * progress + (raw - 0.5) * 2);
+        values[key] = Math.min(agent.scaleMax, Math.max(0, v));
+        continue;
+      }
+
       const base =
         agentId === 'emotional_state'
           ? 3 + raw * 6
@@ -51,10 +63,9 @@ export function buildAgentTimeline(
             ? 2 + raw * 7
             : 25 + raw * 65;
       const drift = agentId === 'risk_indicators' ? i * 0.15 : -i * 0.2;
-      const v = Math.round(
+      values[key] = Math.round(
         Math.min(agent.scaleMax, Math.max(0, base + drift * (raw > 0.5 ? 1 : -1))),
       );
-      values[key] = v;
     }
     return {
       label: `جلسه ${i + 1}`,
