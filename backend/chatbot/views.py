@@ -25,14 +25,14 @@ def _add_cors_headers(response: JsonResponse | StreamingHttpResponse) -> JsonRes
 
 # set up LangChain components once (non-streaming and streaming use the same chain)
 _api_key = os.environ.get("DEEPSEEK_API_KEY")
+
 llm = ChatOpenAI(
     model="deepseek-v4-pro",
     api_key=_api_key,
     base_url="https://api.deepseek.com",
-    temperature=0.9,
-    streaming=True,
-)
-
+    temperature=0,
+    reasoning_effort="high",)
+        # "response_format": {"type": "json_object"} 
 # llm = ChatOpenAI(
 #     base_url="https://api.gapgpt.app/v1",
 #     api_key="sk-maGdVnAynciq7MyrhlnX6NrVYcPirPgNR1y8N5CcxglcEVWG",

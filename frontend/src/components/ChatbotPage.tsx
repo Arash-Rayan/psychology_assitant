@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Smile, Meh, Frown, Heart, Brain, ClipboardList } from 'lucide-react';
+import { Smile, Meh, Frown, Brain, ClipboardList } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { ChatComposer } from './ChatComposer';
 import styles from './ChatbotPage.module.css';
 
 export type ChatbotVariant = 'assistant' | 'pre_consult';
@@ -75,14 +76,14 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
   const chatEndpoint = useMemo(() => resolveChatEndpoint(variant), [variant]);
 
   const [messages, setMessages] = useState<Message[]>(() => createInitialMessages(variant));
-  const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [moodSelected, setMoodSelected] = useState(false);
   const [subjectSelected, setSubjectSelected] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<PreConsultSubject | null>(null);
   const [streamingBotId, setStreamingBotId] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
+  const isTypingRef = useRef(isTyping);
+  isTypingRef.current = isTyping;
 
   const emotionIcons = {
     positive: Smile,
@@ -98,21 +99,26 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
     { type: 'amazing' as MoodType, emoji: '😄', label: 'عالی', color: '#10b981' }
   ];
 
-  // Auto-scroll to bottom when messages change or during streaming
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const scrollToBottom = useCallback((smooth = false) => {
+    const area = messagesAreaRef.current;
+    if (!area) return;
+    area.scrollTo({
+      top: area.scrollHeight,
+      behavior: smooth ? 'smooth' : 'auto',
+    });
+  }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
+  const inputDisabled = variant === 'pre_consult' && !subjectSelected;
+
+  useLayoutEffect(() => {
+    scrollToBottom(false);
+  }, [messages, isTyping, scrollToBottom]);
 
   useEffect(() => {
     setMessages(createInitialMessages(variant));
     setMoodSelected(false);
     setSubjectSelected(false);
     setSelectedSubject(null);
-    setInputValue('');
     setStreamingBotId(null);
     setIsTyping(false);
   }, [variant]);
@@ -180,7 +186,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
     }, 1500);
   };
 
-  const streamChatReply = async (
+  const streamChatReply = useCallback(async (
     userText: string,
     options?: { newSession?: boolean; consultationSubject?: PreConsultSubject },
   ) => {
@@ -232,13 +238,11 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
           setMessages((prev) =>
             prev.map((m) => (m.id === botId ? { ...m, text: accumulated } : m)),
           );
-          scrollToBottom();
         }
       }
 
       setIsTyping(false);
       setStreamingBotId(null);
-      setTimeout(() => scrollToBottom(), 100);
     } catch {
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
@@ -250,7 +254,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       setIsTyping(false);
       setStreamingBotId(null);
     }
-  };
+  }, [chatEndpoint]);
 
   const handleSubjectSelect = async (subject: (typeof PRE_CONSULT_SUBJECTS)[number]) => {
     if (subjectSelected || variant !== 'pre_consult' || isTyping) return;
@@ -277,25 +281,22 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
     );
   };
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return;
-    if (variant === 'pre_consult' && !subjectSelected) return;
+  const handleSendMessage = useCallback(
+    (text: string) => {
+      if (isTypingRef.current || inputDisabled) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputValue,
-      sender: 'user',
-      timestamp: new Date(),
-    };
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        text,
+        sender: 'user',
+        timestamp: new Date(),
+      };
 
-    setMessages((prev) => [...prev, userMessage]);
-    const currentInput = inputValue;
-    setInputValue('');
-
-    await streamChatReply(currentInput);
-  };
-
-  const inputDisabled = variant === 'pre_consult' && !subjectSelected;
+      setMessages((prev) => [...prev, userMessage]);
+      void streamChatReply(text);
+    },
+    [inputDisabled, streamChatReply],
+  );
 
   const getEmotionClass = (emotion?: string) => {
     if (emotion === 'positive') return styles.emotionPositive;
@@ -469,41 +470,18 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
                 </div>
               </motion.div>
             )}
-            <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area */}
-          <div className={styles.inputArea}>
-            <div className={styles.inputContainer}>
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !inputDisabled && handleSend()}
-                placeholder={
-                  inputDisabled
-                    ? 'ابتدا موضوع پیش‌مشاوره را از بالا انتخاب کنید...'
-                    : 'پیام خود را بنویسید...'
-                }
-                className={styles.input}
-                dir="rtl"
-                disabled={inputDisabled || isTyping}
-              />
-              <button
-                onClick={handleSend}
-                disabled={!inputValue.trim() || inputDisabled || isTyping}
-                className={styles.sendButton}
-              >
-                <Send />
-              </button>
-            </div>
-            <div className={styles.privacyNote}>
-              <Heart />
-              <span className={styles.privacyText}>
-                تمام گفتگوها محرمانه و ایمن هستند
-              </span>
-            </div>
-          </div>
+          <ChatComposer
+            key={variant}
+            disabled={inputDisabled}
+            onSend={handleSendMessage}
+            placeholder={
+              inputDisabled
+                ? 'ابتدا موضوع پیش‌مشاوره را از بالا انتخاب کنید...'
+                : 'پیام خود را بنویسید...'
+            }
+          />
         </motion.div>
       </div>
     </div>

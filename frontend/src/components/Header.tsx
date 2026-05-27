@@ -1,6 +1,6 @@
 'use client';
 
-import { Brain, MessageCircle, LayoutDashboard, Home, Menu, X, UserCircle2, Info } from 'lucide-react';
+import { Brain, MessageCircle, LayoutDashboard, Home, Menu, X, UserCircle2, Info, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -29,6 +29,16 @@ export function Header() {
           
           {/* Desktop Navigation */}
           <nav className={styles.navDesktop}>
+            <Link
+              href="/intro"
+              className={`${styles.navButton} ${
+                isActive('/intro') ? styles.navButtonActive : styles.navButtonInactive
+              }`}
+            >
+              <span>معرفی</span>
+              <Sparkles />
+            </Link>
+
             <Link
               href="/auth"
               className={`${styles.navButton} ${
@@ -93,6 +103,17 @@ export function Header() {
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
           <nav className={styles.navMobile} dir="rtl">
+            <Link
+              href="/intro"
+              className={`${styles.navButton} ${
+                isActive('/intro') ? styles.navButtonActive : styles.navButtonInactive
+              }`}
+              onClick={closeMobileMenu}
+            >
+              <span>معرفی</span>
+              <Sparkles />
+            </Link>
+
             <Link
               href="/auth"
               className={`${styles.navButton} ${

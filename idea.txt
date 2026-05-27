@@ -3,3 +3,35 @@ add note summorizer to therapist notes
 1-> therapist 
 
 -- share
+
+
+
+
+1 of 1 error
+
+Unhandled Runtime Error
+ReferenceError: isFocused is not defined
+
+Source
+src\components\PatientAgentIntensityPanel.tsx (248:18) @ isFocused
+
+  246 |                 </div>
+  247 |
+> 248 |                 {isFocused && (
+      |                  ^
+  249 |                   <div className={styles.analysisCardBody}>
+  250 |                     {item.summary && (
+  251 |                       <p className={styles.analysisSummary}>{item.summary}</p>
+Call Stack
+Show collapsed frames 
+
+i have this errorr after ur code and let me explain with detail what i mean 
+
+ببین برای مراجع تست ما چنتا ایجنت داریم که تحلیل کردن یادته ؟ 
+
+الان روی چارت که میای ، یسری آپشن داری ، مثلا طرح واره اختلال و ... 
+
+وقتی طرح واره انتخاب میشه نمودار طرحواره ای که بالاترین امتیاز رو داشته بصورت پیش فرض نمایش داده میشه 
+ولی زیر نمودار طرف می تونه بیاد و انتخاب کنه اوکی الان نمودار طرح واره محرومیت هیجانی رو نشون بده و .. طرح واره هایی که تا حالا داشته بتونه انتخاب بشه ، 
+
+همین برای اختلال و بقیه هم هست ، یعنی وقتی انتخاب شد ، بیاد نمودار بالاترین بیاد زیرش آپشن انتخاب هر کدوم زیر مجموعه هاش برای نمایش روی چارت 
