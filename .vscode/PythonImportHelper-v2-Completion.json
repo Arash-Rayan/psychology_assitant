@@ -1,70 +1,6 @@
 [
     {
-        "label": "admin",
-        "importPath": "django.contrib",
-        "description": "django.contrib",
-        "isExtraImport": true,
-        "detail": "django.contrib",
-        "documentation": {}
-    },
-    {
-        "label": "admin",
-        "importPath": "django.contrib",
-        "description": "django.contrib",
-        "isExtraImport": true,
-        "detail": "django.contrib",
-        "documentation": {}
-    },
-    {
-        "label": "NinjaAPI",
-        "importPath": "ninja",
-        "description": "ninja",
-        "isExtraImport": true,
-        "detail": "ninja",
-        "documentation": {}
-    },
-    {
-        "label": "Schema",
-        "importPath": "ninja",
-        "description": "ninja",
-        "isExtraImport": true,
-        "detail": "ninja",
-        "documentation": {}
-    },
-    {
-        "label": "Schema",
-        "importPath": "ninja",
-        "description": "ninja",
-        "isExtraImport": true,
-        "detail": "ninja",
-        "documentation": {}
-    },
-    {
-        "label": "JsonResponse",
-        "importPath": "django.http",
-        "description": "django.http",
-        "isExtraImport": true,
-        "detail": "django.http",
-        "documentation": {}
-    },
-    {
-        "label": "csrf_exempt",
-        "importPath": "django.views.decorators.csrf",
-        "description": "django.views.decorators.csrf",
-        "isExtraImport": true,
-        "detail": "django.views.decorators.csrf",
-        "documentation": {}
-    },
-    {
-        "label": "method_decorator",
-        "importPath": "django.utils.decorators",
-        "description": "django.utils.decorators",
-        "isExtraImport": true,
-        "detail": "django.utils.decorators",
-        "documentation": {}
-    },
-    {
-        "label": "transaction",
+        "label": "migrations",
         "importPath": "django.db",
         "description": "django.db",
         "isExtraImport": true,
@@ -80,6 +16,47 @@
         "documentation": {}
     },
     {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "transaction",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "django.db.models.deletion",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "django.db.models.deletion",
+        "description": "django.db.models.deletion",
+        "detail": "django.db.models.deletion",
+        "documentation": {}
+    },
+    {
+        "label": "admin",
+        "importPath": "django.contrib",
+        "description": "django.contrib",
+        "isExtraImport": true,
+        "detail": "django.contrib",
+        "documentation": {}
+    },
+    {
+        "label": "admin",
+        "importPath": "django.contrib",
+        "description": "django.contrib",
+        "isExtraImport": true,
+        "detail": "django.contrib",
+        "documentation": {}
+    },
+    {
         "label": "AppConfig",
         "importPath": "django.apps",
         "description": "django.apps",
@@ -88,43 +65,12 @@
         "documentation": {}
     },
     {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
+        "label": "json",
+        "kind": 6,
         "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
         "documentation": {}
     },
     {
@@ -134,6 +80,102 @@
         "importPath": "os",
         "description": "os",
         "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "JsonResponse",
+        "importPath": "django.http",
+        "description": "django.http",
+        "isExtraImport": true,
+        "detail": "django.http",
+        "documentation": {}
+    },
+    {
+        "label": "HttpRequest",
+        "importPath": "django.http",
+        "description": "django.http",
+        "isExtraImport": true,
+        "detail": "django.http",
+        "documentation": {}
+    },
+    {
+        "label": "StreamingHttpResponse",
+        "importPath": "django.http",
+        "description": "django.http",
+        "isExtraImport": true,
+        "detail": "django.http",
+        "documentation": {}
+    },
+    {
+        "label": "csrf_exempt",
+        "importPath": "django.views.decorators.csrf",
+        "description": "django.views.decorators.csrf",
+        "isExtraImport": true,
+        "detail": "django.views.decorators.csrf",
+        "documentation": {}
+    },
+    {
+        "label": "Max",
+        "importPath": "django.db.models",
+        "description": "django.db.models",
+        "isExtraImport": true,
+        "detail": "django.db.models",
+        "documentation": {}
+    },
+    {
+        "label": "get_object_or_404",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "ChatOpenAI",
+        "importPath": "langchain_openai",
+        "description": "langchain_openai",
+        "isExtraImport": true,
+        "detail": "langchain_openai",
+        "documentation": {}
+    },
+    {
+        "label": "ChatPromptTemplate",
+        "importPath": "langchain_core.prompts",
+        "description": "langchain_core.prompts",
+        "isExtraImport": true,
+        "detail": "langchain_core.prompts",
+        "documentation": {}
+    },
+    {
+        "label": "MessagesPlaceholder",
+        "importPath": "langchain_core.prompts",
+        "description": "langchain_core.prompts",
+        "isExtraImport": true,
+        "detail": "langchain_core.prompts",
+        "documentation": {}
+    },
+    {
+        "label": "HumanMessage",
+        "importPath": "langchain_core.messages",
+        "description": "langchain_core.messages",
+        "isExtraImport": true,
+        "detail": "langchain_core.messages",
+        "documentation": {}
+    },
+    {
+        "label": "AIMessage",
+        "importPath": "langchain_core.messages",
+        "description": "langchain_core.messages",
+        "isExtraImport": true,
+        "detail": "langchain_core.messages",
+        "documentation": {}
+    },
+    {
+        "label": "BaseMessage",
+        "importPath": "langchain_core.messages",
+        "description": "langchain_core.messages",
+        "isExtraImport": true,
+        "detail": "langchain_core.messages",
         "documentation": {}
     },
     {
@@ -178,11 +220,19 @@
         "documentation": {}
     },
     {
-        "label": "api",
-        "importPath": "chatbot.api",
-        "description": "chatbot.api",
+        "label": "chat",
+        "importPath": "chatbot.views",
+        "description": "chatbot.views",
         "isExtraImport": true,
-        "detail": "chatbot.api",
+        "detail": "chatbot.views",
+        "documentation": {}
+    },
+    {
+        "label": "pre_consult_chat",
+        "importPath": "chatbot.views",
+        "description": "chatbot.views",
+        "isExtraImport": true,
+        "detail": "chatbot.views",
         "documentation": {}
     },
     {
@@ -203,48 +253,129 @@
         "documentation": {}
     },
     {
-        "label": "AnalysisRecordAdmin",
+        "label": "Migration",
         "kind": 6,
-        "importPath": "backend.chatbot.admin",
-        "description": "backend.chatbot.admin",
-        "peekOfCode": "class AnalysisRecordAdmin(admin.ModelAdmin):\n    list_display = (\"patient_id\", \"conversation_id\", \"score\", \"created_at\")\n    search_fields = (\"patient_id\", \"conversation_id\")\n    list_filter = (\"created_at\",)",
-        "detail": "backend.chatbot.admin",
+        "importPath": "backend.chatbot.migrations.0001_initial",
+        "description": "backend.chatbot.migrations.0001_initial",
+        "peekOfCode": "class Migration(migrations.Migration):\n    initial = True\n    dependencies = []\n    operations = [\n        migrations.CreateModel(\n            name=\"ChatSession\",\n            fields=[\n                (\"id\", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name=\"ID\")),\n                (\"user_name\", models.CharField(max_length=100)),\n                (\"initial_mood\", models.CharField(blank=True, max_length=50, null=True)),",
+        "detail": "backend.chatbot.migrations.0001_initial",
         "documentation": {}
     },
     {
-        "label": "chat_endpoint",
-        "kind": 2,
-        "importPath": "backend.chatbot.api",
-        "description": "backend.chatbot.api",
-        "peekOfCode": "def chat_endpoint(request, payload: ChatRequest):\n    reply = chat_with_llm(payload.message)\n    return {\"reply\": reply}\n@api.post(\"/analyze\", response=AnalyzeResponse)\ndef analyze_endpoint(request, payload: AnalyzeRequest):\n    result = analyze_with_llm(payload.summary, payload.score_hint)\n    return {\"analysis\": result[\"analysis\"], \"score\": result[\"score\"]}\n@api.post(\"/save\", response=SaveResponse)\n@transaction.atomic\ndef save_analysis_endpoint(request, payload: SaveRequest):",
-        "detail": "backend.chatbot.api",
-        "documentation": {}
-    },
-    {
-        "label": "analyze_endpoint",
-        "kind": 2,
-        "importPath": "backend.chatbot.api",
-        "description": "backend.chatbot.api",
-        "peekOfCode": "def analyze_endpoint(request, payload: AnalyzeRequest):\n    result = analyze_with_llm(payload.summary, payload.score_hint)\n    return {\"analysis\": result[\"analysis\"], \"score\": result[\"score\"]}\n@api.post(\"/save\", response=SaveResponse)\n@transaction.atomic\ndef save_analysis_endpoint(request, payload: SaveRequest):\n    record = AnalysisRecord.objects.create(\n        patient_id=payload.patient_id,\n        conversation_id=payload.conversation_id,\n        summary=payload.summary,",
-        "detail": "backend.chatbot.api",
-        "documentation": {}
-    },
-    {
-        "label": "save_analysis_endpoint",
-        "kind": 2,
-        "importPath": "backend.chatbot.api",
-        "description": "backend.chatbot.api",
-        "peekOfCode": "def save_analysis_endpoint(request, payload: SaveRequest):\n    record = AnalysisRecord.objects.create(\n        patient_id=payload.patient_id,\n        conversation_id=payload.conversation_id,\n        summary=payload.summary,\n        score=payload.score,\n        metadata=payload.metadata or {},\n    )\n    return {\"id\": record.id, \"status\": \"saved\"}",
-        "detail": "backend.chatbot.api",
-        "documentation": {}
-    },
-    {
-        "label": "api",
+        "label": "prompt",
         "kind": 5,
-        "importPath": "backend.chatbot.api",
-        "description": "backend.chatbot.api",
-        "peekOfCode": "api = NinjaAPI(title=\"Psychological Chatbot API\")\n@api.post(\"/chat\", response=ChatResponse)\ndef chat_endpoint(request, payload: ChatRequest):\n    reply = chat_with_llm(payload.message)\n    return {\"reply\": reply}\n@api.post(\"/analyze\", response=AnalyzeResponse)\ndef analyze_endpoint(request, payload: AnalyzeRequest):\n    result = analyze_with_llm(payload.summary, payload.score_hint)\n    return {\"analysis\": result[\"analysis\"], \"score\": result[\"score\"]}\n@api.post(\"/save\", response=SaveResponse)",
-        "detail": "backend.chatbot.api",
+        "importPath": "backend.chatbot.prompts.router.supervisor_prompt",
+        "description": "backend.chatbot.prompts.router.supervisor_prompt",
+        "peekOfCode": "prompt = \"\"\"\nYou are a supervisor router in a multi-agent psychological analysis workflow.\nYou will receive:\n1. The conversation text.\n2. A list of available agents.\n3. Descriptions for each agent.\navailable_agents: {agents}\nagent_descriptions: {agents_description}\nYour task:\n- Select only the agents that have strong, clear evidence from the conversation.",
+        "detail": "backend.chatbot.prompts.router.supervisor_prompt",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.attachment",
+        "description": "backend.chatbot.prompts.attachment",
+        "peekOfCode": "prompt = \"\"\"You are a clinical psychology expert in Attachment Theory based on John Bowlby and Mary Ainsworth.\nAnalyze the text like a clinician using a schema-therapy style formulation approach.\n---\n## CORE TASK\nFor EACH attachment style, independently assess whether it is present.\nYou MUST treat each style as an independent clinical construct (like schema therapy EMS analysis).\nDo NOT create a global narrative.\nDo NOT merge styles.\nDo NOT prioritize one style over another.\n---",
+        "detail": "backend.chatbot.prompts.attachment",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.clinical_disorder",
+        "description": "backend.chatbot.prompts.clinical_disorder",
+        "peekOfCode": "prompt = \"\"\"You are an expert clinical psychologist trained in DSM-5-TR differential diagnosis.\nAnalyze the text like a clinician using structured diagnostic formulation.\n---\n## CORE TASK\nIdentify ONLY clinical disorders that have strong and meaningful evidence in the text.\nEach disorder must be treated as an independent clinical construct.\n---\n## IMPORTANT RULES\n- ONLY include disorders with confidence ≥ 70\n- DO NOT include disorders with weak or no evidence",
+        "detail": "backend.chatbot.prompts.clinical_disorder",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.emotional_state",
+        "description": "backend.chatbot.prompts.emotional_state",
+        "peekOfCode": "prompt = \"\"\"\nYou are a psychological analyst. Your task is to assess emotional states based on the user's conversation. This is NOT diagnosis, only emotional state estimation.\nEmotional states:\n- Depression / Sadness\n- Anxiety\n- Anger\n- Shame\n- Guilt\n- Jealousy\n- Hopelessness",
+        "detail": "backend.chatbot.prompts.emotional_state",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.functional_level",
+        "description": "backend.chatbot.prompts.functional_level",
+        "peekOfCode": "prompt = \"\"\"\nYou are a psychological analyst. Your task is to assess functional impairment based on the user's text. This is NOT diagnosis, only functional evaluation.\nFunctional areas:\n- Occupational / Work Functioning\n- Academic / Educational Functioning\n- Social Functioning\n- Sleep Disturbances\n- Concentration / Attention Difficulties\nRules:\n- Score each area from 0 to 10",
+        "detail": "backend.chatbot.prompts.functional_level",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.interview",
+        "description": "backend.chatbot.prompts.interview",
+        "peekOfCode": "prompt = \"\"\"\n# SYSTEM PROMPT – THERAPEUTIC MONITORING ASSISTANT\n## Your Role\nYou are a gentle, conversational assistant working alongside a CBT therapist. Your only job is to talk naturally with the client between sessions and gather useful information – without ever sounding like an assessment or a questionnaire.\nYou are not a therapist. You do not give advice, solutions, or interpretations. You only listen, ask good questions, and keep the conversation pleasant and ongoing.\n---\n## Core Principles\n### 1. Be Natural, Not Clinical\n- Never say \"let me assess your symptoms\" or \"I need to ask you some questions.\"\n- Just talk like a kind, curious person who cares.",
+        "detail": "backend.chatbot.prompts.interview",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.meta_analist",
+        "description": "backend.chatbot.prompts.meta_analist",
+        "peekOfCode": "prompt = \"\"\"\nYou are a psychological supervisor meta-analyst.\nYou receive outputs from multiple psychological agents.  \nEach agent output includes:\n- a structured JSON with scores (0–10)\n- a natural-language summary\n- optionally evidence fields\nYour task is to integrate ALL agent outputs into a single coherent clinical-style report.\n────────────────────────────\nAGGREGATION RULES",
+        "detail": "backend.chatbot.prompts.meta_analist",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.personal_traits",
+        "description": "backend.chatbot.prompts.personal_traits",
+        "peekOfCode": "prompt = \"\"\"\nYou are an expert personality psychologist specializing in trait theory,\nthe Five-Factor Model (OCEAN), and behavioral consistency analysis.\nAnalyze the conversation like a clinical observer. Consider emotional tone,\ncognitive style, social behavior, word choice, and interaction patterns.\nDo NOT rely on simple keyword matching. Infer traits from how the person\nspeaks, what they emphasize, what they avoid, and how they relate to the chatbot.\nYour task:\nIdentify which of the Big Five personality traits (and their key facets)\nare clearly present in the person's side of the conversation.",
+        "detail": "backend.chatbot.prompts.personal_traits",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.pre_consult",
+        "description": "backend.chatbot.prompts.pre_consult",
+        "peekOfCode": "prompt = \"\"\"\nYou are a supportive Persian-language assistant for **pre-consultation** (پیش‌مشاوره): the user has **not** visited a psychologist or psychiatrist yet.\nGoals:\n- Welcome them warmly and explain you help them organize thoughts and concerns before a possible visit.\n- The user selects one topic first: **زوجین** (couples), **فردی** (individual), or **پیش از ازدواج** (pre-marriage). Tailor your questions and examples to that topic.\n- Ask gentle, step-by-step questions (motivation for seeking help, main worries, duration, daily impact, sleep/mood, safety only if appropriate — without being alarmist).\n- You are **not** a therapist and you **do not** diagnose or prescribe.\n- Keep replies short (2–4 sentences), natural conversational Persian (فارسی محاوره‌ای محترمانه).\n- If they ask for unrelated topics (coding, homework answers, etc.), politely redirect to how they feel and what brings them here.\nReplace generic reassurance with **one focused follow-up question** when helpful.",
+        "detail": "backend.chatbot.prompts.pre_consult",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.risk_indicators",
+        "description": "backend.chatbot.prompts.risk_indicators",
+        "peekOfCode": "prompt = \"\"\"\nYou are a psychological analyst. Your task is to assess the presence and intensity of risk indicators in an individual's text. Focus on the following risk indicators:\n- Death-related thoughts  \n- Suicidal thoughts  \n- Suicide planning  \n- Self-harm  \n- Violence toward others  \n- Substance abuse  \n- Severe functional breakdown  \nFor each risk indicator, assign a score from 0 to 10:",
+        "detail": "backend.chatbot.prompts.risk_indicators",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.schema",
+        "description": "backend.chatbot.prompts.schema",
+        "peekOfCode": "prompt = \"\"\"\nYou are an expert schema therapist trained in Jeffrey Young’s Schema Therapy.\nAnalyze the text like a clinician. Consider emotional tone, cognitive beliefs,\nrelationship patterns, and behavioral reactions. Do NOT rely on simple keyword matching.\nYour task:\nIdentify which of the 18 Early Maladaptive Schemas (EMS) are clearly present in the text.\nImportant rules:\n- Only include schemas that have meaningful support in the text.\n- Do NOT list all 18 schemas.\n- Do NOT invent interpretations not supported by the text.",
+        "detail": "backend.chatbot.prompts.schema",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.summary",
+        "description": "backend.chatbot.prompts.summary",
+        "peekOfCode": "prompt = \"\"\"\nYou are a conversation summarization system designed for long‑term memory storage.\nYour task is to summarize a conversation between a user and an AI assistant.\nThe summary will be stored for long‑term retrieval and future analysis by other systems.\nImportant rules:\n- Preserve the main meaning and context of the conversation.\n- Focus on what the user experienced, expressed, or discussed.\n- Capture important events, concerns, emotions, and topics.\n- Do NOT make diagnoses or clinical judgments.\n- Do NOT add interpretations that were not present in the conversation.",
+        "detail": "backend.chatbot.prompts.summary",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.prompts.summary",
+        "description": "backend.chatbot.prompts.summary",
+        "peekOfCode": "prompt = \"\"\"\nsummorize this text like a report of what user is talking about  in persian\n\"\"\"",
+        "detail": "backend.chatbot.prompts.summary",
         "documentation": {}
     },
     {
@@ -257,120 +388,93 @@
         "documentation": {}
     },
     {
-        "label": "SignupRequest",
-        "kind": 6,
-        "importPath": "backend.chatbot.auth_schemas",
-        "description": "backend.chatbot.auth_schemas",
-        "peekOfCode": "class SignupRequest(Schema):\n    name: str\n    email: str\n    password: str\nclass SignupResponse(Schema):\n    id: int\n    name: str\n    email: str\nclass LoginRequest(Schema):\n    email: str",
-        "detail": "backend.chatbot.auth_schemas",
-        "documentation": {}
-    },
-    {
-        "label": "SignupResponse",
-        "kind": 6,
-        "importPath": "backend.chatbot.auth_schemas",
-        "description": "backend.chatbot.auth_schemas",
-        "peekOfCode": "class SignupResponse(Schema):\n    id: int\n    name: str\n    email: str\nclass LoginRequest(Schema):\n    email: str\n    password: str\nclass LoginResponse(Schema):\n    id: int\n    name: str",
-        "detail": "backend.chatbot.auth_schemas",
-        "documentation": {}
-    },
-    {
-        "label": "LoginRequest",
-        "kind": 6,
-        "importPath": "backend.chatbot.auth_schemas",
-        "description": "backend.chatbot.auth_schemas",
-        "peekOfCode": "class LoginRequest(Schema):\n    email: str\n    password: str\nclass LoginResponse(Schema):\n    id: int\n    name: str\n    email: str",
-        "detail": "backend.chatbot.auth_schemas",
-        "documentation": {}
-    },
-    {
-        "label": "LoginResponse",
-        "kind": 6,
-        "importPath": "backend.chatbot.auth_schemas",
-        "description": "backend.chatbot.auth_schemas",
-        "peekOfCode": "class LoginResponse(Schema):\n    id: int\n    name: str\n    email: str",
-        "detail": "backend.chatbot.auth_schemas",
-        "documentation": {}
-    },
-    {
-        "label": "AnalysisRecord",
+        "label": "ChatSession",
         "kind": 6,
         "importPath": "backend.chatbot.models",
         "description": "backend.chatbot.models",
-        "peekOfCode": "class AnalysisRecord(models.Model):\n    patient_id = models.CharField(max_length=128)\n    conversation_id = models.CharField(max_length=128)\n    summary = models.TextField()\n    score = models.IntegerField()\n    metadata = models.JSONField(default=dict, blank=True)\n    created_at = models.DateTimeField(auto_now_add=True)\n    class Meta:\n        db_table = \"chatbot_analysis\"\n        indexes = [",
+        "peekOfCode": "class ChatSession(models.Model):\n    user_name = models.CharField(max_length=100)\n    initial_mood = models.CharField(max_length=50, blank=True, null=True)\n    started_at = models.DateTimeField(auto_now_add=True)\n    ended_at = models.DateTimeField(blank=True, null=True)\n    total_tokens = models.IntegerField(default=0)\n    class Meta:\n        db_table = \"chat_sessions\"\n        ordering = [\"-started_at\"]\nclass ChatMessage(models.Model):",
         "detail": "backend.chatbot.models",
         "documentation": {}
     },
     {
-        "label": "ChatRequest",
+        "label": "ChatMessage",
         "kind": 6,
-        "importPath": "backend.chatbot.schemas",
-        "description": "backend.chatbot.schemas",
-        "peekOfCode": "class ChatRequest(Schema):\n    message: str\nclass ChatResponse(Schema):\n    reply: str\nclass AnalyzeRequest(Schema):\n    summary: str\n    score_hint: int | None = None\nclass AnalyzeResponse(Schema):\n    analysis: str\n    score: int",
-        "detail": "backend.chatbot.schemas",
+        "importPath": "backend.chatbot.models",
+        "description": "backend.chatbot.models",
+        "peekOfCode": "class ChatMessage(models.Model):\n    ROLE_USER = \"user\"\n    ROLE_ASSISTANT = \"assistant\"\n    ROLE_SYSTEM = \"system\"\n    ROLE_CHOICES = [\n        (ROLE_USER, \"User\"),\n        (ROLE_ASSISTANT, \"Assistant\"),\n        (ROLE_SYSTEM, \"System\"),\n    ]\n    session = models.ForeignKey(",
+        "detail": "backend.chatbot.models",
         "documentation": {}
     },
     {
-        "label": "ChatResponse",
-        "kind": 6,
-        "importPath": "backend.chatbot.schemas",
-        "description": "backend.chatbot.schemas",
-        "peekOfCode": "class ChatResponse(Schema):\n    reply: str\nclass AnalyzeRequest(Schema):\n    summary: str\n    score_hint: int | None = None\nclass AnalyzeResponse(Schema):\n    analysis: str\n    score: int\nclass SaveRequest(Schema):\n    patient_id: str",
-        "detail": "backend.chatbot.schemas",
-        "documentation": {}
-    },
-    {
-        "label": "AnalyzeRequest",
-        "kind": 6,
-        "importPath": "backend.chatbot.schemas",
-        "description": "backend.chatbot.schemas",
-        "peekOfCode": "class AnalyzeRequest(Schema):\n    summary: str\n    score_hint: int | None = None\nclass AnalyzeResponse(Schema):\n    analysis: str\n    score: int\nclass SaveRequest(Schema):\n    patient_id: str\n    conversation_id: str\n    summary: str",
-        "detail": "backend.chatbot.schemas",
-        "documentation": {}
-    },
-    {
-        "label": "AnalyzeResponse",
-        "kind": 6,
-        "importPath": "backend.chatbot.schemas",
-        "description": "backend.chatbot.schemas",
-        "peekOfCode": "class AnalyzeResponse(Schema):\n    analysis: str\n    score: int\nclass SaveRequest(Schema):\n    patient_id: str\n    conversation_id: str\n    summary: str\n    score: int\n    metadata: Optional[Dict[str, Any]] = None\nclass SaveResponse(Schema):",
-        "detail": "backend.chatbot.schemas",
-        "documentation": {}
-    },
-    {
-        "label": "SaveRequest",
-        "kind": 6,
-        "importPath": "backend.chatbot.schemas",
-        "description": "backend.chatbot.schemas",
-        "peekOfCode": "class SaveRequest(Schema):\n    patient_id: str\n    conversation_id: str\n    summary: str\n    score: int\n    metadata: Optional[Dict[str, Any]] = None\nclass SaveResponse(Schema):\n    id: int\n    status: str",
-        "detail": "backend.chatbot.schemas",
-        "documentation": {}
-    },
-    {
-        "label": "SaveResponse",
-        "kind": 6,
-        "importPath": "backend.chatbot.schemas",
-        "description": "backend.chatbot.schemas",
-        "peekOfCode": "class SaveResponse(Schema):\n    id: int\n    status: str",
-        "detail": "backend.chatbot.schemas",
-        "documentation": {}
-    },
-    {
-        "label": "chat_with_llm",
+        "label": "chat",
         "kind": 2,
-        "importPath": "backend.chatbot.services",
-        "description": "backend.chatbot.services",
-        "peekOfCode": "def chat_with_llm(message: str) -> str:\n    # TODO: wire up OpenAI/other LLM here\n    # Example: return openai_response\n    return f\"Stubbed chatbot reply to: {message}\"\ndef analyze_with_llm(summary: str, score_hint: int | None = None) -> Dict[str, Any]:\n    # TODO: wire up LLM scoring/analysis here\n    # Could return structured analysis + numeric score\n    score = score_hint if score_hint is not None else 75\n    return {\n        \"analysis\": f\"Stubbed analysis for: {summary}\",",
-        "detail": "backend.chatbot.services",
+        "importPath": "backend.chatbot.views",
+        "description": "backend.chatbot.views",
+        "peekOfCode": "def chat(request: HttpRequest):\n    \"\"\"\n    POST /chat\n    Body: { \"message\": \"...\" }\n    Response: streamed text/plain chunks.\n    \"\"\"\n    return _chat_stream_response(request, chain)\n@csrf_exempt\ndef pre_consult_chat(request: HttpRequest):\n    \"\"\"",
+        "detail": "backend.chatbot.views",
         "documentation": {}
     },
     {
-        "label": "analyze_with_llm",
+        "label": "pre_consult_chat",
         "kind": 2,
-        "importPath": "backend.chatbot.services",
-        "description": "backend.chatbot.services",
-        "peekOfCode": "def analyze_with_llm(summary: str, score_hint: int | None = None) -> Dict[str, Any]:\n    # TODO: wire up LLM scoring/analysis here\n    # Could return structured analysis + numeric score\n    score = score_hint if score_hint is not None else 75\n    return {\n        \"analysis\": f\"Stubbed analysis for: {summary}\",\n        \"score\": score,\n    }",
-        "detail": "backend.chatbot.services",
+        "importPath": "backend.chatbot.views",
+        "description": "backend.chatbot.views",
+        "peekOfCode": "def pre_consult_chat(request: HttpRequest):\n    \"\"\"\n    POST /chat/pre-consult — پیش‌مشاوره (before first clinical visit).\n    Same contract as /chat; separate session namespace via user_name prefix.\n    \"\"\"\n    return _chat_stream_response(request, chain_pre_consult, user_name_prefix=\"pre_consult:\")",
+        "detail": "backend.chatbot.views",
+        "documentation": {}
+    },
+    {
+        "label": "_api_key",
+        "kind": 5,
+        "importPath": "backend.chatbot.views",
+        "description": "backend.chatbot.views",
+        "peekOfCode": "_api_key = os.environ.get(\"DEEPSEEK_API_KEY\")\nllm = ChatOpenAI(\n    model=\"deepseek-v4-pro\",\n    api_key=_api_key,\n    base_url=\"https://api.deepseek.com\",\n    temperature=0,\n    reasoning_effort=\"high\",)\n        # \"response_format\": {\"type\": \"json_object\"} \n# llm = ChatOpenAI(\n#     base_url=\"https://api.gapgpt.app/v1\",",
+        "detail": "backend.chatbot.views",
+        "documentation": {}
+    },
+    {
+        "label": "llm",
+        "kind": 5,
+        "importPath": "backend.chatbot.views",
+        "description": "backend.chatbot.views",
+        "peekOfCode": "llm = ChatOpenAI(\n    model=\"deepseek-v4-pro\",\n    api_key=_api_key,\n    base_url=\"https://api.deepseek.com\",\n    temperature=0,\n    reasoning_effort=\"high\",)\n        # \"response_format\": {\"type\": \"json_object\"} \n# llm = ChatOpenAI(\n#     base_url=\"https://api.gapgpt.app/v1\",\n#     api_key=\"sk-maGdVnAynciq7MyrhlnX6NrVYcPirPgNR1y8N5CcxglcEVWG\",",
+        "detail": "backend.chatbot.views",
+        "documentation": {}
+    },
+    {
+        "label": "prompt",
+        "kind": 5,
+        "importPath": "backend.chatbot.views",
+        "description": "backend.chatbot.views",
+        "peekOfCode": "prompt = ChatPromptTemplate.from_messages(\n    [\n        (\"system\", model_instruct),\n        MessagesPlaceholder(\"chat_history\"),\n        (\"human\", \"{input}\"),\n    ]\n)\nchain = prompt | llm\nprompt_pre_consult = ChatPromptTemplate.from_messages(\n    [",
+        "detail": "backend.chatbot.views",
+        "documentation": {}
+    },
+    {
+        "label": "chain",
+        "kind": 5,
+        "importPath": "backend.chatbot.views",
+        "description": "backend.chatbot.views",
+        "peekOfCode": "chain = prompt | llm\nprompt_pre_consult = ChatPromptTemplate.from_messages(\n    [\n        (\"system\", pre_consult_instruct),\n        MessagesPlaceholder(\"chat_history\"),\n        (\"human\", \"{input}\"),\n    ]\n)\nchain_pre_consult = prompt_pre_consult | llm\ndef _offline_token_count(text: str) -> int:",
+        "detail": "backend.chatbot.views",
+        "documentation": {}
+    },
+    {
+        "label": "prompt_pre_consult",
+        "kind": 5,
+        "importPath": "backend.chatbot.views",
+        "description": "backend.chatbot.views",
+        "peekOfCode": "prompt_pre_consult = ChatPromptTemplate.from_messages(\n    [\n        (\"system\", pre_consult_instruct),\n        MessagesPlaceholder(\"chat_history\"),\n        (\"human\", \"{input}\"),\n    ]\n)\nchain_pre_consult = prompt_pre_consult | llm\ndef _offline_token_count(text: str) -> int:\n    stripped = (text or \"\").strip()",
+        "detail": "backend.chatbot.views",
+        "documentation": {}
+    },
+    {
+        "label": "chain_pre_consult",
+        "kind": 5,
+        "importPath": "backend.chatbot.views",
+        "description": "backend.chatbot.views",
+        "peekOfCode": "chain_pre_consult = prompt_pre_consult | llm\ndef _offline_token_count(text: str) -> int:\n    stripped = (text or \"\").strip()\n    return max(1, len(stripped) // 4) if stripped else 0\ndef _build_langchain_history(session_id: int) -> list[BaseMessage]:\n    history: list[BaseMessage] = []\n    messages = ChatMessage.objects.filter(session_id=session_id).order_by(\"seq\")\n    for msg in messages:\n        if msg.role == ChatMessage.ROLE_USER:\n            history.append(HumanMessage(content=msg.content))",
+        "detail": "backend.chatbot.views",
         "documentation": {}
     },
     {
@@ -459,7 +563,7 @@
         "kind": 5,
         "importPath": "backend.core.settings",
         "description": "backend.core.settings",
-        "peekOfCode": "WSGI_APPLICATION = \"core.wsgi.application\"\nDATABASE_URL = os.getenv(\"DATABASE_URL\")\nif DATABASE_URL:\n    DATABASES = {\"default\": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)}\nelse:\n    DATABASES = {\n        \"default\": {\n            \"ENGINE\": \"django.db.backends.sqlite3\",\n            \"NAME\": BASE_DIR / \"db.sqlite3\",\n        }",
+        "peekOfCode": "WSGI_APPLICATION = \"core.wsgi.application\"\nDATABASE_URL = os.getenv(\"DATABASE_URL\")\nif not DATABASE_URL:\n    raise ValueError(\"DATABASE_URL is required and must point to a PostgreSQL database.\")\nDATABASES = {\n    \"default\": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)\n}\nAUTH_PASSWORD_VALIDATORS = [\n    {\"NAME\": \"django.contrib.auth.password_validation.UserAttributeSimilarityValidator\"},\n    {\"NAME\": \"django.contrib.auth.password_validation.MinimumLengthValidator\"},",
         "detail": "backend.core.settings",
         "documentation": {}
     },
@@ -468,7 +572,16 @@
         "kind": 5,
         "importPath": "backend.core.settings",
         "description": "backend.core.settings",
-        "peekOfCode": "DATABASE_URL = os.getenv(\"DATABASE_URL\")\nif DATABASE_URL:\n    DATABASES = {\"default\": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)}\nelse:\n    DATABASES = {\n        \"default\": {\n            \"ENGINE\": \"django.db.backends.sqlite3\",\n            \"NAME\": BASE_DIR / \"db.sqlite3\",\n        }\n    }",
+        "peekOfCode": "DATABASE_URL = os.getenv(\"DATABASE_URL\")\nif not DATABASE_URL:\n    raise ValueError(\"DATABASE_URL is required and must point to a PostgreSQL database.\")\nDATABASES = {\n    \"default\": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)\n}\nAUTH_PASSWORD_VALIDATORS = [\n    {\"NAME\": \"django.contrib.auth.password_validation.UserAttributeSimilarityValidator\"},\n    {\"NAME\": \"django.contrib.auth.password_validation.MinimumLengthValidator\"},\n    {\"NAME\": \"django.contrib.auth.password_validation.CommonPasswordValidator\"},",
+        "detail": "backend.core.settings",
+        "documentation": {}
+    },
+    {
+        "label": "DATABASES",
+        "kind": 5,
+        "importPath": "backend.core.settings",
+        "description": "backend.core.settings",
+        "peekOfCode": "DATABASES = {\n    \"default\": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)\n}\nAUTH_PASSWORD_VALIDATORS = [\n    {\"NAME\": \"django.contrib.auth.password_validation.UserAttributeSimilarityValidator\"},\n    {\"NAME\": \"django.contrib.auth.password_validation.MinimumLengthValidator\"},\n    {\"NAME\": \"django.contrib.auth.password_validation.CommonPasswordValidator\"},\n    {\"NAME\": \"django.contrib.auth.password_validation.NumericPasswordValidator\"},\n]\nLANGUAGE_CODE = \"en-us\"",
         "detail": "backend.core.settings",
         "documentation": {}
     },
@@ -549,7 +662,7 @@
         "kind": 5,
         "importPath": "backend.core.urls",
         "description": "backend.core.urls",
-        "peekOfCode": "urlpatterns = [\n    path(\"admin/\", admin.site.urls),\n    path(\"api/\", api.urls),\n]",
+        "peekOfCode": "urlpatterns = [\n    path(\"admin/\", admin.site.urls),\n    path(\"chat/pre-consult\", pre_consult_chat, name=\"pre_consult_chat\"),\n    path(\"chat\", chat, name=\"chat\"),\n]",
         "detail": "backend.core.urls",
         "documentation": {}
     },
@@ -569,6 +682,24 @@
         "description": "backend.manage",
         "peekOfCode": "def main():\n    os.environ.setdefault(\"DJANGO_SETTINGS_MODULE\", \"core.settings\")\n    try:\n        from django.core.management import execute_from_command_line\n    except ImportError as exc:\n        raise ImportError(\n            \"Couldn't import Django. Are you sure it's installed and \"\n            \"available on your PYTHONPATH environment variable? Did you \"\n            \"forget to activate a virtual environment?\"\n        ) from exc",
         "detail": "backend.manage",
+        "documentation": {}
+    },
+    {
+        "label": "second",
+        "kind": 5,
+        "importPath": "user_context",
+        "description": "user_context",
+        "peekOfCode": "second = \"\"\"\"\nسلام خسته نباشید مهسام\nخلاصه امروز رو بخوام بگم خیلی از همه چیز نا امید شده بودم و حتی یه کلمه با مامانم یا کسی حرف نزدم \nو بعدش که بابام اومد حسابی اعصابم بهم ریخت و دوباره شروع کرد از گذشته و اینکه مامانم لاشخوره و خانواده لاشخوری داره حرف زدن \nمتین هم اعصاب نداشت فکر میکرد بهش دروغ گفتم بابام اومده \nازش عذرخواهی کردم با اینکه میدونستم تقصیر من نبوده \nدر کل خستم \nو ممنونم واسه امروز\nامروز حس کردم خیلی دم دستی ام و از بس برای همه بودم همه عادت دارن که من باشم \nو امروز فهمیدم هیچ وقت نتونستم رفتار دخترونه داشته باشم چون هیچ وقت نتونستم نه ناز کنم نه ناز من کسی بخره ",
+        "detail": "user_context",
+        "documentation": {}
+    },
+    {
+        "label": "third",
+        "kind": 5,
+        "importPath": "user_context",
+        "description": "user_context",
+        "peekOfCode": "third = \"\"\"\nمن حالم بده داغونم چهارده ساله ازدواج کردم از همون اول مشکل داشتیم بی محبتی بی احترامی بچه ننه بودن مشکلات مالی از سال نود و شش تا الان علنأ ورشکسته شدیم چند روزه که بیکار هم شده هر چی داشتیم و نداشتیم سر نزوله چندباره به باد داد ولی تحمل کردم ساختم گفتم اشکال نداره از صفر شروع میکنیم\nولییییییی چندروزه  وسط همین گیر و دار ورشکسته شدنه چندباره فهمیدم بهم خیانت کرده زیر بار نمی‌رفت تا دیشب که پیاماشو دیدم و گفتم این دیگه تیر خلاصه من دیشب تا حالا مردم و هیچکس متوجه نشده هیچ مراسمی برام گرفته نشده ولی خودم می‌دونم مردم من دیگه آدم نمیشم می‌دونم\nواقعا زندگیم ارزش موندن نداره ارزش این همه حرص خوردن و عذاب کشیدن و صبوری کردن نداره ولی من یه مادرم قرص آرامبخش بهم معرفی کنید میرم میخرم شاید حالم عوض شه\n\"\"\"",
+        "detail": "user_context",
         "documentation": {}
     }
 ]

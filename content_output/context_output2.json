@@ -1,0 +1,153 @@
+
+{
+    "traits(agents_output_context2)": {
+      "Conscientiousness": {
+        "polarity": "high",
+        "confidence_score": 80,
+        "evidence": [
+          "امروز کل خونه رو تمیز کردم کل اتاقمو تمیز کردم غذا درست کردم"
+        ],
+        "clinical_analysis": "این کاربر با تمیز کردن خانه و اتاق و پختن غذا، نظم و انضباط شخصی بالایی نشان می‌دهد. همچنین اشاره می‌کند که همیشه در خدمت دیگران بوده است ('از بس برای همه بودم'). این رفتارها با وجدان‌گرایی بالا هماهنگ است."
+      },
+      "Extraversion": {
+        "polarity": "low",
+        "confidence_score": 75,
+        "evidence": [
+          "حتی یه کلمه با مامانم یا کسی حرف نزدم",
+          "با خودم خلوت کردم"
+        ],
+        "clinical_analysis": "این کاربر در حالت ناامیدی از تعامل اجتماعی کناره‌گیری کرده و با کسی حرف نزده است. همچنین زمان را با خودش خلوت کرده است. این نشان‌دهنده برون‌گرایی پایین (درون‌گرایی) و نیاز به تنهایی است."
+      },
+      "Agreeableness": {
+        "polarity": "high",
+        "confidence_score": 85,
+        "evidence": [
+          "ازش عذرخواهی کردم با اینکه میدونستم تقصیر من نبوده",
+          "از بس برای همه بودم همه عادت دارن که من باشم"
+        ],
+        "clinical_analysis": "این کاربر سازگاری بالایی دارد؛ حتی زمانی که تقصیر خودش نبوده عذرخواهی کرده و همیشه در دسترس دیگران بوده است. اگرچه از این الگو ناراحت است، اما همچنان رفتار هماهنگ و سازگارانه نشان می‌دهد."
+      },
+      "Neuroticism": {
+        "polarity": "high",
+        "confidence_score": 95,
+        "evidence": [
+          "خیلی از همه چیز نا امید شده بودم",
+          "بابام اومد حسابی اعصابم بهم ریخت",
+          "امروز حس کردم خیلی دم دستی ام",
+          "هنوزم نمی‌تونم با خیلی چیزا کنار بیام"
+        ],
+        "clinical_analysis": "این کاربر سطح بالایی از روان‌رنجوری را نشان می‌دهد: ناامیدی فراگیر، واکنش شدید عاطفی به رویدادها (اعصاب بهم ریخت)، احساس بی‌ارزشی و طردشدگی (دم‌دستی)، و ناتوانی در کنار آمدن با مسائل. این الگو حاکی از ناپایداری عاطفی و حساسیت بالا به محرک‌های منفی است."
+      }
+    }
+  }
+
+  {
+  "patterns": {
+    "Unhealthy Dependence": {
+      "score": 7,
+      "evidence": [
+        "دوست داشتم متین بهم یه پیام طولانی بده",
+        "دوست داشتم بابام بهم زنگ بزنه یا منو ببره بیرون",
+        "کاش وقتی برای بقیه ذوق میکنم اونا هم برام ذوق کنن",
+        "حس کردم خیلی دم دستی ام و از بس برای همه بودم"
+      ],
+      "summary": "وابستگی شدید به تأیید و توجه دیگران، نیاز به دریافت محبت متقابل و احساس نادیده گرفته شدن."
+    },
+    "Recurrent Conflict Pattern": {
+      "score": 6,
+      "evidence": [
+        "متین فکر کرد بهش دروغ گفتم و من عذرخواهی کردم با اینکه تقصیر من نبود",
+        "بابام دوباره از گذشته و لاشخوری مامانم حرف زد و اعصابم بهم ریخت"
+      ],
+      "summary": "تعارضات مکرر با پدر و متین، و عذرخواهی بی‌جهت حتی وقتی تقصیر کاربر نیست."
+    }
+  }
+}
+
+# meta analist summary
+{
+    "collected_outputs": {
+      "relational_pattern": {
+        "patterns": {
+          "Unhealthy Dependence": {
+            "score": 7,
+            "evidence": [
+              "دوست داشتم متین بهم یه پیام طولانی بده",
+              "دوست داشتم بابام بهم زنگ بزنه یا منو ببره بیرون",
+              "کاش وقتی برای بقیه ذوق میکنم اونا هم برام ذوق کنن",
+              "حس کردم خیلی دم دستی ام و از بس برای همه بودم"
+            ],
+            "summary": "وابستگی شدید به تأیید و توجه دیگران، نیاز به دریافت محبت متقابل و احساس نادیده گرفته شدن."
+          },
+          "Recurrent Conflict Pattern": {
+            "score": 6,
+            "evidence": [
+              "متین فکر کرد بهش دروغ گفتم و من عذرخواهی کردم با اینکه تقصیر من نبود",
+              "بابام دوباره از گذشته و لاشخوری مامانم حرف زد و اعصابم بهم ریخت"
+            ],
+            "summary": "تعارضات مکرر با پدر و متین، و عذرخواهی بی‌جهت حتی وقتی تقصیر کاربر نیست."
+          }
+        }
+      },
+      "personal_traits": {
+        "traits": {
+          "Conscientiousness": {
+            "polarity": "high",
+            "confidence_score": 80,
+            "evidence": [
+              "امروز کل خونه رو تمیز کردم کل اتاقمو تمیز کردم غذا درست کردم"
+            ],
+            "clinical_analysis": "این کاربر با تمیز کردن خانه و اتاق و پختن غذا، نظم و انضباط شخصی بالایی نشان می‌دهد. همچنین اشاره می‌کند که همیشه در خدمت دیگران بوده است ('از بس برای همه بودم'). این رفتارها با وجدان‌گرایی بالا هماهنگ است."
+          },
+          "Extraversion": {
+            "polarity": "low",
+            "confidence_score": 75,
+            "evidence": [
+              "حتی یه کلمه با مامانم یا کسی حرف نزدم",
+              "با خودم خلوت کردم"
+            ],
+            "clinical_analysis": "این کاربر در حالت ناامیدی از تعامل اجتماعی کناره‌گیری کرده و با کسی حرف نزده است. همچنین زمان را با خودش خلوت کرده است. این نشان‌دهنده برون‌گرایی پایین (درون‌گرایی) و نیاز به تنهایی است."
+          },
+          "Agreeableness": {
+            "polarity": "high",
+            "confidence_score": 85,
+            "evidence": [
+              "ازش عذرخواهی کردم با اینکه میدونستم تقصیر من نبوده",
+              "از بس برای همه بودم همه عادت دارن که من باشم"
+            ],
+            "clinical_analysis": "این کاربر سازگاری بالایی دارد؛ حتی زمانی که تقصیر خودش نبوده عذرخواهی کرده و همیشه در دسترس دیگران بوده است. اگرچه از این الگو ناراحت است، اما همچنان رفتار هماهنگ و سازگارانه نشان می‌دهد."
+          },
+          "Neuroticism": {
+            "polarity": "high",
+            "confidence_score": 95,
+            "evidence": [
+              "خیلی از همه چیز نا امید شده بودم",
+              "بابام اومد حسابی اعصابم بهم ریخت",
+              "امروز حس کردم خیلی دم دستی ام",
+              "هنوزم نمی‌تونم با خیلی چیزا کنار بیام"
+            ],
+            "clinical_analysis": "این کاربر سطح بالایی از روان‌رنجوری را نشان می‌دهد: ناامیدی فراگیر، واکنش شدید عاطفی به رویدادها (اعصاب بهم ریخت)، احساس بی‌ارزشی و طردشدگی (دم‌دستی)، و ناتوانی در کنار آمدن با مسائل. این الگو حاکی از ناپایداری عاطفی و حساسیت بالا به محرک‌های منفی است."
+          }
+        }
+      }
+    },
+    "final_answer": {
+      "json_scores": {
+        "relational_pattern": {
+          "patterns": {
+            "Unhealthy Dependence": 7,
+            "Recurrent Conflict Pattern": 6
+          }
+        },
+        "personal_traits": {
+          "traits": {
+            "Conscientiousness": 80,
+            "Extraversion": 75,
+            "Agreeableness": 85,
+            "Neuroticism": 95
+          }
+        }
+      },
+      "final_summary": "The patient presents with a deeply entrenched pattern of emotional dysregulation and interpersonal dependency, consistent with high Neuroticism (95) and marked Unhealthy Dependence (7). The attachment style appears anxious-preoccupied, characterized by an intense need for validation and fear of abandonment, as evidenced by repeated pleas for attention and distress when others are perceived as distant. Concurrently, Recurrent Conflict Patterns (6) emerge in relationships, particularly with father and a partner, where the patient apologizes even when not at fault, indicating a compulsive compliance driven by a high Agreeableness (85) that prioritizes harmony over self-assertion. Despite this external cooperativeness, low Extraversion (75) and tendencies toward social withdrawal during distress suggest a reliance on solitude for emotional regulation, possibly exacerbating feelings of isolation. High Conscientiousness (80) manifests in meticulous self-care and domestic order, perhaps serving as an attempt to maintain control amid emotional turmoil. The clinical picture is one of significant neurotic vulnerability, with the interplay between dependency, conflict, and avoidance creating a cycle of need, disappointment, and retreat. Therapeutic focus on distress tolerance, assertive communication, and restructuring core schemas of worthlessness and abandonment is recommended."
+    }
+  }

@@ -1,0 +1,212 @@
+{
+    "collected_outputs": {
+      "schema": {
+        "schemas": {
+          "Defectiveness/Shame": {
+            "core_belief": "من ذاتاً معیوب، بی‌ارزش و دوست‌داشتنی نیستم.",
+            "confidence": 80,
+            "evidence": [
+              "نقص و شرم خیلی زیاد داشت",
+              "حس مضخرفی دارم چون اوون ورزشگار خوشش میاد",
+              "حس مضخرفی دارم چون اون خوشش نمیاد که من پول نداشته باشم"
+            ],
+            "clinical_analysis": "گوینده عیب‌های طرف مقابل را با احساس شرم خود یکی می‌کند و با معیارهای ظاهری و مالی پارتنر فعلی، خود را معیوب و شرم‌آور می‌بیند. این الگو نشان‌دهندهٔ باور عمیق به نقص ذاتی خود است."
+          },
+          "Abandonment/Instability": {
+            "core_belief": "افراد مهم زندگی من مرا ترک خواهند کرد.",
+            "confidence": 85,
+            "evidence": [
+              "تقریبا مطمئنم این رابطه موقته",
+              "می دونم که یروز نزدیکی مسیرش جدا میشه"
+            ],
+            "clinical_analysis": "گوینده با وجود ورود به رابطهٔ جدید، از ابتدا آن را موقت و محکوم به پایان می‌بیند. این پیش‌بینی منفی از رها شدن، رفتارهای تاییدطلبانه را تشدید می‌کند."
+          },
+          "Subjugation": {
+            "core_belief": "نیازها و خواسته‌های من مهم نیستند؛ باید برای جلب رضایت دیگران تسلیم شوم.",
+            "confidence": 80,
+            "evidence": [
+              "دوست دارم یجوری لباس بپوشم که اون خوشش بیاد",
+              "تمام پولم رو براش تقریبا خرج می کنم",
+              "وقتی که می توونم صرف ساز زدن و پیشرفت بکنم دارم با اون می گذرونم"
+            ],
+            "clinical_analysis": "گوینده نیازهای خود (پیشرفت، خرید کفش) را نادیده گرفته و کاملاً خود را با سلیقه و خواستهٔ پارتنر هماهنگ می‌کند. این تسلیم شدن هزینهٔ بالایی برای او دارد."
+          },
+          "Approval-Seeking/Recognition-Seeking": {
+            "core_belief": "برای احساس ارزشمندی، نیاز مبرم به تأیید و تحسین دیگران دارم.",
+            "confidence": 90,
+            "evidence": [
+              "دائم در حال تایید گرفتن هستم ازش",
+              "این جوریه که دارم ازون تایید میگیرم"
+            ],
+            "clinical_analysis": "تمام رفتارهای گوینده (لباس پوشیدن، خرج کردن پول، اولویت دادن به وقت‌گذرانی) حول جلب تأیید پارتنر می‌چرخد. او به صراحت می‌گوید که به خود آسیب می‌زند تا تایید بگیرد."
+          },
+          "Punitiveness": {
+            "core_belief": "اشتباهات من مستحق تنبیه و سرزنش شدید هستند.",
+            "confidence": 75,
+            "evidence": [
+              "به خودم فوش می دم که چرا این پول رو دادی",
+              "به خودم میگم این پول رو می تونستی برا خودت کفش بخری",
+              "گند زدم و از دستش دادم"
+            ],
+            "clinical_analysis": "گوینده پس از خرج کردن پول، خود را با فحش و سرزنش تنبیه می‌کند و رابطهٔ قبلی را نیز با برچسب «گند زدم» خودسرزنشگرانه ارزیابی می‌کند. این الگو نشان‌دهندهٔ درونی‌سازی تنبیه است."
+          },
+          "Negativity/Pessimism": {
+            "core_belief": "جنبه‌های منفی زندگی غالب می‌شوند و در نهایت همه چیز خراب خواهد شد.",
+            "confidence": 75,
+            "evidence": [
+              "تقریبا مطمئنم این رابطه موقته",
+              "می دونم که یروز نزدیکی مسیرش جدا میشه",
+              "دائم دارم خاطرات پارتنر قبلیم رو مرور می کنم"
+            ],
+            "clinical_analysis": "گوینده نه تنها رابطهٔ فعلی را موقت و محکوم به جدایی می‌بیند، بلکه دائماً به خاطرات و حسرت رابطهٔ قبلی (که آن را از دست داده) فکر می‌کند. این تمرکز بر جنبهٔ منفی و از دست‌دادن، باور بدبینانه را تقویت می‌کند."
+          }
+        }
+      },
+      "attachment": {
+        "Secure": {
+          "score": 0,
+          "evidence": [],
+          "clinical_analysis": "هیچ نشانه معناداری در متن یافت نشد"
+        },
+        "Anxious / Ambivalent": {
+          "score": 9,
+          "evidence": [
+            "دائم در حال تایید گرفتن هستم ازش",
+            "تمام پولم رو براش تقریبا خرج می کنم",
+            "دوست دارم یجوری لباس بپوشم که اون خوشش بیاد",
+            "نسبت به اینکه بدن وزشکاری ندارم حس مضخرفی دارم چون اوون ورزشگار خوشش میاد",
+            "خیلی وقتا خودم دارم با کسایی مقایسه می کنم",
+            "واسه یه رابطه ای که می دونم موقته اما باز هم وابسته شده‌ام",
+            "تقریبا هر روز به پارتنر قبلی فکر می کنم و خودم رو سرزنش می‌کنم"
+          ],
+          "clinical_analysis": "فرد به شدت نیازمند تأیید از طرف مقابل است و برای جلوگیری از طرد شدن دائم در حال جلب رضایت است. خود را با دیگران مقایسه می‌کند، احساس شرم از عدم تطابق با خواسته‌های پارتنر دارد، و حتی با آگاهی از موقتی بودن رابطه، همچنان منابع خود را صرف آن می‌کند. نشخوار فکری درباره پارتنر قبلی و سرزنش خود برای از دست دادن آن رابطه، نشانه‌های قوی از اضطراب و وابستگی پیش‌مشغله است."
+        },
+        "Avoidant": {
+          "score": 0,
+          "evidence": [],
+          "clinical_analysis": "هیچ نشانه معناداری در متن یافت نشد"
+        },
+        "Disorganized": {
+          "score": 7,
+          "evidence": [
+            "با اینکه وارد یه رابطه جدیدی شدم، تقریبا مطمئنم این رابطه موقته اما بازم دارم جوی زندگی می کنم که به خودم آسیب می زنم",
+            "بعضی وقتا وقتی دائم دارم این پولو براش خرج می کنم به خودم فوش می دم که چرا این پول رو دادی",
+            "دائم دارم خاطرات پارتنر قبلیم رو مرور می کنم و گاهی حسرت میخورم",
+            "نمی دونم چیشو دوست دارم ولی هر روز بهش فکر می کنم",
+            "همش به این فکر می کنم که گند زدم و از دستش دادم"
+          ],
+          "clinical_analysis": "فرد رفتارهای متناقض و آشفته‌ای از خود نشان می‌دهد: وارد رابطه‌ای می‌شود که خود آن را موقتی می‌داند اما تمام احساس و منابع خود را صرف آن می‌کند و در عین حال دلبستگی حل‌نشده به پارتنر قبلی دارد. خودتخریبی مالی، سرزنش خود، و سردرگمی عاطفی (نمی‌داند چرا به پارتنر قبلی وابسته است) نشانه‌های آشفتگی در دلبستگی است که با ترس و تضاد درونی همراه می‌باشد."
+        }
+      },
+      "cognetive_distortion": {
+        "distortions": {
+          "Negative Future Prediction": {
+            "score": 8,
+            "evidence": [
+              "تقریبا مطمئنم این رابطه موقته",
+              "می دونم که یروز نزدیکی مسیرش جدا میشه"
+            ],
+            "summary": "پیش‌بینی منفی درباره آینده رابطه جدید"
+          },
+          "Mind Reading": {
+            "score": 7,
+            "evidence": [
+              "چون اوون ورزشگار خوشش میاد",
+              "چون اون خوشش نمیاد که من پول تداشته باشم",
+              "ممکه ملیکا بیشتر اون خوشش بیاد"
+            ],
+            "summary": "فرض‌سازی درباره افکار و ترجیحات طرف مقابل"
+          },
+          "Negative Mental Filtering": {
+            "score": 6,
+            "evidence": [
+              "نسبت به اینکه بدن وزشکاری ندارم حس مضخرفی دارم",
+              "نسبت به اینکه درامد زیادی ندارم حس مضخرفی دارم"
+            ],
+            "summary": "تمرکز بر جنبه‌های منفی خود و نادیده گرفتن نکات مثبت"
+          },
+          "Personalization": {
+            "score": 5,
+            "evidence": [
+              "به این فکر می کنم که گند زدم و از دستش دادم"
+            ],
+            "summary": "خود را مسئول از دست دادن رابطه قبلی دانستن"
+          }
+        }
+      },
+      "functional_level": {
+        "functioning": {
+          "Concentration / Attention Difficulties": {
+            "score": 7,
+            "evidence": [
+              "دائم خاطرات پارتنر قبلی را مرور می‌کند",
+              "تقریبا هر روز به او فکر می‌کند",
+              "به جای پیشرفت، وقت را با پارتنر موقت می‌گذراند"
+            ],
+            "summary": "دائماً درگیر افکار و خاطرات پارتنر قبلی است و نمی‌تواند روی فعالیت‌های سازنده تمرکز کند."
+          },
+          "Social Functioning": {
+            "score": 5,
+            "evidence": [
+              "دائم از پارتنر فعلی تأیید می‌گیرد",
+              "خود را با دیگران مقایسه می‌کند",
+              "تمام پول خود را برای رضایت او خرج می‌کند"
+            ],
+            "summary": "وابستگی بیش از حد به تأیید دیگران و صرف منابع به ضرر خود، نشان‌دهنده اختلال در روابط اجتماعی است."
+          }
+        }
+      },
+      "relational_pattern": {
+        "patterns": {
+          "Unhealthy Dependence": {
+            "score": 8,
+            "evidence": [
+              "تمام پولم رو براش تقریبا خرج می کنم",
+              "دوست دارم یجوری لباس بپوشم که اون خوشش بیاد",
+              "دائم در حال تایید گرفتن هستم ازش",
+              "واسه یه رابطه ای که می دونم موقته"
+            ],
+            "summary": "وابستگی ناسالم بالا به پارتنر فعلی، صرف تمام منابع و تغییر خود برای جلب تأیید، با وجود آگاهی از موقتی بودن رابطه"
+          },
+          "Pathological Jealousy": {
+            "score": 6,
+            "evidence": [
+              "ممکه ملیکا بیشتر اون خوشش بیاد",
+              "ممکنه اون فرد مورد علاقه تر باشه برا اون",
+              "نسبت به اینکه بدن وزشکاری ندارم حس مضخرفی دارم چون اوون ورزشگار خوشش میاد"
+            ],
+            "summary": "حسادت بیمارگونه نسبت به احتمال جذابیت دیگران برای پارتنر و مقایسه خود با دیگران"
+          }
+        }
+      }
+    },
+    "final_answer": {
+      "json_scores": {
+        "schema": {
+          "Defectiveness/Shame": 80,
+          "Abandonment/Instability": 85,
+          "Subjugation": 80,
+          "Approval-Seeking/Recognition-Seeking": 90,
+          "Punitiveness": 75,
+          "Negativity/Pessimism": 75
+        },
+        "attachment": {
+          "Anxious / Ambivalent": 9,
+          "Disorganized": 7
+        },
+        "cognetive_distortion": {
+          "Negative Future Prediction": 8,
+          "Mind Reading": 7,
+          "Negative Mental Filtering": 6
+        },
+        "functional_level": {
+          "Concentration / Attention Difficulties": 7
+        },
+        "relational_pattern": {
+          "Unhealthy Dependence": 8,
+          "Pathological Jealousy": 6
+        }
+      },
+      "final_summary": "The client presents with a deeply entrenched early maladaptive schema of Approval-Seeking/Recognition-Seeking (90), driving a compulsive need for external validation, particularly from romantic partners. This is reinforced by Defectiveness/Shame (80) and Abandonment/Instability (85) schemas, leading to a pervasive fear of rejection and a core belief of being inherently flawed and unworthy. The attachment profile is predominantly Anxious/Ambivalent (9) with a significant Disorganized component (7), manifesting as intense dependence on the current partner while simultaneously expecting abandonment, self-sacrifice (Subjugation 80), and harsh self-punishment (Punitiveness 75) for perceived failures. Cognitively, the client engages in Negative Future Prediction (8), automatically assuming the relationship is temporary, and Mind Reading (7), attributing negative preferences to the partner (e.g., preferring others due to physical or financial status). Negative Mental Filtering (6) reinforces focus on perceived inadequacies. Functionally, Concentration/Attention Difficulties (7) are evident due to persistent rumination on the previous partner and neglect of personal goals. Relationally, the pattern is characterized by Unhealthy Dependence (8)—spending all financial resources and adapting appearance to please the partner despite awareness of the relationship's precariousness—and Pathological Jealousy (6), driven by comparisons and fear of being replaced. These schemas and patterns interlock: the deep need for approval fuels anxious attachment and cognitive distortions, which in turn maintain self-defeating relational behaviors and emotional dysregulation, creating a cycle of temporary relief followed by intensified self-criticism and pessimism."
+    }
+  }
