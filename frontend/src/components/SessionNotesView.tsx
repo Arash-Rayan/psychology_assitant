@@ -7,6 +7,7 @@ import { Patient } from './PatientCard';
 import { AddSessionNoteDialog } from './AddSessionNoteDialog';
 import { SessionNotesAiSummaryDialog } from './SessionNotesAiSummaryDialog';
 import { cn } from '@/components/ui/utils';
+import { getMetaAnalystClinicalSummary } from '@/constants/metaAnalystOutputTest2';
 
 interface SessionNote {
   id: string;
@@ -243,6 +244,7 @@ const cognitiveDistortionPersianLabels: Record<string, string> = {
   'All-or-Nothing Thinking': 'تفکر همه یا هیچ',
   'Mind Reading': 'ذهن‌خوانی',
   'Negative Future Prediction': 'پیش‌بینی منفی آینده',
+  'Negative Mental Filtering': 'فیلتر ذهنی منفی',
   Personalization: 'شخصی‌سازی',
   Labeling: 'برچسب‌زنی'
 };
@@ -337,20 +339,239 @@ const functionalLevelAnalysisData = {
 
 const functionalLevelPersianLabels: Record<string, string> = {
   'Social Functioning': 'عملکرد اجتماعی',
-  'Concentration / Attention Difficulties': 'مشکل تمرکز / توجه'
+  'Concentration / Attention Difficulties': 'مشکل تمرکز / توجه',
+  'Occupational / Work Functioning': 'عملکرد شغلی / کاری'
 };
+
+/** مراجع تست ۲ — خروجی graph.invoke (user_context.forth) — content_output/context_output2.json */
+const schemaAnalysisDataTest2: Record<string, SchemaAnalysisItem> = {
+  'جلب توجه / تأییدخواهی': {
+    نمره: 90,
+    شواهد: [
+      'دوست دارم یجوری لباس بپوشم که اون خوشش بیاد',
+      'دائم در حال تایید گرفتن هستم ازش',
+      'تمام پولم رو براش تقریبا خرج می کنم'
+    ],
+    باور_بنیادین: 'باید دیگران از من خوششان بیاید تا احساس ارزشمندی کنم.',
+    تحلیل_بالینی:
+      'شخص دائماً به دنبال تأیید شریک عاطفی خود است و ظاهر و رفتار خود را بر اساس خواسته او تنظیم می‌کند. این نشان‌دهنده طرح واره جلب توجه و تأیید است.'
+  },
+  'اطاعت': {
+    نمره: 85,
+    شواهد: [
+      'تمام پولم رو براش تقریبا خرج می کنم، وقتی که می توونم صرف ساز زدن و پیشرفت بکنم دارم با اون می گذرونم',
+      'به خودم میگم این پول رو می تونستی برا خودت کفش بخری، در صورتی که کفش نداری، ولی بازم میرم انجامش میدم'
+    ],
+    باور_بنیادین: 'باید خواسته‌های دیگران را بر خواسته‌های خودم مقدم بدانم تا طرد نشوم.',
+    تحلیل_بالینی:
+      'فرد علی‌رغم آگاهی از نیازهای خود باز هم خواسته‌های شریک را مقدم می‌دهد و به هزینه خود عمل می‌کند.'
+  },
+  'نقص/شرم': {
+    نمره: 80,
+    شواهد: [
+      'نسبت به اینکه بدن وزشکاری ندارم حس مضخرفی دارم، چون اوون ورزشگار خوشش میاد',
+      'نسبت به اینکه درامد زیادی ندارم حس مضخرفی دارم'
+    ],
+    باور_بنیادین: 'من معیوب و ناکافی هستم و دیگران این نقص را می‌بینند.',
+    تحلیل_بالینی:
+      'خود را به دلیل نداشتن ویژگی‌های مطلوب (بدن ورزشکاری، درآمد بالا) حقیر و شرم‌آور می‌داند.'
+  },
+  'رهاشدگی/بی‌ثباتی': {
+    نمره: 75,
+    شواهد: [
+      'تقریبا مطمئنم این رابطه موقته، و می دونم که یروز نزدیکی مسیرش جدا میشه',
+      'دائم خاطرات پارتنر قبلیم رو مرور می کنم... و همش به این فکر می کنم که گند زدم و از دستش دادم'
+    ],
+    باور_بنیادین: 'روابط من پایدار نیستند و عزیزانم مرا ترک خواهند کرد.',
+    تحلیل_بالینی:
+      'هر دو رابطه قبلی و فعلی ناپایدار دیده می‌شوند؛ در رابطه فعلی انتظار جدایی دارد و در رابطه قبلی خود را عامل پایان می‌داند.'
+  }
+};
+
+const attachmentAnalysisDataTest2 = {
+  ایمن: {
+    نمره: 0,
+    شواهد: [] as string[],
+    تحلیل_بالینی: 'هیچ نشانه معناداری از دلبستگی ایمن در متن یافت نشد.'
+  },
+  'اضطرابی / دوسوگرا': {
+    نمره: 8,
+    شواهد: [
+      'دائم به یاد پارتنر قبلی ام و حسرت آن رابطه را می خورم',
+      'از پارتنر فعلی تایید می گیرم و تمام پولم را برایش خرج می کنم',
+      'خودم را با دیگران مقایسه می کنم و می ترسم پارتنر فعلی دیگری را بیشتر دوست داشته باشد',
+      'حس می کنم پارتنر قبلی را دوست دارم و هر روز به او فکر می کنم'
+    ],
+    تحلیل_بالینی:
+      'ترس از طرد، نیاز مداوم به تأیید، مقایسه با دیگران و ناتوانی در رها کردن رابطه گذشته؛ فعال‌سازی سیستم دلبستگی اضطرابی.'
+  },
+  'اجتنابی / طردکننده': {
+    نمره: 0,
+    شواهد: [] as string[],
+    تحلیل_بالینی: 'هیچ نشانه معناداری از دلبستگی اجتنابی در متن یافت نشد.'
+  },
+  'آشفته (ترسناک-اجتنابی)': {
+    نمره: 5,
+    شواهد: [
+      'می دانم رابطه فعلی موقت است ولی باز هم در آن سرمایه گذاری می کنم',
+      'به خودم آسیب می زنم ولی نمی توانم دست از این رفتارها بردارم'
+    ],
+    تحلیل_بالینی:
+      'الگوهای متناقض و خودتخریب‌گرانه؛ حسرت رابطه‌ای که خودش به آن خیانت کرده و گیر در چرخه تأییدجویی.'
+  }
+};
+
+const clinicalDisorderAnalysisDataTest2 = {
+  اختلالات: {
+    'اختلال سازگاری': {
+      اطمینان: 85,
+      شواهد: [
+        'من رابطه ی عاطفی رو به خیانت کردن خودم از دست داام',
+        'دائم دارم خاطرات پارتنر قبلیم رو مرور می کنم',
+        'به خودم میگم گند زدم و از دستش دادم',
+        'واسه ی رابطه ای که می دونم موقته، تمام پولم رو براش تقریبا خرج می کنم'
+      ],
+      تحلیل_بالینی:
+        'در واکنش به پایان رابطه قبلی و ورود به رابطه موقت، حسرت، خودسرزنشی، تأییدخواهی و افت عملکرد دیده می‌شود؛ با ملاک‌های اختلال سازگاری سازگار است.'
+    }
+  }
+};
+
+const cognitiveDistortionAnalysisDataTest2 = {
+  distortions: {
+    'Negative Future Prediction': {
+      score: 7,
+      evidence: ['تقریبا مطمئنم این رابطه موقته', 'می دونم که یروز نزدیکی مسیرش جدا میشه'],
+      summary: 'پیش‌بینی قطعی پایان رابطه فعلی.'
+    },
+    'Mind Reading': {
+      score: 6,
+      evidence: [
+        'چون اوون ورزشگار خوشش میاد',
+        'چون اون خوشش نمیاد که من پول تداشته باشم',
+        'ممکه ملیکا بیشتر اون خوشش بیاد'
+      ],
+      summary: 'فرض‌گیری درباره ترجیحات طرف مقابل بدون شواهد کافی.'
+    },
+    'Negative Mental Filtering': {
+      score: 5,
+      evidence: [
+        'نسبت به اینکه بدن وزشکاری ندارم حس مضخرفی دارم',
+        'دائم دارم خاطرات پارتنر قبلیم رو مرور می کنم'
+      ],
+      summary: 'تمرکز بر نقص‌های خود و خاطرات منفی گذشته.'
+    },
+    Personalization: {
+      score: 5,
+      evidence: ['من رابطه ی عاطفی رو به خیانت کردن خودم از دست داام', 'گند زدم و از دستش دادم'],
+      summary: 'خود را مسئول از دست دادن رابطه قبلی می‌داند.'
+    }
+  }
+};
+
+const personalTraitAnalysisDataTest2 = {
+  traits: {
+    Neuroticism: {
+      score: 95 / 10,
+      evidence: [
+        'و یه حسرت بزرگی از اون رابطه تو دلم هست',
+        'بازم دارم جوی زندگی می کنم که به خودم آسیب می زنم',
+        'دائم در حال تایید گرفتن هستم ازش'
+      ],
+      summary: 'قطب: بالا — اطمینان مدل: ۹۵٪',
+      clinicalAnalysis: 'حسرت، اضطراب، خودسرزنشگری، نشخوار فکری و احساس حقارت.'
+    },
+    Conscientiousness: {
+      score: 80 / 10,
+      evidence: [
+        'تمام پولم رو براش تقریبا خرج می کنم... ولی بازم میرم انجامش میدم',
+        'وقتی که می توونم صرف ساز زدن و پیشرفت بکنم دارم با اون می گذرونم'
+      ],
+      summary: 'قطب: پایین — اطمینان مدل: ۸۰٪',
+      clinicalAnalysis: 'ضعف در کنترل تکانه و اولویت‌بندی اهداف بلندمدت.'
+    },
+    Agreeableness: {
+      score: 75 / 10,
+      evidence: [
+        'دوست دارم یجوری لباس بپوشم که اون خوشش بیاد',
+        'دائم در حال تایید گرفتن هستم ازش',
+        'تمام پولم رو براش تقریبا خرج می کنم'
+      ],
+      summary: 'قطب: بالا — اطمینان مدل: ۷۵٪',
+      clinicalAnalysis: 'جلب رضایت دیگران حتی به بهای نادیده گرفتن نیازهای خود.'
+    }
+  }
+};
+
+const relationalPatternAnalysisDataTest2 = {
+  relational_pattern: {
+    'Unhealthy Dependence': {
+      score: 7,
+      evidence: [
+        'دائم در حال تایید گرفتن هستم ازش',
+        'تمام پولم رو براش تقریبا خرج می کنم',
+        'دوست دارم یجوری لباس بپوشم که اون خوشش بیاد'
+      ],
+      summary: 'وابستگی شدید به تأیید شریک و تنظیم رفتار بر اساس خواسته او.'
+    },
+    'Pathological Jealousy': {
+      score: 6,
+      evidence: [
+        'ممکه ملیکا بیشتر اون خوشش بیاد، ممکنه اون فرد مورد علاقه تر باشه برا اون',
+        'خیلی وقتا خودم دارم با کسایی مقایسه می کنم'
+      ],
+      summary: 'مقایسه مداوم با دیگران و ترس از دست دادن توجه شریک.'
+    }
+  }
+};
+
+const functionalLevelAnalysisDataTest2 = {
+  functional_level: {
+    'Social Functioning': {
+      score: 8,
+      evidence: [
+        'دائم در حال تایید گرفتن هستم ازش',
+        'خیلی وقتا خودم دارم با کسایی مقایسه می‌کنم',
+        'دائم دارم خاطرات پارتنر قبلیم رو مرور می‌کنم'
+      ],
+      summary: 'وابستگی به تأیید، مقایسه مداوم و مرور خاطرات رابطه قبلی.'
+    },
+    'Concentration / Attention Difficulties': {
+      score: 7,
+      evidence: [
+        'تقریبا هر روز بهش فکر می‌کنم',
+        'دائم دارم خاطرات پارتنر قبلیم رو مرور می‌کنم',
+        'وقتی که می‌تونم صرف ساز زدن و پیشرفت بکنم دارم با اون می‌گذرونم'
+      ],
+      summary: 'افکار مزاحم درباره پارتنر قبلی و فعلی؛ وقت صرف تأییدخواهی.'
+    },
+    'Occupational / Work Functioning': {
+      score: 5,
+      evidence: [
+        'وقتی که می‌تونم صرف ساز زدن و پیشرفت بکنم دارم با اون می‌گذرونم',
+        'تمام پولم رو براش تقریبا خرج می‌کنم'
+      ],
+      summary: 'صرف وقت و پول در رابطه به جای پیشرفت شخصی.'
+    }
+  }
+};
+
+const clinicalSummaryIntroTest2 = getMetaAnalystClinicalSummary('test-patient-2')!.intro;
+const clinicalSummarySectionsTest2 = getMetaAnalystClinicalSummary('test-patient-2')!.sections;
 
 const relationalPatternPersianLabels: Record<string, string> = {
   'Recurrent Conflict Pattern': 'الگوی تعارض تکرارشونده',
   'Unhealthy Dependence': 'وابستگی ناسالم',
   'Push-Pull / Rejection-Cling Cycle': 'چرخه طرد-جذب',
-  'Controlling Behavior': 'رفتار کنترل‌گرانه'
+  'Controlling Behavior': 'رفتار کنترل‌گرانه',
+  'Pathological Jealousy': 'حسادت مرضی'
 };
 
 const personalTraitPersianLabels: Record<string, string> = {
   Neuroticism: 'روان‌رنجوری (NEO)',
   Conscientiousness: 'وجدان‌کاری (NEO)',
-  'Openness to Experience': 'تجربه‌گری (NEO)'
+  'Openness to Experience': 'تجربه‌گری (NEO)',
+  Agreeableness: 'توافق‌پذیری (NEO)'
 };
 
 const clinicalSummaryIntro =
@@ -384,6 +605,38 @@ const clinicalSummarySections = [
       'در پایان، کاربر بیان می‌کند که خواهان «ثبات» و «آزادی» است، هنوز نمی‌داند انتخاب درست چیست، و همچنان احساس گیجی و آشفتگی دارد. با این حال، از اینکه در برابر فشار رابطه‌ای، از تن دادن به خواسته‌های فیزیکی طرف مقابل خودداری کرده، احساس رضایت دارد.'
   }
 ];
+
+function resolveSessionAnalysisBundle(patientId: string | null | undefined) {
+  if (patientId === 'test-patient-2') {
+    return {
+      schemaAnalysisData: schemaAnalysisDataTest2,
+      attachmentAnalysisData: attachmentAnalysisDataTest2,
+      clinicalDisorderAnalysisData: clinicalDisorderAnalysisDataTest2,
+      cognitiveDistortionAnalysisData: cognitiveDistortionAnalysisDataTest2,
+      personalTraitAnalysisData: personalTraitAnalysisDataTest2,
+      relationalPatternAnalysisData: relationalPatternAnalysisDataTest2,
+      functionalLevelAnalysisData: functionalLevelAnalysisDataTest2,
+      clinicalSummaryIntro: clinicalSummaryIntroTest2,
+      clinicalSummarySections: clinicalSummarySectionsTest2,
+      relationalPatternPersianLabels,
+      personalTraitPersianLabels
+    };
+  }
+  return {
+    schemaAnalysisData,
+    attachmentAnalysisData,
+    clinicalDisorderAnalysisData,
+    cognitiveDistortionAnalysisData,
+    personalTraitAnalysisData,
+    relationalPatternAnalysisData,
+    functionalLevelAnalysisData,
+    clinicalSummaryIntro,
+    clinicalSummarySections,
+    relationalPatternPersianLabels,
+    personalTraitPersianLabels
+  };
+}
+
 interface SessionNotesViewProps {
   patients: Patient[];
   onBack: () => void;
@@ -467,18 +720,38 @@ export function SessionNotesView({
     () => (effectiveSelectedId ? buildSessionNotes(effectiveSelectedId) : []),
     [effectiveSelectedId],
   );
-  const schemaEntries = Object.entries(schemaAnalysisData).sort((a, b) => b[1].نمره - a[1].نمره);
-  const attachmentEntries = Object.entries(attachmentAnalysisData);
+
+  const analysisBundle = useMemo(
+    () => resolveSessionAnalysisBundle(effectiveSelectedId),
+    [effectiveSelectedId],
+  );
+
+  const {
+    schemaAnalysisData: activeSchemaAnalysisData,
+    attachmentAnalysisData: activeAttachmentAnalysisData,
+    clinicalDisorderAnalysisData: activeClinicalDisorderAnalysisData,
+    cognitiveDistortionAnalysisData: activeCognitiveDistortionAnalysisData,
+    personalTraitAnalysisData: activePersonalTraitAnalysisData,
+    relationalPatternAnalysisData: activeRelationalPatternAnalysisData,
+    functionalLevelAnalysisData: activeFunctionalLevelAnalysisData,
+    clinicalSummaryIntro: activeClinicalSummaryIntro,
+    clinicalSummarySections: activeClinicalSummarySections,
+    relationalPatternPersianLabels: activeRelationalPatternPersianLabels,
+    personalTraitPersianLabels: activePersonalTraitPersianLabels,
+  } = analysisBundle;
+
+  const schemaEntries = Object.entries(activeSchemaAnalysisData).sort((a, b) => b[1].نمره - a[1].نمره);
+  const attachmentEntries = Object.entries(activeAttachmentAnalysisData);
   const attachmentScoreEntries = [...attachmentEntries].sort((a, b) => b[1].نمره - a[1].نمره);
-  const clinicalDisorderEntries = Object.entries(clinicalDisorderAnalysisData.اختلالات);
+  const clinicalDisorderEntries = Object.entries(activeClinicalDisorderAnalysisData.اختلالات);
   const clinicalDisorderScoreEntries = [...clinicalDisorderEntries].sort((a, b) => b[1].اطمینان - a[1].اطمینان);
-  const cognitiveDistortionEntries = Object.entries(cognitiveDistortionAnalysisData.distortions);
+  const cognitiveDistortionEntries = Object.entries(activeCognitiveDistortionAnalysisData.distortions);
   const cognitiveDistortionScoreEntries = [...cognitiveDistortionEntries].sort((a, b) => b[1].score - a[1].score);
-  const personalTraitEntries = Object.entries(personalTraitAnalysisData.traits);
+  const personalTraitEntries = Object.entries(activePersonalTraitAnalysisData.traits);
   const personalTraitScoreEntries = [...personalTraitEntries].sort((a, b) => b[1].score - a[1].score);
-  const relationalPatternEntries = Object.entries(relationalPatternAnalysisData.relational_pattern);
+  const relationalPatternEntries = Object.entries(activeRelationalPatternAnalysisData.relational_pattern);
   const relationalPatternScoreEntries = [...relationalPatternEntries].sort((a, b) => b[1].score - a[1].score);
-  const functionalLevelEntries = Object.entries(functionalLevelAnalysisData.functional_level);
+  const functionalLevelEntries = Object.entries(activeFunctionalLevelAnalysisData.functional_level);
   const functionalLevelScoreEntries = [...functionalLevelEntries].sort((a, b) => b[1].score - a[1].score);
   const chartWidth = Math.max(760, schemaEntries.length * 170);
   const chartColors = ['#7C3AED', '#2563EB', '#06B6D4', '#10B981', '#F59E0B', '#EF4444'];
@@ -852,12 +1125,18 @@ export function SessionNotesView({
               <div className="p-6 rounded-xl bg-white border border-border">
                 <h3 className="text-lg text-foreground mb-4 text-right">خلاصه بالینی مکالمه</h3>
 
+                {effectiveSelectedId === 'test-patient-2' && (
+                  <p className="text-xs text-muted-foreground text-right mb-3">
+                    منبع: خروجی تحلیل‌گر فرامتنی (meta_analist)
+                  </p>
+                )}
+
                 <div className="rounded-xl border border-primary/15 bg-gradient-to-l from-primary/10 to-transparent p-4 mb-5">
-                  <p className="text-foreground text-right leading-8">{clinicalSummaryIntro}</p>
+                  <p className="text-foreground text-right leading-8">{activeClinicalSummaryIntro}</p>
                 </div>
 
                 <div className="space-y-3">
-                  {clinicalSummarySections.map((section) => (
+                  {activeClinicalSummarySections.map((section) => (
                     <div key={section.title} className="rounded-xl border border-border bg-white p-4">
                       <h4 className="text-base text-foreground text-right mb-2">{section.title}</h4>
                       <p className="text-muted-foreground text-right leading-8">{section.content}</p>
@@ -1445,7 +1724,7 @@ export function SessionNotesView({
                             const barHeight = (traitData.score / 10) * 180;
                             const y = 240 - barHeight;
                             const color = chartColors[index % chartColors.length];
-                            const localizedName = personalTraitPersianLabels[traitName] ?? traitName;
+                            const localizedName = activePersonalTraitPersianLabels[traitName] ?? traitName;
                             const label = localizedName.length > 16 ? `${localizedName.slice(0, 16)}...` : localizedName;
                             return (
                               <g key={`svg-trait-${traitName}`}>
@@ -1478,7 +1757,7 @@ export function SessionNotesView({
                   <div key={`trait-card-${traitName}`} className="p-5 rounded-xl bg-white border border-border shadow-sm">
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm">
-                        {personalTraitPersianLabels[traitName] ?? traitName}
+                        {activePersonalTraitPersianLabels[traitName] ?? traitName}
                       </span>
                       <span className="text-sm text-foreground">
                         احتمال مدل: <span className="text-primary">{traitData.score}</span>/10
@@ -1560,7 +1839,7 @@ export function SessionNotesView({
                             const barHeight = (patternData.score / 10) * 180;
                             const y = 240 - barHeight;
                             const color = chartColors[index % chartColors.length];
-                            const localizedName = relationalPatternPersianLabels[patternName] ?? patternName;
+                            const localizedName = activeRelationalPatternPersianLabels[patternName] ?? patternName;
                             const label = localizedName.length > 16 ? `${localizedName.slice(0, 16)}...` : localizedName;
                             return (
                               <g key={`svg-relation-${patternName}`}>
@@ -1593,7 +1872,7 @@ export function SessionNotesView({
                   <div key={`relation-card-${patternName}`} className="p-5 rounded-xl bg-white border border-border shadow-sm">
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 text-sm">
-                        {relationalPatternPersianLabels[patternName] ?? patternName}
+                        {activeRelationalPatternPersianLabels[patternName] ?? patternName}
                       </span>
                       <span className="text-sm text-foreground">
                         احتمال مدل: <span className="text-primary">{patternData.score}</span>/10

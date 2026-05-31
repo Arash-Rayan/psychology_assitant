@@ -68,7 +68,7 @@ export function PatientAgentIntensityPanel({
   const isSchema = agentId === 'schema';
 
   const analysisItems = useMemo(() => {
-    const items = getAnalysisItemsForAgent(agentId);
+    const items = getAnalysisItemsForAgent(agentId, patientId);
     if (isEmotional) {
       return mergePatientMoodScore(items, patientId, sessionCount);
     }
@@ -88,7 +88,7 @@ export function PatientAgentIntensityPanel({
       setChartKey('mood');
       return;
     }
-    const top = getTopAnalysisItem(agentId);
+    const top = getTopAnalysisItem(agentId, patientId);
     if (top) setChartKey(top.key);
     else if (analysisItems[0]) setChartKey(analysisItems[0].key);
   }, [agentId, isEmotional, analysisItems]);

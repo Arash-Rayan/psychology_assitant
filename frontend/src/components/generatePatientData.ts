@@ -235,6 +235,81 @@ export function generatePatients(
         anxiety: 61,
         stress: 55
       }
+    },
+    {
+      id: 'test-patient-2',
+      name: 'مراجع تست ۲',
+      age: 27,
+      gender: 'زن',
+      phone: '۰۹۱۳ ۴۵۶ ۷۸۹۰',
+      clinicalEngagement: 'established',
+      assignedDoctorId: doctors[0]?.id ?? 'd1',
+      status: 'attention',
+      overallScore: 52,
+      sessionsCount: 4,
+      lastSession: 'دیروز',
+      schemas: [
+        {
+          name: 'جلب توجه / تأییدخواهی',
+          severity: 'high',
+          frequency: 12,
+          lastDetected: 'دیروز',
+          description: 'خودارزشی وابسته به تأیید شریک؛ رفتار و ظاهر بر اساس خواسته او تنظیم می‌شود.'
+        },
+        {
+          name: 'اطاعت',
+          severity: 'high',
+          frequency: 10,
+          lastDetected: 'دیروز',
+          description: 'مقدم دانستن خواسته‌های دیگران بر نیازهای خود، حتی با آگاهی از هزینه شخصی.'
+        },
+        {
+          name: 'نقص / شرم',
+          severity: 'medium',
+          frequency: 9,
+          lastDetected: 'هفته گذشته',
+          description: 'احساس شرم از بدن و درآمد ناکافی در مقایسه با معیارهای شریک.'
+        }
+      ],
+      behaviors: [
+        {
+          pattern: 'تأییدخواهی و خرج کردن برای جلب رضایت شریک',
+          occurrences: 14,
+          trend: 'increasing'
+        },
+        {
+          pattern: 'نشخوار فکری درباره پارتنر قبلی',
+          occurrences: 10,
+          trend: 'stable'
+        }
+      ],
+      monthlyMood: [
+        { date: 'هفته ۱', mood: 48, anxiety: 68, depression: 55 },
+        { date: 'هفته ۲', mood: 50, anxiety: 65, depression: 52 },
+        { date: 'هفته ۳', mood: 51, anxiety: 63, depression: 50 },
+        { date: 'هفته ۴', mood: 52, anxiety: 62, depression: 49 }
+      ],
+      aiInsights: [
+        'دلبستگی اضطرابی با وابستگی ناسالم به شریک فعلی و حسرت رابطه قبلی هم‌پوشانی دارد.',
+        'تحریف‌های شناختی (ذهن‌خوانی، پیش‌بینی منفی) چرخه تأییدخواهی را تقویت می‌کنند.'
+      ],
+      chatbotSummary: {
+        mainTopic: 'روابط',
+        confidence: 88,
+        notes: 'پس از خیانت و پایان رابطه قبلی، ورود به رابطه موقت جدید با الگوی تأییدخواهی، خرج مالی افراطی و نشخوار فکری درباره پارتنر سابق.'
+      },
+      assessments: {
+        neo: {
+          neuroticism: 95,
+          extraversion: 45,
+          openness: 50,
+          agreeableness: 75,
+          conscientiousness: 35
+        },
+        depression: 52,
+        anxiety: 72,
+        stress: 64
+      }
     }
   ];
   const schemaKeys = Object.keys(SCHEMA_TYPES) as SchemaType[];

@@ -1,4 +1,5 @@
 import type { AnalysisAgentId } from '@/constants/analysisAgents';
+import { TEST_PATIENT_2_AGENT_ITEMS } from '@/constants/analysisDemoDataTest2';
 
 export interface AnalysisResultItem {
   key: string;
@@ -336,7 +337,7 @@ const MOOD_ITEM: AnalysisResultItem = {
   ],
 };
 
-const AGENT_ITEMS: Record<AnalysisAgentId, AnalysisResultItem[]> = {
+const TEST_PATIENT_1_AGENT_ITEMS: Record<AnalysisAgentId, AnalysisResultItem[]> = {
   emotional_state: [MOOD_ITEM],
   schema: SCHEMA_ITEMS,
   attachment: ATTACHMENT_ITEMS,
@@ -348,19 +349,42 @@ const AGENT_ITEMS: Record<AnalysisAgentId, AnalysisResultItem[]> = {
   risk_indicators: RISK_ITEMS,
 };
 
-export function getAnalysisItemsForAgent(agentId: AnalysisAgentId): AnalysisResultItem[] {
-  const items = [...(AGENT_ITEMS[agentId] ?? [])];
+const PATIENT_AGENT_ITEMS: Record<string, Record<AnalysisAgentId, AnalysisResultItem[]>> = {
+  'test-patient-1': TEST_PATIENT_1_AGENT_ITEMS,
+  'test-patient-2': TEST_PATIENT_2_AGENT_ITEMS,
+};
+
+const DEFAULT_TEST_PATIENT_ID = 'test-patient-1';
+
+function resolvePatientAgentItems(
+  patientId?: string,
+): Record<AnalysisAgentId, AnalysisResultItem[]> {
+  if (patientId && PATIENT_AGENT_ITEMS[patientId]) {
+    return PATIENT_AGENT_ITEMS[patientId];
+  }
+  return PATIENT_AGENT_ITEMS[DEFAULT_TEST_PATIENT_ID];
+}
+
+export function getAnalysisItemsForAgent(
+  agentId: AnalysisAgentId,
+  patientId?: string,
+): AnalysisResultItem[] {
+  const items = [...(resolvePatientAgentItems(patientId)[agentId] ?? [])];
   return items.sort((a, b) => b.score - a.score);
 }
 
-export function getTopAnalysisItem(agentId: AnalysisAgentId): AnalysisResultItem | null {
-  const items = getAnalysisItemsForAgent(agentId);
+export function getTopAnalysisItem(
+  agentId: AnalysisAgentId,
+  patientId?: string,
+): AnalysisResultItem | null {
+  const items = getAnalysisItemsForAgent(agentId, patientId);
   return items[0] ?? null;
 }
 
 export function getAnalysisItemByKey(
   agentId: AnalysisAgentId,
   key: string,
+  patientId?: string,
 ): AnalysisResultItem | undefined {
-  return AGENT_ITEMS[agentId]?.find((i) => i.key === key);
+  return resolvePatientAgentItems(patientId)[agentId]?.find((i) => i.key === key);
 }
