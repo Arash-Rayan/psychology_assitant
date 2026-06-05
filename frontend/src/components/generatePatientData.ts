@@ -239,76 +239,151 @@ export function generatePatients(
     {
       id: 'test-patient-2',
       name: 'مراجع تست ۲',
-      age: 27,
+      age: 31,
       gender: 'زن',
       phone: '۰۹۱۳ ۴۵۶ ۷۸۹۰',
       clinicalEngagement: 'established',
       assignedDoctorId: doctors[0]?.id ?? 'd1',
       status: 'attention',
-      overallScore: 52,
+      overallScore: 48,
       sessionsCount: 4,
       lastSession: 'دیروز',
       schemas: [
         {
-          name: 'جلب توجه / تأییدخواهی',
+          name: 'محرومیت هیجانی',
           severity: 'high',
           frequency: 12,
           lastDetected: 'دیروز',
-          description: 'خودارزشی وابسته به تأیید شریک؛ رفتار و ظاهر بر اساس خواسته او تنظیم می‌شود.'
+          description: 'کمبود توجه و اولویت‌دهی همسر؛ تشدید پس از تولد فرزند.'
         },
         {
-          name: 'اطاعت',
+          name: 'بی‌اعتمادی / بدرفتاری',
           severity: 'high',
-          frequency: 10,
+          frequency: 11,
           lastDetected: 'دیروز',
-          description: 'مقدم دانستن خواسته‌های دیگران بر نیازهای خود، حتی با آگاهی از هزینه شخصی.'
+          description: 'خشونت فیزیکی و شکستن اعتماد؛ احساس گول خوردن.'
         },
         {
-          name: 'نقص / شرم',
+          name: 'وابستگی / ناکارآمدی',
           severity: 'medium',
           frequency: 9,
-          lastDetected: 'هفته گذشته',
-          description: 'احساس شرم از بدن و درآمد ناکافی در مقایسه با معیارهای شریک.'
+          lastDetected: 'دیروز',
+          description: 'وابستگی حال روانی به تغییر رفتار همسر؛ احساس درماندگی.'
         }
       ],
       behaviors: [
         {
-          pattern: 'تأییدخواهی و خرج کردن برای جلب رضایت شریک',
-          occurrences: 14,
+          pattern: 'تعارض با شوهر (دعوا، قهر و سکوت)',
+          occurrences: 12,
           trend: 'increasing'
         },
         {
-          pattern: 'نشخوار فکری درباره پارتنر قبلی',
-          occurrences: 10,
+          pattern: 'نشخوار فکری درباره خواهر شوهر و تماس‌های او',
+          occurrences: 9,
           trend: 'stable'
         }
       ],
       monthlyMood: [
-        { date: 'هفته ۱', mood: 48, anxiety: 68, depression: 55 },
-        { date: 'هفته ۲', mood: 50, anxiety: 65, depression: 52 },
-        { date: 'هفته ۳', mood: 51, anxiety: 63, depression: 50 },
-        { date: 'هفته ۴', mood: 52, anxiety: 62, depression: 49 }
+        { date: 'هفته ۱', mood: 42, anxiety: 70, depression: 62 },
+        { date: 'هفته ۲', mood: 40, anxiety: 72, depression: 65 },
+        { date: 'هفته ۳', mood: 38, anxiety: 74, depression: 68 },
+        { date: 'هفته ۴', mood: 38, anxiety: 75, depression: 70 }
       ],
       aiInsights: [
-        'دلبستگی اضطرابی با وابستگی ناسالم به شریک فعلی و حسرت رابطه قبلی هم‌پوشانی دارد.',
-        'تحریف‌های شناختی (ذهن‌خوانی، پیش‌بینی منفی) چرخه تأییدخواهی را تقویت می‌کنند.'
+        'دلبستگی اضطرابی-آشفته با دخالت خانواده همسر و خشونت فیزیکی هم‌پوشانی دارد.',
+        'افسردگی و ناامیدی پس از تولد فرزند؛ باور که ناراحتی تنها راه وادار کردن همسر به تلاش است.'
       ],
       chatbotSummary: {
-        mainTopic: 'روابط',
-        confidence: 88,
-        notes: 'پس از خیانت و پایان رابطه قبلی، ورود به رابطه موقت جدید با الگوی تأییدخواهی، خرج مالی افراطی و نشخوار فکری درباره پارتنر سابق.'
+        mainTopic: 'ازدواج و خانواده',
+        confidence: 90,
+        notes: '۷ سال ازدواج، فرزند یک‌ساله؛ نارضایتی از دخالت خانواده شوهر، افسردگی پس از تولد بچه، خشونت فیزیکی همسر و الگوی تعارض مکرر.'
       },
       assessments: {
         neo: {
           neuroticism: 95,
-          extraversion: 45,
-          openness: 50,
-          agreeableness: 75,
-          conscientiousness: 35
+          extraversion: 35,
+          openness: 48,
+          agreeableness: 38,
+          conscientiousness: 52
         },
-        depression: 52,
-        anxiety: 72,
-        stress: 64
+        depression: 70,
+        anxiety: 68,
+        stress: 72
+      }
+    },
+    {
+      id: 'test-patient-3',
+      name: 'مراجع تست ۳',
+      age: 28,
+      gender: 'زن',
+      phone: '۰۹۱۴ ۵۶۷ ۸۹۰۱',
+      clinicalEngagement: 'established',
+      assignedDoctorId: doctors[0]?.id ?? 'd1',
+      status: 'attention',
+      overallScore: 50,
+      sessionsCount: 3,
+      lastSession: 'امروز',
+      schemas: [
+        {
+          name: 'جلب توجه / تأییدخواهی',
+          severity: 'high',
+          frequency: 13,
+          lastDetected: 'امروز',
+          description: 'تأییدطلبی وسواسی از شریک فعلی؛ رفتار و ظاهر مطابق خواسته او حتی با آگاهی از موقتی بودن رابطه.'
+        },
+        {
+          name: 'اطاعت',
+          severity: 'high',
+          frequency: 11,
+          lastDetected: 'امروز',
+          description: 'صرف پول و زمان برای شریک به‌جای نیازهای خود؛ نادیده گرفتن پیشرفت شخصی.'
+        },
+        {
+          name: 'نقص / شرم',
+          severity: 'high',
+          frequency: 10,
+          lastDetected: 'دیروز',
+          description: 'شرم از بدن و درآمد ناکافی در مقایسه با معیارهای شریک.'
+        }
+      ],
+      behaviors: [
+        {
+          pattern: 'نشخوار فکری درباره پارتنر قبلی (حدیث)',
+          occurrences: 12,
+          trend: 'increasing'
+        },
+        {
+          pattern: 'خرج کردن افراطی و خودسرزنشگری مالی',
+          occurrences: 11,
+          trend: 'stable'
+        }
+      ],
+      monthlyMood: [
+        { date: 'هفته ۱', mood: 46, anxiety: 70, depression: 58 },
+        { date: 'هفته ۲', mood: 47, anxiety: 69, depression: 56 },
+        { date: 'هفته ۳', mood: 49, anxiety: 67, depression: 54 },
+        { date: 'هفته ۴', mood: 50, anxiety: 66, depression: 53 }
+      ],
+      aiInsights: [
+        'دلبستگی اضطرابی و آشفته با وابستگی ناسالم به شریک فعلی و حسرت رابطه قبلی هم‌پوشانی دارد.',
+        'طرحواره تأییدطلبی و نقص/شرم چرخه خودتخریب مالی را تقویت می‌کنند.'
+      ],
+      chatbotSummary: {
+        mainTopic: 'روابط',
+        confidence: 90,
+        notes: 'خیانت به رابطه قبلی، حسرت و نشخوار فکری؛ ورود به رابطه موقت با تأییدطلبی شدید، خرج مالی و مقایسه با دیگران.'
+      },
+      assessments: {
+        neo: {
+          neuroticism: 90,
+          extraversion: 42,
+          openness: 48,
+          agreeableness: 72,
+          conscientiousness: 32
+        },
+        depression: 54,
+        anxiety: 74,
+        stress: 66
       }
     }
   ];

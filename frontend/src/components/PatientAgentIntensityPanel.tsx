@@ -19,7 +19,9 @@ import {
   getAnalysisAgent,
   type AnalysisAgentId,
 } from '@/constants/analysisAgents';
+import { AgentAnalysisTab } from '@/components/AgentAnalysisTab';
 import {
+  getAgentOutputCount,
   getAnalysisItemsForAgent,
   getDisplaySummary,
   getTopAnalysisItem,
@@ -135,16 +137,14 @@ export function PatientAgentIntensityPanel({
       <p className={styles.fieldLabel}>انتخاب تحلیل‌گر</p>
       <div className={styles.agentGrid} role="tablist" aria-label="تحلیل‌گرها">
         {ANALYSIS_AGENTS.map((a) => (
-          <button
+          <AgentAnalysisTab
             key={a.id}
-            type="button"
-            role="tab"
-            aria-selected={agentId === a.id}
-            className={cn(styles.agentTab, agentId === a.id && styles.agentTabActive)}
+            label={a.label}
+            count={getAgentOutputCount(a.id, patientId)}
+            active={agentId === a.id}
             onClick={() => setAgentId(a.id)}
-          >
-            {a.label}
-          </button>
+            className={styles.agentTabCard}
+          />
         ))}
       </div>
 

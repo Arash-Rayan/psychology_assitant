@@ -52,30 +52,8 @@
   }
 }
 
-.agentTab {
-  min-height: 2.75rem;
-  padding: 0.5rem 0.625rem;
-  border-radius: 0.75rem;
-  border: 1px solid #e2e8f0;
-  background: white;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1.35;
-  color: #475569;
-  text-align: center;
+.agentTabCard {
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
-}
-
-.agentTab:hover {
-  border-color: #c4b5fd;
-}
-
-.agentTabActive {
-  border-color: #7c3aed;
-  background: rgba(124, 58, 237, 0.1);
-  color: #6d28d9;
-  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.15);
 }
 
 .outputChips {

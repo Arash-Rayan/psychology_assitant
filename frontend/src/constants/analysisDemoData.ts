@@ -1,5 +1,6 @@
 import type { AnalysisAgentId } from '@/constants/analysisAgents';
 import { TEST_PATIENT_2_AGENT_ITEMS } from '@/constants/analysisDemoDataTest2';
+import { TEST_PATIENT_3_AGENT_ITEMS } from '@/constants/analysisDemoDataTest3';
 
 export interface AnalysisResultItem {
   key: string;
@@ -352,6 +353,7 @@ const TEST_PATIENT_1_AGENT_ITEMS: Record<AnalysisAgentId, AnalysisResultItem[]> 
 const PATIENT_AGENT_ITEMS: Record<string, Record<AnalysisAgentId, AnalysisResultItem[]>> = {
   'test-patient-1': TEST_PATIENT_1_AGENT_ITEMS,
   'test-patient-2': TEST_PATIENT_2_AGENT_ITEMS,
+  'test-patient-3': TEST_PATIENT_3_AGENT_ITEMS,
 };
 
 const DEFAULT_TEST_PATIENT_ID = 'test-patient-1';
@@ -371,6 +373,14 @@ export function getAnalysisItemsForAgent(
 ): AnalysisResultItem[] {
   const items = [...(resolvePatientAgentItems(patientId)[agentId] ?? [])];
   return items.sort((a, b) => b.score - a.score);
+}
+
+/** تعداد آیتم‌های خروجی یک agent برای مراجع (۰ = router اجرا نکرده یا نتیجه‌ای نداشت) */
+export function getAgentOutputCount(
+  agentId: AnalysisAgentId,
+  patientId?: string,
+): number {
+  return getAnalysisItemsForAgent(agentId, patientId).length;
 }
 
 export function getTopAnalysisItem(
