@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { TEAM_MEMBERS, type TeamMember } from '@/constants/teamMembers';
+import { Logo } from './Logo';
 import styles from './IntroductionPage.module.css';
 
 interface PreRegisterForm {
@@ -178,11 +179,10 @@ export function IntroductionPage() {
             transition={{ delay: 0.2, duration: 0.7 }}
           >
             <motion.div
-              className={styles.heroOrb}
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <Brain className={styles.heroOrbIcon} />
+              <Logo size="hero" priority />
             </motion.div>
             <div className={styles.heroStatCards}>
               <motion.div className={styles.heroStatCard}>

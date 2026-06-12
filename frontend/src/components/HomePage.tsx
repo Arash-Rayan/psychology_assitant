@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import { Brain, MessageCircle, TrendingUp, Shield, Sparkles, Heart, Smile, Activity } from 'lucide-react';
+import { Brain, MessageCircle, TrendingUp, Shield, Sparkles, Heart, Smile } from 'lucide-react';
+import { Logo } from './Logo';
 import styles from './HomePage.module.css';
 
 export function HomePage() {
@@ -130,13 +131,31 @@ export function HomePage() {
                   <div className={styles.connectionContainer}>
                     <div className={styles.connectionCircle}>
                       <motion.div
+                        className={styles.glowRing}
+                        animate={{ scale: [1, 1.08, 1], opacity: [0.35, 0.65, 0.35] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                        aria-hidden
+                      />
+                      <motion.div
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                        transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
                         className={styles.rotatingBorder}
-                      ></motion.div>
-                      <div className={styles.innerCircle}>
-                        <Activity />
-                      </div>
+                        aria-hidden
+                      />
+                      <motion.div
+                        animate={{ rotate: -360 }}
+                        transition={{ duration: 32, repeat: Infinity, ease: 'linear' }}
+                        className={styles.rotatingBorderOuter}
+                        aria-hidden
+                      />
+                      <motion.div
+                        className={styles.innerCircle}
+                        animate={{ scale: [1, 1.03, 1] }}
+                        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                      >
+                        <span className={styles.logoAura} aria-hidden />
+                        <Logo size="featured" className={styles.innerCircleLogo} />
+                      </motion.div>
                     </div>
                   </div>
                 </div>

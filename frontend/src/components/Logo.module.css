@@ -1,0 +1,105 @@
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .logo {
+    gap: 0.75rem;
+  }
+}
+
+.logoImage {
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.logoImage_sm {
+  width: 2rem;
+  height: 2rem;
+}
+
+.logoImage_md {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .logoImage_md {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+.logoImage_lg {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+@media (min-width: 640px) {
+  .logoImage_lg {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+}
+
+.logoImage_featured {
+  width: 9rem;
+  height: 9rem;
+}
+
+@media (min-width: 640px) {
+  .logoImage_featured {
+    width: 10rem;
+    height: 10rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .logoImage_featured {
+    width: 11rem;
+    height: 11rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .logoImage_featured {
+    width: 12rem;
+    height: 12rem;
+  }
+}
+
+.logoImage_hero {
+  width: 9rem;
+  height: 9rem;
+  box-shadow:
+    0 24px 48px -12px rgba(124, 58, 237, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.logoText {
+  font-size: 1rem;
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+@media (min-width: 480px) {
+  .logoText {
+    font-size: 1.0625rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .logoText {
+    font-size: 1.125rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .logoText {
+    font-size: 1.25rem;
+  }
+}

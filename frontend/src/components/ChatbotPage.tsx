@@ -1,6 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Smile, Meh, Frown, Brain, ClipboardList } from 'lucide-react';
+import { Smile, Meh, Frown, ClipboardList } from 'lucide-react';
+import { Logo } from './Logo';
 import ReactMarkdown from 'react-markdown';
 import { ChatComposer } from './ChatComposer';
 import styles from './ChatbotPage.module.css';
@@ -318,9 +319,13 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
             className={`${styles.chatHeader} ${variant === 'pre_consult' ? styles.chatHeaderPreConsult : ''}`}
           >
             <div className={styles.headerContent}>
-              <div className={styles.headerIcon}>
-                {variant === 'pre_consult' ? <ClipboardList /> : <Brain />}
-              </div>
+              {variant === 'pre_consult' ? (
+                <div className={styles.headerIcon}>
+                  <ClipboardList />
+                </div>
+              ) : (
+                <Logo size="lg" />
+              )}
               <div className={styles.headerText}>
                 <h2>{variant === 'pre_consult' ? 'پیش‌مشاوره' : 'روانصد'}</h2>
                 <p>

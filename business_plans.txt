@@ -1,0 +1,10 @@
+architecture 
+
+1-> running agents takes more than 5 minutes time , we can say run agents after a user reserve visit 
+
+
+businesss 
+1-> introductoin to friends and familes and having chat with chatbot give u discount 
+2-> doctors with more interaction and updates are vip and get suggestion 
+3-> doctors that fix the output problem of the agents, get discount 
+4-> we dont only get same patient visit fee 2 times a week 

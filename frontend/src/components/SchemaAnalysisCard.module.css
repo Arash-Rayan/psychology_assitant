@@ -1,0 +1,36 @@
+.beliefSection {
+  border-radius: 1rem;
+  border: 1px solid rgba(242, 201, 76, 0.45);
+  background-color: rgba(242, 201, 76, 0.22);
+  padding: 1rem 1.25rem;
+  text-align: right;
+}
+
+.beliefTitle {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.analysisSection {
+  border-radius: 1rem;
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  background-color: rgba(124, 58, 237, 0.14);
+  padding: 1rem 1.25rem;
+  text-align: right;
+}
+
+.analysisTitle {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #5b21b6;
+}
+
+.sectionText {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 2;
+  color: var(--foreground);
+}

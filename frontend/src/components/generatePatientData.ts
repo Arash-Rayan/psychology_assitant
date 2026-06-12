@@ -170,7 +170,7 @@ export function generatePatients(
   const patients: PatientDetail[] = [
     {
       id: 'test-patient-1',
-      name: 'مراجع تست',
+      name: 'مراجع تست ۱',
       age: 29,
       gender: 'زن',
       phone: '۰۹۱۲ ۳۴۵ ۶۷۸۹',
@@ -182,46 +182,63 @@ export function generatePatients(
       lastSession: 'امروز',
       schemas: [
         {
-          name: 'رهاشدگی/بی‌ثباتی',
-          severity: 'medium',
-          frequency: 9,
-          lastDetected: 'دیروز',
-          description: 'ترس از ترک شدن یا از دست دادن رابطه ایمن در موقعیت های هیجانی.'
+          name: 'بی‌اعتمادی/بدرفتاری',
+          severity: 'high',
+          frequency: 13,
+          lastDetected: 'امروز',
+          description: 'نمیتوانم به کسی اعتماد کنم؛ دیگران در صدد تحقیر و آزار من هستند.',
+        },
+        {
+          name: 'نقص/شرم',
+          severity: 'high',
+          frequency: 12,
+          lastDetected: 'امروز',
+          description: 'من ذاتاً معیوب و ناکافی هستم؛ چیزی در من اشتباه است.',
+        },
+        {
+          name: 'تسلیم',
+          severity: 'high',
+          frequency: 11,
+          lastDetected: 'امروز',
+          description: 'مجبور هستم خواسته‌های دیگران را برآورده کنم و آزادی خود را از دست بدهم.',
         },
         {
           name: 'محرومیت هیجانی',
-          severity: 'medium',
-          frequency: 7,
-          lastDetected: 'هفته گذشته',
-          description: 'احساس نادیده گرفته شدن نیازهای عاطفی و دریافت ناکافی حمایت هیجانی.'
-        }
+          severity: 'high',
+          frequency: 10,
+          lastDetected: 'امروز',
+          description: 'نیازهای عاطفی من برآورده نخواهد شد؛ دیگران مرا درک نمی‌کنند و دوستم ندارند.',
+        },
       ],
       behaviors: [
         {
-          pattern: 'نشخوار فکری بعد از تعارض بین فردی',
+          pattern: 'مراجع پس از هر تماس یا دیدار با همسر سابق به چرخه تکراری اولیه بازمی‌گردد.',
           occurrences: 11,
-          trend: 'increasing'
+          trend: 'increasing',
         },
         {
-          pattern: 'نوشتن احساسات پیش از خواب',
+          pattern: 'مراجع به مدت یک هفته حمام نرفته است به جز روزی که قرار بود به دیدن شریک سابق برود.',
           occurrences: 8,
-          trend: 'stable'
-        }
+          trend: 'stable',
+        },
       ],
       monthlyMood: [
         { date: 'هفته ۱', mood: 52, anxiety: 63, depression: 49 },
         { date: 'هفته ۲', mood: 54, anxiety: 60, depression: 47 },
         { date: 'هفته ۳', mood: 57, anxiety: 58, depression: 45 },
-        { date: 'هفته ۴', mood: 59, anxiety: 55, depression: 43 }
+        { date: 'هفته ۴', mood: 59, anxiety: 55, depression: 43 },
       ],
       aiInsights: [
-        'الگوی نگرانی بین فردی همچنان فعال است و نیاز به مداخله ساختاریافته دارد.',
-        'توانایی خودتنظیمی اولیه وجود دارد اما هنوز ناپایدار است.'
+        '«من هر بار میبینمت، هر بار زنگ میزنی، هر بار پیام میدی، من بر میگردم اول چرخه.»',
+        '«چرا من باید با بوی گردن اون توی اون لحظه یاد یه نفر دیگه بیوفتم؟»',
+        '«ثبات میخوام، آزادی میخوام. بدون اینا نمیتونم دووم بیارم.»',
+        '«خیلی گیجم، خیلی آشفتم.»',
       ],
       chatbotSummary: {
         mainTopic: 'روابط',
         confidence: 82,
-        notes: 'در مکالمات اخیر تمرکز اصلی بر تعارض‌های رابطه‌ای، نیاز به مرزبندی و بهبود گفت‌وگوی زوجی بوده است.'
+        notes:
+          'مراجع در این جلسه از آشفتگی شدید پس از دیدار با همسر سابقش سخن می‌گوید. او در حین بغل کردن همسر سابق، بوی گردن او را به یاد فرد دیگری (ماهان) می‌اندازد و دچار احساس گناه و عذاب وجدان عمیقی می‌شود.',
       },
       assessments: {
         neo: {
@@ -238,7 +255,7 @@ export function generatePatients(
     },
     {
       id: 'test-patient-2',
-      name: 'مراجع تست ۲',
+      name: 'مراجع خانم (مشکلات خانوادگی)',
       age: 31,
       gender: 'زن',
       phone: '۰۹۱۳ ۴۵۶ ۷۸۹۰',
@@ -254,22 +271,29 @@ export function generatePatients(
           severity: 'high',
           frequency: 12,
           lastDetected: 'دیروز',
-          description: 'کمبود توجه و اولویت‌دهی همسر؛ تشدید پس از تولد فرزند.'
+          description: 'عدم دریافت توجه و اولویت عاطفی؛ کاهش توجه پس از تولد فرزند.'
         },
         {
-          name: 'بی‌اعتمادی / بدرفتاری',
+          name: 'منفی‌نگری/بدبینی',
           severity: 'high',
           frequency: 11,
           lastDetected: 'دیروز',
-          description: 'خشونت فیزیکی و شکستن اعتماد؛ احساس گول خوردن.'
+          description: 'از دست دادن امید؛ باور به عدم امکان بهبود تا تغییر شرایط بیرونی.'
         },
         {
-          name: 'وابستگی / ناکارآمدی',
-          severity: 'medium',
-          frequency: 9,
+          name: 'معیارهای سرسختانه',
+          severity: 'high',
+          frequency: 11,
           lastDetected: 'دیروز',
-          description: 'وابستگی حال روانی به تغییر رفتار همسر؛ احساس درماندگی.'
-        }
+          description: 'انتظار مطلق از همسر برای اولویت‌بخشی و قطع ارتباط با خواهر.'
+        },
+        {
+          name: 'بی‌اعتمادی/بدرفتاری',
+          severity: 'high',
+          frequency: 10,
+          lastDetected: 'دیروز',
+          description: 'خشونت فیزیکی، شکست اعتماد و احساس فریب‌خوردن.'
+        },
       ],
       behaviors: [
         {
@@ -313,7 +337,7 @@ export function generatePatients(
     },
     {
       id: 'test-patient-3',
-      name: 'مراجع تست ۳',
+      name: 'مراجع E J',
       age: 28,
       gender: 'زن',
       phone: '۰۹۱۴ ۵۶۷ ۸۹۰۱',
@@ -325,35 +349,38 @@ export function generatePatients(
       lastSession: 'امروز',
       schemas: [
         {
-          name: 'جلب توجه / تأییدخواهی',
+          name: 'تأییدجویی/شناخت‌طلبی',
           severity: 'high',
           frequency: 13,
           lastDetected: 'امروز',
-          description: 'تأییدطلبی وسواسی از شریک فعلی؛ رفتار و ظاهر مطابق خواسته او حتی با آگاهی از موقتی بودن رابطه.'
+          description:
+            'ارزش من به تأیید دیگران وابسته است و باید خودم را مطابق خواسته‌های آنها تغییر دهم تا پذیرفته شوم.'
         },
         {
-          name: 'اطاعت',
+          name: 'تسلیم',
+          severity: 'high',
+          frequency: 12,
+          lastDetected: 'امروز',
+          description:
+            'نیازها و خواسته‌های من در مقایسه با خواسته‌های دیگران بی‌اهمیت هستند و من باید خودم را تسلیم کنم تا طرد نشوم.'
+        },
+        {
+          name: 'نقص/شرم',
           severity: 'high',
           frequency: 11,
           lastDetected: 'امروز',
-          description: 'صرف پول و زمان برای شریک به‌جای نیازهای خود؛ نادیده گرفتن پیشرفت شخصی.'
-        },
-        {
-          name: 'نقص / شرم',
-          severity: 'high',
-          frequency: 10,
-          lastDetected: 'دیروز',
-          description: 'شرم از بدن و درآمد ناکافی در مقایسه با معیارهای شریک.'
+          description:
+            'من ذاتاً نقص دارم و به دلیل کمبودهایم (بدن، درآمد، ارزش) لایق عشق و پذیرش نیستم.'
         }
       ],
       behaviors: [
         {
-          pattern: 'نشخوار فکری درباره پارتنر قبلی (حدیث)',
+          pattern: 'مراجع دائماً به رابطه قبلی خود با حدیث فکر می‌کند و خاطرات را مرور می‌کند.',
           occurrences: 12,
           trend: 'increasing'
         },
         {
-          pattern: 'خرج کردن افراطی و خودسرزنشگری مالی',
+          pattern: 'مراجع به دلیل خرج کردن پول برای پارتنر جدید به خود فحش می‌دهد اما باز هم این کار را تکرار می‌کند.',
           occurrences: 11,
           trend: 'stable'
         }
@@ -365,21 +392,24 @@ export function generatePatients(
         { date: 'هفته ۴', mood: 50, anxiety: 66, depression: 53 }
       ],
       aiInsights: [
-        'دلبستگی اضطرابی و آشفته با وابستگی ناسالم به شریک فعلی و حسرت رابطه قبلی هم‌پوشانی دارد.',
-        'طرحواره تأییدطلبی و نقص/شرم چرخه خودتخریب مالی را تقویت می‌کنند.'
+        'تمام پولم رو براش تقریبا خرج می‌کنم',
+        'به خودم فوش می‌دم که چرا این پول رو دادی، ولی بازم میرم انجامش می‌دم',
+        'احساس می‌کنم فرد رابطه قبلیم حدیث رو دوستش دارم، حتی نمی‌دونم چیشو دوست دارم',
+        'همش به این فکر می‌کنم که گند زدم و از دستش دادم',
       ],
       chatbotSummary: {
         mainTopic: 'روابط',
         confidence: 90,
-        notes: 'خیانت به رابطه قبلی، حسرت و نشخوار فکری؛ ورود به رابطه موقت با تأییدطلبی شدید، خرج مالی و مقایسه با دیگران.'
+        notes:
+          'مراجع با حسرت از دست دادن رابطه قبلی خود به دلیل خیانتش صحبت می‌کند و با وجود آگاهی از نقص‌های طرف مقابل، روزانه خاطرات او را مرور می‌کند. هم‌زمان وارد رابطه جدیدی شده که خودش آن را موقتی می‌داند، اما تمام وقت و پول خود را برای جلب تأیید پارتنر جدید صرف می‌کند و از پیشرفت شخصی خود غافل می‌شود.'
       },
       assessments: {
         neo: {
-          neuroticism: 90,
+          neuroticism: 85,
           extraversion: 42,
           openness: 48,
           agreeableness: 72,
-          conscientiousness: 32
+          conscientiousness: 30
         },
         depression: 54,
         anxiety: 74,

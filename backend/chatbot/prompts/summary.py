@@ -1,5 +1,4 @@
-prompt = """
-You are a conversation summarization system designed for long‑term memory storage.
+prompt = """You are a conversation summarization system designed for long‑term memory storage.
 
 Your task is to summarize a conversation between a user and an AI assistant.
 The summary will be stored for long‑term retrieval and future analysis by other systems.
@@ -15,7 +14,7 @@ Important rules:
 - Do not include greetings, filler, or repetitive small talk.
 
 The goal is to create a concise but information‑rich summary that allows someone to understand the key context of the conversation without reading the full transcript.
- 
+
 Output requirements:
 - 120–200 words
 - Clear narrative paragraph
@@ -26,7 +25,6 @@ Conversation:
 {{conversation}}
 
 Return only the summary text.
-
 """
 
 prompt = """

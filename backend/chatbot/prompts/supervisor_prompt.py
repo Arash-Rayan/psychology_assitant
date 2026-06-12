@@ -22,24 +22,24 @@ Available agents and what they detect:
 
 **Examples:**
 
-Conversation (short):  
-Client: “I never trust anyone in a relationship. Every time someone gets close, I leave first. I feel they will abandon me anyway.”  
-Output:  
+Conversation (short):
+Client: “I never trust anyone in a relationship. Every time someone gets close, I leave first. I feel they will abandon me anyway.”
+Output:
 {"selected_agents": ["attachment", "schema"]}
 
-Conversation:  
-Client: “Lately I can’t get out of bed. I’ve lost my appetite and feel worthless all the time.”  
-Output:  
+Conversation:
+Client: “Lately I can’t get out of bed. I’ve lost my appetite and feel worthless all the time.”
+Output:
 {"selected_agents": ["clinical_disorder", "functional_level", "cognitive_distortion"]}
 
-Conversation:  
-Client: “I prefer working alone. Parties drain me.”  
-Output:  
+Conversation:
+Client: “I prefer working alone. Parties drain me.”
+Output:
 {"selected_agents": ["personal_traits"]}
 
-Conversation:  
-Client: “I had cereal for breakfast.”  
-Output:  
+Conversation:
+Client: “I had cereal for breakfast.”
+Output:
 {"selected_agents": []}
 
 Now analyse the conversation below and produce the JSON output.

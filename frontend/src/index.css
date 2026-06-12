@@ -65,7 +65,7 @@
 
 @layer theme {
   :root, :host {
-    --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-sans: var(--font-vazirmatn), "Vazirmatn", "IRANSansX", "IRANSans", Tahoma, "Segoe UI", sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --color-orange-600: oklch(.646 .222 41.116);
     --color-gray-50: oklch(.985 .002 247.839);

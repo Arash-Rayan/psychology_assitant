@@ -1,9 +1,10 @@
 'use client';
 
-import { Brain, MessageCircle, LayoutDashboard, Home, Menu, X, UserCircle2, Info, Sparkles } from 'lucide-react';
+import { MessageCircle, LayoutDashboard, Home, Menu, X, UserCircle2, Info, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { Logo } from './Logo';
 import styles from './Header.module.css';
 
 export function Header() {
@@ -20,12 +21,9 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.headerContent}>
         <div className={styles.navContainer} dir="rtl">
-          <div className={styles.logoContainer}>
-            <div className={styles.logoIcon}>
-              <Brain />
-            </div>
-            <span className={styles.logoText}>روانصد</span>
-          </div>
+          <Link href="/home" className={styles.logoLink} aria-label="روانصد — صفحه اصلی">
+            <Logo size="md" showText priority />
+          </Link>
           
           {/* Desktop Navigation */}
           <nav className={styles.navDesktop}>

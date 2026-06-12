@@ -1,0 +1,15 @@
+.embeddedChatCard {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  background-color: white;
+  box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.05);
+  max-height: min(72vh, 720px);
+  width: 100%;
+}
+
+.embeddedChatCard .messagesArea {
+  max-height: min(60vh, 620px);
+}

@@ -9,10 +9,7 @@ interface AgentAnalysisTabProps {
   className?: string;
 }
 
-/**
- * تب تحلیل — شمارنده ستون جدا (چپ در RTL)، عنوان وسط باقی باکس.
- * بدون absolute تا هیچ‌وقت روی متن نیفتد.
- */
+/** تب تحلیل — شمارنده سمت چپ، عنوان راست (RTL). */
 export function AgentAnalysisTab({
   label,
   count,
@@ -26,30 +23,30 @@ export function AgentAnalysisTab({
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      dir="rtl"
       className={cn(
-        'flex min-h-[3.75rem] w-full items-stretch gap-0 rounded-xl border py-2 pl-1.5 pr-2 text-center transition-all duration-200 sm:min-h-[3.5rem]',
+        'flex min-h-[3.75rem] w-full items-stretch rounded-xl border py-2 pr-2 pl-1.5 text-center transition-all duration-200 sm:min-h-[3.5rem]',
         active
           ? 'border-primary bg-primary/12 text-primary shadow-sm ring-1 ring-primary/15'
           : 'border-border bg-white text-foreground hover:border-primary/35 hover:bg-muted/30',
         className,
       )}
     >
-      {/* عنوان — وسط باقی باکس */}
-      <div className="flex min-w-0 flex-1 items-center justify-center px-0.5">
-        <span
-          className={cn(
-            'line-clamp-3 w-full text-center text-[11px] font-medium leading-snug sm:text-xs sm:leading-tight',
-            active ? 'text-primary' : 'text-foreground',
-          )}
-        >
-          {label}
-        </span>
-      </div>
+      {/* LTR row: count pinned to physical left */}
+      <div className="flex w-full min-w-0 items-center gap-1" dir="ltr">
+        <div className="flex w-7 shrink-0 items-center justify-center">
+          <AgentOutputCountBadge count={count} variant="tab" />
+        </div>
 
-      {/* ستون شمارنده — سمت چپ در RTL */}
-      <div className="flex w-7 shrink-0 items-start justify-center pt-0.5">
-        <AgentOutputCountBadge count={count} variant="tab" />
+        <div className="flex min-w-0 flex-1 items-center justify-center" dir="rtl">
+          <span
+            className={cn(
+              'line-clamp-3 w-full text-center text-[11px] font-medium leading-snug sm:text-xs sm:leading-tight',
+              active ? 'text-primary' : 'text-foreground',
+            )}
+          >
+            {label}
+          </span>
+        </div>
       </div>
     </button>
   );

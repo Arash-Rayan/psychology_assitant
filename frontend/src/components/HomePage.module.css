@@ -332,6 +332,7 @@
   position: relative;
   width: 13rem;
   height: 13rem;
+  isolation: isolate;
 }
 
 @media (min-width: 640px) {
@@ -355,21 +356,74 @@
   }
 }
 
+.glowRing {
+  position: absolute;
+  inset: -0.75rem;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    rgba(139, 92, 246, 0.28) 0%,
+    rgba(167, 139, 250, 0.12) 45%,
+    transparent 70%
+  );
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.rotatingBorderOuter {
+  position: absolute;
+  inset: -0.35rem;
+  border-radius: 9999px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(139, 92, 246, 0.08) 60deg,
+    rgba(167, 139, 250, 0.22) 120deg,
+    transparent 180deg,
+    rgba(124, 58, 237, 0.1) 240deg,
+    rgba(196, 181, 253, 0.2) 300deg,
+    transparent 360deg
+  );
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px));
+  pointer-events: none;
+}
+
 .rotatingBorder {
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  border: 2px dashed rgba(139, 92, 246, 0.3);
+  background: conic-gradient(
+    from 90deg,
+    rgba(139, 92, 246, 0.15),
+    rgba(167, 139, 250, 0.55),
+    rgba(124, 58, 237, 0.35),
+    rgba(233, 213, 255, 0.4),
+    rgba(139, 92, 246, 0.15)
+  );
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.25));
+  pointer-events: none;
 }
 
 .innerCircle {
   position: absolute;
   inset: 2rem;
   border-radius: 9999px;
-  background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.08), rgba(233, 213, 255, 0.12));
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(237, 233, 254, 0.75) 45%,
+    rgba(221, 214, 254, 0.55) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 16px 40px -12px rgba(124, 58, 237, 0.35);
 }
 
 @media (min-width: 768px) {
@@ -378,30 +432,51 @@
   }
 }
 
-.innerCircle svg {
-  width: 3.5rem;
-  height: 3.5rem;
-  color: var(--primary);
+.logoAura {
+  position: absolute;
+  width: 72%;
+  height: 72%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
+  animation: logoAuraPulse 3.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
-@media (min-width: 640px) {
-  .innerCircle svg {
-    width: 4.25rem;
-    height: 4.25rem;
+@keyframes logoAuraPulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.45;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
   }
 }
 
-@media (min-width: 768px) {
-  .innerCircle svg {
-    width: 5rem;
-    height: 5rem;
-  }
+.innerCircleLogo {
+  position: relative;
+  z-index: 1;
+  justify-content: center;
 }
 
-@media (min-width: 1024px) {
-  .innerCircle svg {
-    width: 5.5rem;
-    height: 5.5rem;
+.innerCircleLogo img {
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.65),
+    0 0 28px rgba(124, 58, 237, 0.45),
+    0 14px 36px rgba(91, 33, 182, 0.28);
+  animation: logoFloatGlow 5s ease-in-out infinite;
+}
+
+@keyframes logoFloatGlow {
+  0%,
+  100% {
+    filter: brightness(1) saturate(1);
+  }
+
+  50% {
+    filter: brightness(1.06) saturate(1.08);
   }
 }
 
