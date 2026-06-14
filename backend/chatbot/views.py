@@ -27,10 +27,11 @@ def _add_cors_headers(response: JsonResponse | StreamingHttpResponse) -> JsonRes
 _api_key = os.environ.get("DEEPSEEK_API_KEY")
 
 llm = ChatOpenAI(
-    model="deepseek-v4-pro",
+    model="deepseek-v4-flash",
     api_key=_api_key,
     base_url="https://api.deepseek.com",
-    temperature=0,
+    temperature=1,
+    top_p = 0.9,
     reasoning_effort="high",)
         # "response_format": {"type": "json_object"} 
 # llm = ChatOpenAI(
@@ -48,6 +49,9 @@ prompt = ChatPromptTemplate.from_messages(
         ("human", "{input}"),
     ]
 )
+
+
+
 
 chain = prompt | llm
 
