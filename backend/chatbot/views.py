@@ -51,8 +51,6 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 
-
-
 chain = prompt | llm
 
 prompt_pre_consult = ChatPromptTemplate.from_messages(

@@ -81,7 +81,6 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
   const [moodSelected, setMoodSelected] = useState(false);
   const [subjectSelected, setSubjectSelected] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<PreConsultSubject | null>(null);
-  const [streamingBotId, setStreamingBotId] = useState<string | null>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
   const isTypingRef = useRef(isTyping);
   isTypingRef.current = isTyping;
@@ -120,7 +119,6 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
     setMoodSelected(false);
     setSubjectSelected(false);
     setSelectedSubject(null);
-    setStreamingBotId(null);
     setIsTyping(false);
   }, [variant]);
 
@@ -220,7 +218,6 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       };
 
       setMessages((prev) => [...prev, botMessage]);
-      setStreamingBotId(botId);
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -243,7 +240,6 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       }
 
       setIsTyping(false);
-      setStreamingBotId(null);
     } catch {
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
@@ -253,7 +249,6 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       };
       setMessages((prev) => [...prev, errorMessage]);
       setIsTyping(false);
-      setStreamingBotId(null);
     }
   }, [chatEndpoint]);
 
@@ -365,13 +360,9 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
                         message.sender === 'user' ? styles.messageContentUser : styles.messageContentBot
                       }`}
                     >
-                      {message.sender === 'bot' && message.id === streamingBotId ? (
-                        <p className={styles.messageText}>{message.text}</p>
-                      ) : message.sender === 'bot' ? (
+                      {message.sender === 'bot' ? (
                         <div className={`${styles.messageText} ${styles.markdownContent}`}>
-                          <ReactMarkdown>
-                            {message.text}
-                          </ReactMarkdown>
+                          <ReactMarkdown>{message.text}</ReactMarkdown>
                         </div>
                       ) : (
                         <p className={styles.messageText}>{message.text}</p>
