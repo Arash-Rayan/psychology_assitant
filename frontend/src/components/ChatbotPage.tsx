@@ -32,6 +32,32 @@ const PRE_CONSULT_SUBJECTS: {
   { id: 'pre_marriage', label: 'پیش از ازدواج', description: 'آمادگی و سوالات قبل از ازدواج' },
 ];
 
+const ASSISTANT_WELCOME_MESSAGE = `سلام 👋
+
+من ربات روانصد هستم.
+
+اینجا هستم تا با دقت به حرف‌هات گوش بدم، کمک کنم راحت‌تر درباره تجربه‌ها و احساس‌هات صحبت کنی، و اطلاعاتی که به اشتراک می‌ذاری رو به شکلی امن و منظم به دکترت منتقل کنم.
+
+حریم خصوصی و امنیت اطلاعاتت برای ما خیلی مهمه و با دقت ازش محافظت می‌شه.
+
+ممنون که به تیم روانصد اعتماد کردی 🤍`;
+
+const SESSION_STORAGE_KEY: Record<ChatbotVariant, string> = {
+  assistant: 'ruansad_chat_session_id',
+  pre_consult: 'ruansad_pre_consult_session_id',
+};
+
+interface HistoryMessage {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  created_at: string;
+}
+
+interface ChatHistoryResponse {
+  session_id: number | null;
+  messages: HistoryMessage[];
+}
+
 function resolveChatEndpoint(variant: ChatbotVariant): string {
   const base = (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000').replace(/\/$/, '');
   if (variant === 'pre_consult') {
@@ -42,7 +68,15 @@ function resolveChatEndpoint(variant: ChatbotVariant): string {
   return `${base}/chat`;
 }
 
-function createInitialMessages(variant: ChatbotVariant): Message[] {
+function resolveHistoryEndpoint(variant: ChatbotVariant): string {
+  const base = (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000').replace(/\/$/, '');
+  if (variant === 'pre_consult') {
+    return `${base}/chat/pre-consult/history`;
+  }
+  return `${base}/chat/history`;
+}
+
+function createWelcomeMessages(variant: ChatbotVariant): Message[] {
   if (variant === 'pre_consult') {
     return [
       {
@@ -59,8 +93,15 @@ function createInitialMessages(variant: ChatbotVariant): Message[] {
   }
   return [
     {
-      id: '1',
-      text: 'سلام! امروز چطور بود؟ 🌟',
+      id: 'welcome',
+      text: ASSISTANT_WELCOME_MESSAGE,
+      sender: 'bot',
+      emotion: 'positive',
+      timestamp: new Date(),
+    },
+    {
+      id: 'mood-prompt',
+      text: 'امروز چطور بود؟ 🌟',
       sender: 'bot',
       emotion: 'positive',
       timestamp: new Date(),
@@ -69,14 +110,30 @@ function createInitialMessages(variant: ChatbotVariant): Message[] {
   ];
 }
 
+function mapHistoryToMessages(messages: HistoryMessage[]): Message[] {
+  return messages
+    .filter((m) => m.role === 'user' || m.role === 'assistant')
+    .map((m, index) => ({
+      id: `hist-${index}`,
+      text: m.content,
+      sender: m.role === 'user' ? 'user' : 'bot',
+      emotion: m.role === 'assistant' ? 'neutral' as const : undefined,
+      timestamp: new Date(m.created_at),
+    }));
+}
+
 interface ChatbotPageProps {
   variant?: ChatbotVariant;
 }
 
 export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
   const chatEndpoint = useMemo(() => resolveChatEndpoint(variant), [variant]);
+  const historyEndpoint = useMemo(() => resolveHistoryEndpoint(variant), [variant]);
+  const sessionStorageKey = SESSION_STORAGE_KEY[variant];
 
-  const [messages, setMessages] = useState<Message[]>(() => createInitialMessages(variant));
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [sessionId, setSessionId] = useState<number | null>(null);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [moodSelected, setMoodSelected] = useState(false);
   const [subjectSelected, setSubjectSelected] = useState(false);
@@ -115,12 +172,64 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
   }, [messages, isTyping, scrollToBottom]);
 
   useEffect(() => {
-    setMessages(createInitialMessages(variant));
-    setMoodSelected(false);
-    setSubjectSelected(false);
-    setSelectedSubject(null);
-    setIsTyping(false);
-  }, [variant]);
+    let cancelled = false;
+    const storedSessionId = localStorage.getItem(sessionStorageKey);
+
+    async function loadHistory() {
+      setHistoryLoaded(false);
+      setMessages([]);
+      setMoodSelected(false);
+      setSubjectSelected(false);
+      setSelectedSubject(null);
+      setSessionId(null);
+      setIsTyping(false);
+
+      const params = new URLSearchParams();
+      if (storedSessionId) {
+        params.set('session_id', storedSessionId);
+      }
+
+      try {
+        const res = await fetch(`${historyEndpoint}?${params.toString()}`);
+        if (!res.ok) {
+          throw new Error('History request failed');
+        }
+
+        const data = (await res.json()) as ChatHistoryResponse;
+        if (cancelled) return;
+
+        if (data.messages.length > 0 && data.session_id != null) {
+          setSessionId(data.session_id);
+          localStorage.setItem(sessionStorageKey, String(data.session_id));
+          setMessages(mapHistoryToMessages(data.messages));
+          if (variant === 'pre_consult') {
+            setSubjectSelected(true);
+          }
+          if (variant === 'assistant') {
+            setMoodSelected(true);
+          }
+        } else {
+          localStorage.removeItem(sessionStorageKey);
+          setMessages(createWelcomeMessages(variant));
+        }
+      } catch {
+        if (!cancelled) {
+          localStorage.removeItem(sessionStorageKey);
+          setMessages(createWelcomeMessages(variant));
+        }
+      } finally {
+        if (!cancelled) {
+          setHistoryLoaded(true);
+        }
+      }
+    }
+
+    void loadHistory();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [variant, historyEndpoint, sessionStorageKey]);
 
   const handleMoodSelect = (mood: MoodType) => {
     if (moodSelected || variant === 'pre_consult') return;
@@ -193,7 +302,13 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
 
     try {
       const payload: Record<string, unknown> = { message: userText };
-      if (options?.newSession) payload.new_session = true;
+      if (options?.newSession) {
+        payload.new_session = true;
+        setSessionId(null);
+        localStorage.removeItem(sessionStorageKey);
+      } else if (sessionId != null) {
+        payload.session_id = sessionId;
+      }
       if (options?.consultationSubject) {
         payload.consultation_subject = options.consultationSubject;
       }
@@ -206,6 +321,15 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
 
       if (!res.ok || !res.body) {
         throw new Error('Request failed');
+      }
+
+      const returnedSessionId = res.headers.get('X-Session-Id');
+      if (returnedSessionId) {
+        const sid = Number.parseInt(returnedSessionId, 10);
+        if (!Number.isNaN(sid)) {
+          setSessionId(sid);
+          localStorage.setItem(sessionStorageKey, String(sid));
+        }
       }
 
       const botId = (Date.now() + 1).toString();
@@ -250,7 +374,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       setMessages((prev) => [...prev, errorMessage]);
       setIsTyping(false);
     }
-  }, [chatEndpoint]);
+  }, [chatEndpoint, sessionId, sessionStorageKey]);
 
   const handleSubjectSelect = async (subject: (typeof PRE_CONSULT_SUBJECTS)[number]) => {
     if (subjectSelected || variant !== 'pre_consult' || isTyping) return;
@@ -279,7 +403,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
 
   const handleSendMessage = useCallback(
     (text: string) => {
-      if (isTypingRef.current || inputDisabled) return;
+      if (isTypingRef.current || inputDisabled || !historyLoaded) return;
 
       const userMessage: Message = {
         id: Date.now().toString(),
@@ -291,7 +415,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       setMessages((prev) => [...prev, userMessage]);
       void streamChatReply(text);
     },
-    [inputDisabled, streamChatReply],
+    [inputDisabled, historyLoaded, streamChatReply],
   );
 
   const getEmotionClass = (emotion?: string) => {
@@ -470,7 +594,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
 
           <ChatComposer
             key={variant}
-            disabled={inputDisabled}
+            disabled={inputDisabled || !historyLoaded}
             onSend={handleSendMessage}
             placeholder={
               inputDisabled

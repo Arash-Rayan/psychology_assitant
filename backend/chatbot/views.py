@@ -18,7 +18,7 @@ from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 
 def _add_cors_headers(response: JsonResponse | StreamingHttpResponse) -> JsonResponse | StreamingHttpResponse:
     response["Access-Control-Allow-Origin"] = "*"
-    response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response["Access-Control-Allow-Headers"] = "Content-Type"
     return response
 
@@ -30,10 +30,11 @@ llm = ChatOpenAI(
     model="deepseek-v4-flash",
     api_key=_api_key,
     base_url="https://api.deepseek.com",
-    temperature=1,
+    temperature=0.7,
     top_p = 0.9,
     reasoning_effort="high",)
         # "response_format": {"type": "json_object"} 
+
 # llm = ChatOpenAI(
 #     base_url="https://api.gapgpt.app/v1",
 #     api_key="sk-maGdVnAynciq7MyrhlnX6NrVYcPirPgNR1y8N5CcxglcEVWG",
@@ -41,7 +42,6 @@ llm = ChatOpenAI(
 #     temperature=0.9
 # )
 
-print(model_instruct)
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", model_instruct),
@@ -223,6 +223,59 @@ def chat(request: HttpRequest):
     return _chat_stream_response(request, chain)
 
 
+def _chat_history_response(request: HttpRequest, user_name_prefix: str = "") -> JsonResponse:
+    if request.method == "OPTIONS":
+        resp = JsonResponse({}, status=200)
+        return _add_cors_headers(resp)
+
+    if request.method != "GET":
+        resp = JsonResponse({"error": "Only GET is allowed"}, status=405)
+        return _add_cors_headers(resp)
+
+    user_name = request.GET.get("user_name") or "anonymous"
+    if user_name_prefix:
+        user_name = f"{user_name_prefix}{user_name}"
+
+    session_id = request.GET.get("session_id")
+    session = None
+
+    if session_id:
+        try:
+            sid = int(session_id)
+            session = ChatSession.objects.filter(id=sid, user_name=user_name).first()
+        except (TypeError, ValueError):
+            session = None
+        if not session:
+            resp = JsonResponse({"session_id": None, "messages": []})
+            return _add_cors_headers(resp)
+    else:
+        session = ChatSession.objects.filter(user_name=user_name).order_by("-started_at").first()
+        if not session:
+            resp = JsonResponse({"session_id": None, "messages": []})
+            return _add_cors_headers(resp)
+
+    messages = ChatMessage.objects.filter(session_id=session.id).order_by("seq")
+    payload = {
+        "session_id": session.id,
+        "messages": [
+            {
+                "role": msg.role,
+                "content": msg.content,
+                "created_at": msg.created_at.isoformat(),
+            }
+            for msg in messages
+        ],
+    }
+    resp = JsonResponse(payload)
+    return _add_cors_headers(resp)
+
+
+@csrf_exempt
+def chat_history(request: HttpRequest):
+    """GET /chat/history — returns persisted messages for the latest or given session."""
+    return _chat_history_response(request)
+
+
 @csrf_exempt
 def pre_consult_chat(request: HttpRequest):
     """
@@ -230,3 +283,9 @@ def pre_consult_chat(request: HttpRequest):
     Same contract as /chat; separate session namespace via user_name prefix.
     """
     return _chat_stream_response(request, chain_pre_consult, user_name_prefix="pre_consult:")
+
+
+@csrf_exempt
+def pre_consult_chat_history(request: HttpRequest):
+    """GET /chat/pre-consult/history — pre-consult session history."""
+    return _chat_history_response(request, user_name_prefix="pre_consult:")
