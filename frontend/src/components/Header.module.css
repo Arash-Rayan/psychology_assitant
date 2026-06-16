@@ -205,3 +205,46 @@
   height: 1rem;
 }
 
+/* ── Profile avatar button ── */
+.mobileActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .mobileActions {
+    display: none;
+  }
+}
+
+.profileBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid rgba(139, 92, 246, 0.35);
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(139,92,246,0.25);
+}
+
+.profileBtn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 4px 14px rgba(139,92,246,0.35);
+}
+
+.profileAvatar {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  pointer-events: none;
+}
+

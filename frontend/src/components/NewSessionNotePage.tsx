@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+﻿import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
 import {
@@ -25,6 +25,29 @@ import { Label } from './ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { cn } from './ui/utils';
 import { toast } from 'sonner';
+import { useSpeechRecognition, isSpeechRecognitionSupported } from '@/hooks/useSpeechRecognition';
+import { HomeworkPickerField } from './HomeworkPickerField';
+
+type VoiceTargetField =
+  | 'chiefComplaint'
+  | 'historyBackground'
+  | 'sessionObjective'
+  | 'summary'
+  | 'formulation'
+  | 'treatmentPlan'
+  | 'homework'
+  | 'nextSessionGoals';
+
+const VOICE_FIELD_OPTIONS: { value: VoiceTargetField; label: string }[] = [
+  { value: 'summary', label: 'خلاصه جلسه' },
+  { value: 'chiefComplaint', label: 'شکایت اصلی مراجع' },
+  { value: 'historyBackground', label: 'پیشینه و سابقه مشکل' },
+  { value: 'sessionObjective', label: 'دستور و هدف جلسه فعلی' },
+  { value: 'formulation', label: 'فرمولاسیون و تحلیل بالینی' },
+  { value: 'treatmentPlan', label: 'طرح درمان' },
+  { value: 'homework', label: 'تکالیف و تمرین‌های خانگی' },
+  { value: 'nextSessionGoals', label: 'اهداف جلسه بعد' },
+];
 
 interface FormItem {
   id: string;
@@ -287,7 +310,7 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
   const [supplementInputOpen, setSupplementInputOpen] = useState(false);
   const [timerOpen, setTimerOpen] = useState(true);
   const [inputMethod, setInputMethod] = useState<'type' | 'voice' | 'image'>('type');
-  const [isRecording, setIsRecording] = useState(false);
+  const [voiceTargetField, setVoiceTargetField] = useState<VoiceTargetField>('summary');
   const [sessionStartedAt, setSessionStartedAt] = useState('');
   const [sessionEndedAt, setSessionEndedAt] = useState('');
   const [isSessionRunning, setIsSessionRunning] = useState(false);
@@ -458,13 +481,39 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
     );
   };
 
+  const appendTranscriptToField = useCallback((text: string) => {
+    setFormData((prev) => {
+      const current = prev[voiceTargetField];
+      return {
+        ...prev,
+        [voiceTargetField]: current ? `${current} ${text}` : text,
+      };
+    });
+  }, [voiceTargetField]);
+
+  const {
+    isListening,
+    interimText,
+    sessionTranscript,
+    start: startSpeech,
+    stop: stopSpeech,
+    resetSession: resetSpeechSession,
+  } = useSpeechRecognition({
+    lang: 'fa-IR',
+    onFinal: appendTranscriptToField,
+    onError: (message) => toast.error(message),
+  });
+
+  const speechSupported = isSpeechRecognitionSupported();
+
   const handleRecordToggle = () => {
-    setIsRecording(!isRecording);
-    if (!isRecording) {
-      toast.success('شروع ضبط صدا...');
-    } else {
+    if (isListening) {
+      stopSpeech();
       toast.success('ضبط متوقف شد');
+      return;
     }
+    startSpeech();
+    toast.success('شروع ضبط صدا...');
   };
 
   const handleImageUpload = () => {
@@ -482,6 +531,10 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
   };
 
   const handleSave = () => {
+    if (isListening) {
+      stopSpeech();
+    }
+    resetSpeechSession();
     toast.success('یادداشت جلسه با موفقیت ذخیره شد');
     handleBack();
   };
@@ -873,10 +926,7 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                       value={formData.treatmentPlan}
                       onChange={(v) => setFormData({ ...formData, treatmentPlan: v })}
                     />
-                    <ClinicalField
-                      id="homework"
-                      title="تکالیف و تمرین‌های خانگی"
-                      placeholder="تمرین یا تکلیف محول‌شده..."
+                    <HomeworkPickerField
                       value={formData.homework}
                       onChange={(v) => setFormData({ ...formData, homework: v })}
                     />
@@ -1012,33 +1062,64 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                   className="w-full space-y-6"
                   dir="rtl"
                 >
+                  {!speechSupported && (
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-right text-sm text-amber-900">
+                      تشخیص گفتار در این مرورگر پشتیبانی نمی‌شود. لطفاً از Chrome یا Edge استفاده کنید.
+                    </div>
+                  )}
+
+                  <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-4 text-right sm:px-5">
+                    <Label htmlFor="voice-target-field" className="mb-2 block text-sm font-medium text-slate-700">
+                      افزودن متن به بخش
+                    </Label>
+                    <select
+                      id="voice-target-field"
+                      value={voiceTargetField}
+                      onChange={(e) => setVoiceTargetField(e.target.value as VoiceTargetField)}
+                      disabled={isListening}
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15"
+                      dir="rtl"
+                    >
+                      {VOICE_FIELD_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                      متن گفتار به‌صورت خودکار به فیلد انتخاب‌شده اضافه می‌شود. با توقف و شروع دوباره، متن جدید به همان متن قبلی اضافه می‌شود تا زمانی که یادداشت را ذخیره کنید.
+                    </p>
+                  </div>
+
                   <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-primary/25 bg-gradient-to-b from-primary/[0.04] to-transparent py-10 px-5 sm:py-12 sm:px-6">
                     <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-all ${
-                      isRecording 
-                        ? 'bg-[#eb5757] animate-pulse' 
+                      isListening
+                        ? 'bg-[#eb5757] animate-pulse'
                         : 'bg-primary'
                     }`}>
                       <Mic className="w-10 h-10 text-white" />
                     </div>
                     
                     <p className="text-lg text-foreground mb-2 text-center">
-                      {isRecording ? 'در حال ضبط...' : 'آماده برای ضبط صدا'}
+                      {isListening ? 'در حال ضبط...' : 'آماده برای ضبط صدا'}
                     </p>
                     <p className="text-sm text-muted-foreground mb-6 text-center">
-                      {isRecording 
-                        ? 'صدای شما به متن تبدیل می‌شود' 
+                      {isListening
+                        ? 'صدای شما به متن تبدیل می‌شود'
                         : 'برای شروع ضبط، دکمه زیر را بزنید'}
                     </p>
 
                     <button
+                      type="button"
                       onClick={handleRecordToggle}
-                      className={`flex items-center gap-2 px-8 py-3 rounded-xl transition-all ${
-                        isRecording
+                      disabled={!speechSupported}
+                      className={`flex items-center gap-2 px-8 py-3 rounded-xl transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                        isListening
                           ? 'bg-[#eb5757] hover:bg-[#d94848] text-white'
                           : 'bg-primary hover:bg-primary-hover text-primary-foreground'
                       }`}
                     >
-                      {isRecording ? (
+                      {isListening ? (
                         <>
                           <span className="w-3 h-3 rounded-sm bg-white"></span>
                           <span>توقف ضبط</span>
@@ -1052,12 +1133,21 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                     </button>
                   </div>
 
-                  {isRecording && (
-                    <div className="p-4 bg-accent/30 rounded-xl border border-primary/20">
-                      <p className="text-sm text-muted-foreground mb-2 text-right">متن تبدیل شده:</p>
-                      <p className="text-foreground text-right leading-relaxed">
-                        مراجع در این جلسه پیشرفت خوبی در مدیریت احساسات خود نشان داد. مشکلات مربوط به محیط کار به تفصیل بررسی شد...
+                  {(isListening || sessionTranscript || interimText) && (
+                    <div className="space-y-3 rounded-xl border border-primary/20 bg-accent/30 p-4">
+                      <p className="text-sm text-muted-foreground text-right">متن تبدیل‌شده:</p>
+                      <p className="text-foreground text-right leading-relaxed whitespace-pre-wrap" dir="rtl">
+                        {sessionTranscript}
+                        {interimText ? (
+                          <span className="text-slate-500 italic">
+                            {sessionTranscript ? ' ' : ''}
+                            {interimText}
+                          </span>
+                        ) : null}
                       </p>
+                      {!sessionTranscript && !interimText && isListening && (
+                        <p className="text-sm text-slate-500 text-right">در حال گوش دادن...</p>
+                      )}
                     </div>
                   )}
                 </motion.div>

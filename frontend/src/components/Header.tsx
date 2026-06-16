@@ -86,16 +86,34 @@ export function Header() {
               <span>پنل درمانگر</span>
               <LayoutDashboard />
             </Link>
+
+            {/* Profile Button */}
+            <Link
+              href="/profile"
+              className={styles.profileBtn}
+              aria-label="پروفایل من"
+            >
+              <span className={styles.profileAvatar}>سا</span>
+            </Link>
           </nav>
           
-          {/* Mobile Hamburger Button */}
-          <button 
-            className={styles.hamburger}
-            onClick={toggleMobileMenu}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X /> : <Menu />}
-          </button>
+          {/* Mobile Profile + Hamburger */}
+          <div className={styles.mobileActions}>
+            <Link
+              href="/profile"
+              className={styles.profileBtn}
+              aria-label="پروفایل من"
+            >
+              <span className={styles.profileAvatar}>سا</span>
+            </Link>
+            <button 
+              className={styles.hamburger}
+              onClick={toggleMobileMenu}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X /> : <Menu />}
+            </button>
+          </div>
         </div>
         
         {/* Mobile Navigation Menu */}
