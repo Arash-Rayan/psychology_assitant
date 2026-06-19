@@ -14,6 +14,7 @@ export interface SessionNoteForSummary {
   treatmentPlan: string;
   homework: string;
   nextSessionGoals: string;
+  considerations?: string;
 }
 
 export interface LabeledItem {

@@ -1,6 +1,6 @@
 'use client';
 
-import { X, User, BookOpen, Headphones, CheckSquare, Square, Zap, Tag, ChevronLeft } from 'lucide-react';
+import { X, User, BookOpen, Headphones, CheckSquare, Square, Zap, Tag, ChevronLeft, MessageCircle, ClipboardCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import styles from './UserProfilePanel.module.css';
 
@@ -23,6 +23,20 @@ interface Podcast {
   topic: string;
 }
 
+interface TherapistMessage {
+  id: string;
+  text: string;
+  date: string;
+  read: boolean;
+}
+
+interface SessionFeedback {
+  id: string;
+  sessionNumber: number;
+  date: string;
+  summary: string;
+}
+
 interface UserProfile {
   firstName: string;
   lastName: string;
@@ -35,6 +49,9 @@ interface UserProfile {
   homework: Homework[];
   books: Book[];
   podcasts: Podcast[];
+  therapistMessages: TherapistMessage[];
+  sessionFeedback: SessionFeedback[];
+  therapistName: string;
 }
 
 // Placeholder data — replace with real API call when backend is ready
@@ -59,6 +76,29 @@ const MOCK_PROFILE: UserProfile = {
   podcasts: [
     { title: 'ذهن آرام', host: 'دکتر رضایی', topic: 'مدیریت استرس' },
     { title: 'گفتگوی روان', host: 'تیم روانصد', topic: 'سلامت روان' },
+  ],
+  therapistName: 'دکتر مریم رضایی',
+  therapistMessages: [
+    {
+      id: 'm1',
+      text: 'ثبت احساسات در هفته گذشته قابل تقدیر بود. همین مسیر را ادامه بده.',
+      date: '۱۴۰۳/۰۴/۰۲',
+      read: false,
+    },
+    {
+      id: 'm2',
+      text: 'سه موقعیت استرس‌زای این هفته را یادداشت کن.',
+      date: '۱۴۰۳/۰۳/۲۸',
+      read: true,
+    },
+  ],
+  sessionFeedback: [
+    {
+      id: 'f1',
+      sessionNumber: 8,
+      date: '۱۴۰۳/۰۴/۰۱',
+      summary: 'روی شناسایی افکار خودکار قبل از واکنش‌های هیجانی کار کردیم.',
+    },
   ],
 };
 
@@ -198,6 +238,50 @@ export function UserProfilePanel({ open, onClose }: UserProfilePanelProps) {
                           <p className={styles.hwDue}>موعد: {hw.dueDate}</p>
                         )}
                       </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Therapist messages */}
+              <div className={styles.card}>
+                <div className={styles.cardHeader}>
+                  <MessageCircle className={styles.cardIcon} />
+                  <h3 className={styles.cardTitle}>پیام‌های درمانگر</h3>
+                  {p.therapistMessages.some((m) => !m.read) && (
+                    <span className={styles.cardBadge}>جدید</span>
+                  )}
+                </div>
+                <ul className={styles.messageList}>
+                  {p.therapistMessages.map((msg) => (
+                    <li
+                      key={msg.id}
+                      className={`${styles.messageItem} ${!msg.read ? styles.messageItemUnread : ''}`}
+                    >
+                      <div className={styles.messageMeta}>
+                        <span>{p.therapistName}</span>
+                        <span>{msg.date}</span>
+                      </div>
+                      <p className={styles.messageText}>{msg.text}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Session feedback */}
+              <div className={styles.card}>
+                <div className={styles.cardHeader}>
+                  <ClipboardCheck className={styles.cardIcon} />
+                  <h3 className={styles.cardTitle}>بازخورد جلسات</h3>
+                </div>
+                <ul className={styles.feedbackList}>
+                  {p.sessionFeedback.map((fb) => (
+                    <li key={fb.id} className={styles.feedbackItem}>
+                      <div className={styles.feedbackMeta}>
+                        <span>جلسه {fb.sessionNumber.toLocaleString('fa-IR')}</span>
+                        <span>{fb.date}</span>
+                      </div>
+                      <p className={styles.feedbackText}>{fb.summary}</p>
                     </li>
                   ))}
                 </ul>

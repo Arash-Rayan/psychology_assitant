@@ -42,6 +42,7 @@ interface SessionNote {
   treatmentPlan: string;
   homework: string;
   nextSessionGoals: string;
+  considerations?: string;
 }
 
 function stableNoteCount(patientId: string): number {
@@ -82,6 +83,10 @@ function buildSessionNotes(patientId: string): SessionNote[] {
       homework: 'انجام تمرینات تنفسی روزانه، ثبت احساسات در دفترچه یادداشت، تمرین گفتگوی مثبت با خود',
       nextSessionGoals:
         'بررسی پیشرفت در تمرینات خانگی، کار روی طرحواره‌های شناختی، تمرکز بر روابط بین‌فردی',
+      considerations:
+        i === noteCount - 1
+          ? 'فعلاً فشار زیاد وارد نشود تا جلسات ادامه پیدا کند. نگرانی از قطع درمان؛ در موضوعات خودآسیب با احتیاط و پیگیری نزدیک برخورد شود.'
+          : '',
     };
   });
 }
@@ -1190,6 +1195,7 @@ export function SessionNotesView({
             treatmentPlan: n.treatmentPlan,
             homework: n.homework,
             nextSessionGoals: n.nextSessionGoals,
+            considerations: n.considerations,
           }))}
         />
       )}
@@ -1402,6 +1408,13 @@ export function SessionNotesView({
                   <h4 className="text-sm text-muted-foreground mb-2 text-right">اهداف جلسه بعد:</h4>
                   <p className="text-foreground leading-relaxed text-right">{note.nextSessionGoals}</p>
                 </div>
+
+                {note.considerations?.trim() ? (
+                  <div className="mt-4 p-4 rounded-xl border border-dashed border-amber-200/80 bg-amber-50/40">
+                    <h4 className="text-sm text-amber-800/80 mb-2 text-right">ملاحظات درمانگر</h4>
+                    <p className="text-foreground leading-relaxed text-right whitespace-pre-wrap">{note.considerations}</p>
+                  </div>
+                ) : null}
               </motion.div>
             ))}
 

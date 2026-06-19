@@ -614,6 +614,198 @@
   letter-spacing: 0.02em;
 }
 
+/* ══ THERAPIST MESSAGES & FEEDBACK ══ */
+.therapistRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .therapistRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sectionIntro {
+  font-size: 0.8125rem;
+  color: #64748b;
+  text-align: right;
+  line-height: 1.6;
+  margin: -0.5rem 0 1.125rem;
+}
+
+.messageList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.messageItem {
+  position: relative;
+  padding: 1rem 1.125rem;
+  border-radius: 0.875rem;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  text-align: right;
+  transition: all 0.15s;
+}
+
+.messageItem:hover {
+  border-color: rgba(139, 92, 246, 0.15);
+  background: rgba(139, 92, 246, 0.02);
+}
+
+.messageItemUnread {
+  background: rgba(139, 92, 246, 0.04);
+  border-color: rgba(139, 92, 246, 0.18);
+}
+
+.messageTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-direction: row-reverse;
+  margin-bottom: 0.5rem;
+}
+
+.messageTherapist {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.messageDate {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+
+.messageTag {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.messageText {
+  font-size: 0.875rem;
+  color: #334155;
+  line-height: 1.7;
+}
+
+.messageUnreadDot {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.feedbackList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feedbackItem {
+  padding: 1.125rem 1.25rem;
+  border-radius: 0.875rem;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  text-align: right;
+}
+
+.feedbackHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-direction: row-reverse;
+  margin-bottom: 0.75rem;
+}
+
+.feedbackSession {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #8b5cf6;
+}
+
+.feedbackDate {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.feedbackSummary {
+  font-size: 0.875rem;
+  color: #475569;
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+
+.feedbackGroups {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+}
+
+@media (max-width: 640px) {
+  .feedbackGroups {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feedbackGroup {
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.75rem;
+  background: #fff;
+  border: 1px solid #eef2f7;
+}
+
+.feedbackGroupTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #10b981;
+  margin-bottom: 0.5rem;
+}
+
+.feedbackGroupTitleFocus {
+  color: #f59e0b;
+}
+
+.feedbackBullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.feedbackBullets li {
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.55;
+  padding-right: 0.875rem;
+  position: relative;
+}
+
+.feedbackBullets li::before {
+  content: '•';
+  position: absolute;
+  right: 0;
+  color: #cbd5e1;
+}
+
 /* ══ RESOURCES ROW ══ */
 .resourcesRow {
   display: grid;

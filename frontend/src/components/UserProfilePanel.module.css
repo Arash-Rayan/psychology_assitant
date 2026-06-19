@@ -380,3 +380,50 @@
   color: #94a3b8;
   text-align: right;
 }
+
+.messageList,
+.feedbackList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.messageItem,
+.feedbackItem {
+  padding: 0.875rem;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  text-align: right;
+}
+
+.messageItemUnread {
+  background: rgba(139, 92, 246, 0.04);
+  border-color: rgba(139, 92, 246, 0.15);
+}
+
+.messageMeta,
+.feedbackMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-direction: row-reverse;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.messageMeta span:first-child,
+.feedbackMeta span:first-child {
+  font-weight: 600;
+  color: #64748b;
+}
+
+.messageText,
+.feedbackText {
+  font-size: 0.8125rem;
+  color: #475569;
+  line-height: 1.65;
+}

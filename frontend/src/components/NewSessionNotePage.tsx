@@ -36,7 +36,8 @@ type VoiceTargetField =
   | 'formulation'
   | 'treatmentPlan'
   | 'homework'
-  | 'nextSessionGoals';
+  | 'nextSessionGoals'
+  | 'considerations';
 
 const VOICE_FIELD_OPTIONS: { value: VoiceTargetField; label: string }[] = [
   { value: 'summary', label: 'خلاصه جلسه' },
@@ -47,6 +48,7 @@ const VOICE_FIELD_OPTIONS: { value: VoiceTargetField; label: string }[] = [
   { value: 'treatmentPlan', label: 'طرح درمان' },
   { value: 'homework', label: 'تکالیف و تمرین‌های خانگی' },
   { value: 'nextSessionGoals', label: 'اهداف جلسه بعد' },
+  { value: 'considerations', label: 'ملاحظات درمانگر' },
 ];
 
 interface FormItem {
@@ -334,7 +336,8 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
     formulation: '',
     treatmentPlan: '',
     homework: '',
-    nextSessionGoals: ''
+    nextSessionGoals: '',
+    considerations: '',
   });
 
   const nowDateTimeLocal = () => {
@@ -938,6 +941,15 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                       onChange={(v) => setFormData({ ...formData, nextSessionGoals: v })}
                       optional
                     />
+                    <ClinicalField
+                      id="considerations"
+                      title="ملاحظات درمانگر"
+                      placeholder="احتیاط‌ها، نگرانی‌های بالینی، نکات پیگیری و دستورالعمل‌های درمان — فقط برای پرونده درمانگر"
+                      value={formData.considerations}
+                      onChange={(v) => setFormData({ ...formData, considerations: v })}
+                      optional
+                      tall
+                    />
                   </div>
                 </div>
               </CollapsibleContent>
@@ -978,9 +990,9 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                     />
                   </div>
                   <div className="min-w-0 flex-1 text-right">
-                    <h2 className="text-xl font-bold tracking-tight text-slate-900">روش ثبت مکمل</h2>
+                    <h2 className="text-xl font-bold tracking-tight text-slate-900">یادداشت و ضبط صوت</h2>
                     <p className="mt-2 text-sm leading-relaxed text-slate-500">
-                      متن اصلی در بلوک بالا؛ اینجا صدا یا تصویر در صورت نیاز.
+                      تایپ یادداشت جلسه، ضبط صدا یا بارگذاری تصویر.
                     </p>
                   </div>
                 </button>

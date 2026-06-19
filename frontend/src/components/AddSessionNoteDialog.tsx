@@ -528,7 +528,8 @@ export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber
     formulation: '',
     treatmentPlan: '',
     homework: '',
-    nextSessionGoals: ''
+    nextSessionGoals: '',
+    considerations: '',
   });
 
   const nowDateTimeLocal = () => {
@@ -707,7 +708,8 @@ export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber
         formulation: '',
         treatmentPlan: '',
         homework: '',
-        nextSessionGoals: ''
+        nextSessionGoals: '',
+        considerations: '',
       });
       setSessionStartedAt('');
       setSessionEndedAt('');
@@ -1352,6 +1354,23 @@ export function AddSessionNoteDialog({ open, onClose, patientName, sessionNumber
                           onChange={(e) => setFormData({ ...formData, nextSessionGoals: e.target.value })}
                           placeholder="..."
                           className="min-h-[72px] text-sm w-full resize-y rounded-md border-border/50"
+                          dir="rtl"
+                        />
+                      </div>
+                      <div className="rounded-lg border border-dashed border-amber-200/80 bg-amber-50/30 p-3 space-y-1 md:col-span-2">
+                        <Label className="flex items-center justify-end gap-1.5 text-xs font-medium text-foreground">
+                          <BookOpen className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                          ملاحظات درمانگر
+                          <span className="text-muted-foreground/70 font-normal">(اختیاری — فقط پرونده)</span>
+                        </Label>
+                        <p className="text-[11px] text-muted-foreground/70 text-right leading-snug">
+                          احتیاط‌ها، نگرانی‌های بالینی و نکات پیگیری برای جلسات بعد.
+                        </p>
+                        <Textarea
+                          value={formData.considerations}
+                          onChange={(e) => setFormData({ ...formData, considerations: e.target.value })}
+                          placeholder="مثال: فعلاً فشار زیاد وارد نشود؛ نگرانی از قطع جلسات..."
+                          className="min-h-[88px] text-sm w-full resize-y rounded-md border-border/50"
                           dir="rtl"
                         />
                       </div>
