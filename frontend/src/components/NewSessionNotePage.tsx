@@ -25,31 +25,9 @@ import { Label } from './ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
 import { cn } from './ui/utils';
 import { toast } from 'sonner';
-import { useSpeechRecognition, isSpeechRecognitionSupported } from '@/hooks/useSpeechRecognition';
 import { HomeworkPickerField } from './HomeworkPickerField';
-
-type VoiceTargetField =
-  | 'chiefComplaint'
-  | 'historyBackground'
-  | 'sessionObjective'
-  | 'summary'
-  | 'formulation'
-  | 'treatmentPlan'
-  | 'homework'
-  | 'nextSessionGoals'
-  | 'considerations';
-
-const VOICE_FIELD_OPTIONS: { value: VoiceTargetField; label: string }[] = [
-  { value: 'summary', label: 'خلاصه جلسه' },
-  { value: 'chiefComplaint', label: 'شکایت اصلی مراجع' },
-  { value: 'historyBackground', label: 'پیشینه و سابقه مشکل' },
-  { value: 'sessionObjective', label: 'دستور و هدف جلسه فعلی' },
-  { value: 'formulation', label: 'فرمولاسیون و تحلیل بالینی' },
-  { value: 'treatmentPlan', label: 'طرح درمان' },
-  { value: 'homework', label: 'تکالیف و تمرین‌های خانگی' },
-  { value: 'nextSessionGoals', label: 'اهداف جلسه بعد' },
-  { value: 'considerations', label: 'ملاحظات درمانگر' },
-];
+import { useSpeechRecognition, isSpeechRecognitionSupported } from '@/hooks/useSpeechRecognition';
+import { VOICE_FIELD_OPTIONS, type VoiceTargetField } from '@/types/sessionNote';
 
 interface FormItem {
   id: string;
@@ -496,6 +474,8 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
 
   const {
     isListening,
+    isReconnecting,
+    segmentCount,
     interimText,
     sessionTranscript,
     start: startSpeech,
@@ -1111,14 +1091,20 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                     }`}>
                       <Mic className="w-10 h-10 text-white" />
                     </div>
-                    
+
                     <p className="text-lg text-foreground mb-2 text-center">
-                      {isListening ? 'در حال ضبط...' : 'آماده برای ضبط صدا'}
+                      {isReconnecting
+                        ? 'در حال اتصال مجدد...'
+                        : isListening
+                          ? 'در حال ضبط...'
+                          : 'آماده برای ضبط صدا'}
                     </p>
                     <p className="text-sm text-muted-foreground mb-6 text-center">
-                      {isListening
-                        ? 'صدای شما به متن تبدیل می‌شود'
-                        : 'برای شروع ضبط، دکمه زیر را بزنید'}
+                      {isReconnecting
+                        ? 'Chrome هر ~۱۰–۱۵ ثانیه ضبط را قطع و دوباره وصل می‌کند — چند لحظه صبر کنید'
+                        : isListening
+                          ? 'صدای شما به متن تبدیل می‌شود (تشخیص گفتار Chrome)'
+                          : 'برای شروع ضبط، دکمه زیر را بزنید'}
                     </p>
 
                     <button
@@ -1157,8 +1143,13 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                           </span>
                         ) : null}
                       </p>
-                      {!sessionTranscript && !interimText && isListening && (
+                      {!sessionTranscript && !interimText && isListening && !isReconnecting && (
                         <p className="text-sm text-slate-500 text-right">در حال گوش دادن...</p>
+                      )}
+                      {isListening && segmentCount > 1 && (
+                        <p className="text-xs text-slate-400 text-right">
+                          بخش ضبط: {segmentCount} (هر بخش حدود ۱۰–۱۵ ثانیه است)
+                        </p>
                       )}
                     </div>
                   )}

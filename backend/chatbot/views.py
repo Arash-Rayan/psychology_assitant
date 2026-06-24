@@ -32,15 +32,8 @@ llm = ChatOpenAI(
     base_url="https://api.deepseek.com",
     temperature=0.7,
     top_p = 0.9,
-    reasoning_effort="high",)
+        reasoning_effort="high",)
         # "response_format": {"type": "json_object"} 
-
-# llm = ChatOpenAI(
-#     base_url="https://api.gapgpt.app/v1",
-#     api_key="sk-maGdVnAynciq7MyrhlnX6NrVYcPirPgNR1y8N5CcxglcEVWG",
-#     model="gpt-5.4",
-#     temperature=0.9
-# )
 
 prompt = ChatPromptTemplate.from_messages(
     [

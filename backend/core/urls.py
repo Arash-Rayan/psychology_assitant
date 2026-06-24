@@ -10,4 +10,3 @@ urlpatterns = [
     path("chat/history", chat_history, name="chat_history"),
     path("chat", chat, name="chat"),
 ]
-
