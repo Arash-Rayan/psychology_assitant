@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { ClinicalEngagement, PatientDetail } from "./PatientDetailView";
+import { DEMO_PRE_CONSULT_PATIENT_ID } from "@/constants/demoPreConsultCouplesChat";
 import styles from "./ClinicManagementView.module.css";
 import { doctors } from "@/utils/mockClinicData";
 import {
@@ -271,6 +272,33 @@ function createSchedule(
   return slots;
 }
 
+/** همیشه یک سلول «مراجع جدید» با گفت‌وگوی پیش‌مشاورهٔ نمونه در تقویم هفته */
+function pinDemoPreConsultSlot(
+  slots: SchedulerSlot[],
+  patients: PatientDetail[],
+  weekColumns: WeekColumn[],
+): SchedulerSlot[] {
+  const demo = patients.find((p) => p.id === DEMO_PRE_CONSULT_PATIENT_ID);
+  if (!demo || weekColumns.length === 0) return slots;
+
+  const targetYmd = weekColumns[0]!.ymd;
+  const targetTime = TIMES[2] ?? TIMES[0]!;
+  const idx = slots.findIndex(
+    (s) => s.dateYmd === targetYmd && s.time === targetTime,
+  );
+  if (idx < 0) return slots;
+
+  const next = slots.slice();
+  next[idx] = {
+    dateYmd: targetYmd,
+    time: targetTime,
+    patientId: demo.id,
+    patientName: demo.name,
+    clinicalEngagement: demo.clinicalEngagement,
+  };
+  return next;
+}
+
 /** How each calendar cell should describe آزاد / اشغال based on active filters. */
 type CellFilterMode = "overview" | "room" | "doctor" | "both";
 
@@ -472,10 +500,14 @@ export function ClinicManagementView({
   const laneSchedules = useMemo(() => {
     return visibleLanes.map((lane) => ({
       lane,
-      slots: createSchedule(
+      slots: pinDemoPreConsultSlot(
+        createSchedule(
+          patients,
+          weekColumns,
+          `${calendarKey}:${lane.id}`,
+        ),
         patients,
         weekColumns,
-        `${calendarKey}:${lane.id}`,
       ),
     }));
   }, [visibleLanes, patients, weekColumns, calendarKey]);

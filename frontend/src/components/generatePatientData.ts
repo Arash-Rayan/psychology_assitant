@@ -1,6 +1,14 @@
 import { PatientDetail } from './PatientDetailView';
 import { SCHEMA_TYPES, SchemaType } from './SchemaTypes';
 import { doctors } from '@/utils/mockClinicData';
+import { buildDemoPreConsultPatient } from '@/constants/demoPreConsultPatient';
+import {
+  DEMO_PRE_CONSULT_PATIENT_ID,
+  PRE_CONSULT_SAMPLE_CHAT,
+  PRE_CONSULT_SAMPLE_HIGHLIGHTS,
+  PRE_CONSULT_SAMPLE_SUBJECT,
+  PRE_CONSULT_SAMPLE_SUMMARY,
+} from '@/constants/demoPreConsultCouplesChat';
 
 /** ثابت برای دادهٔ شبیه‌سازی؛ هر بار بارگذاری صفحه همان مراجع با همان id تولید می‌شوند و لینک تقویم ↔ لیست مراجعین هم‌خوان می‌ماند. */
 export const DEMO_THERAPIST_DATA_SEED = 0x706d6832; // 'pmh2'
@@ -70,30 +78,6 @@ const chatbotTopics: Array<'ازدواج' | 'روابط' | 'فردی' | 'اضط�
   'فردی',
   'اضطراب',
   'خانواده'
-];
-
-const intakeConversationSummaries = [
-  'مراجع در چند پیام اول از خواب نامنظم، تپش قلب هنگام ورود به محیط کار و احساس «غرق شدن در فکر» صحبت کرد. تمایل به اجتناب از تماس‌های کاری را بیان کرد و هم‌زمان نگران قضاوت همکاران بود. در پاسخ به سوالات باز، اشاره کرد که از دو هفته پیش شدت علائم بیشتر شده و برای آرام شدن گاهی تا دیروقت در شبکه‌های اجتماعی می‌ماند.',
-  'گفت‌وگو حول تعارض با یکی از اعضای خانواده، احساس طرد شدن و ترس از قطع رابطه چرخید. مراجع چند بار تأکید کرد که «نمی‌داند انتخاب درست چیست» و هم احساس دلتنگی و هم نیاز به فاصله را هم‌زمان توصیف کرد. در بخش پایانی تمایل به مراجعه حضوری برای شروع فرایند درمان را اعلام کرد.',
-  'تمرکز اصلی بر اضطراب اجتماعی محدود به موقعیت‌های ارائه و صحبت در جمع بود. مراجع تکنیک تنفس را امتحان کرده اما می‌گفت در لحظه واقعی فراموش می‌کند. از سردردهای عصرگاهی و گرفتگی شانه‌ها هم نام برد. برای بار اول با پلتفرم آشنا بود و پاسخ‌ها کوتاه اما هم‌راستا با غربالگری بود.',
-];
-
-const intakeHighlightPools: string[][] = [
-  [
-    'علائم جسمی همراه با استرس (تپش، سفتی عضلانی) گزارش شد.',
-    'الگوی اجتناب از موقعیت‌های عملکردی محور کار بیان شد.',
-    'آستانه تحمل در هفتهٔ اخیر کاهش یافته است.',
-  ],
-  [
-    'تعارض بین‌فردی خانوادگی محور گفت‌وگو بود.',
-    'دوگانگی احساسی (دلتنگی در کنار نیاز به فاصله) مشخص بود.',
-    'مراجع آمادگی برای ادامهٔ مسیر درمانی را نشان داد.',
-  ],
-  [
-    'ترس از ارزیابی منفی دیگران در موقعیت‌های اجتماعی برجسته بود.',
-    'استفاده نامنظم از مهارت‌های تنظیم هیجان ذکر شد.',
-    'پیگیری خواب و فعالیت روزانه پیشنهاد شد؛ مراجع موافقت اولیه کرد.',
-  ],
 ];
 
 const timeReferences = [
@@ -527,20 +511,8 @@ export function generatePatients(
     }
 
     const intakeNotes = isNewIntake
-      ? 'خلاصهٔ اولیه از گفت‌وگوی غربالگری: مراجع تازه‌وار؛ تمرکز روی علائم و زمینهٔ مراجعه. پروندهٔ درمانی کامل هنوز تشکیل نشده — فقط دادهٔ ارزیابی ورودی موجود است.'
+      ? 'پیش‌مشاورهٔ زوجین تکمیل شده؛ خلاصه و گفت‌وگوی نمونه در پروندهٔ ورودی موجود است.'
       : 'تحلیل چت‌بات نشان می‌دهد الگوی غالب در گفت‌وگوها نیاز به مداخله هدفمند در همین حوزه است.';
-
-    const intakeConversationSummary = isNewIntake
-      ? intakeConversationSummaries[
-          (firstName.charCodeAt(0) + lastName.charCodeAt(0) + i) %
-            intakeConversationSummaries.length
-        ]
-      : undefined;
-    const intakeChatHighlights = isNewIntake
-      ? intakeHighlightPools[
-          (lastName.charCodeAt(0) + i * 7) % intakeHighlightPools.length
-        ]
-      : undefined;
 
     patients.push({
       id: String(i + 1),
@@ -568,12 +540,17 @@ export function generatePatients(
         : generateMoodData(rng),
       aiInsights: patientInsights,
       chatbotSummary: {
-        mainTopic: rng.element(chatbotTopics),
+        mainTopic: isNewIntake ? 'روابط' : rng.element(chatbotTopics),
         confidence: isNewIntake ? rng.int(55, 78) : rng.int(62, 95),
         notes: intakeNotes,
       },
       ...(isNewIntake
-        ? { intakeConversationSummary, intakeChatHighlights }
+        ? {
+            intakeConversationSummary: PRE_CONSULT_SAMPLE_SUMMARY,
+            intakeChatHighlights: PRE_CONSULT_SAMPLE_HIGHLIGHTS,
+            intakeChatMessages: PRE_CONSULT_SAMPLE_CHAT,
+            preConsultSubject: PRE_CONSULT_SAMPLE_SUBJECT,
+          }
         : {}),
       assessments: {
         neo: {
@@ -590,5 +567,6 @@ export function generatePatients(
     });
   }
 
-  return patients;
+  const withoutDemo = patients.filter((p) => p.id !== DEMO_PRE_CONSULT_PATIENT_ID);
+  return [buildDemoPreConsultPatient(), ...withoutDemo];
 }

@@ -1,0 +1,131 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.intro {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.introTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--foreground);
+}
+
+.introText {
+  margin: 0;
+  color: var(--muted-foreground);
+  line-height: 1.7;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.08);
+}
+
+.cardIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.08));
+  color: var(--primary);
+}
+
+.cardTitle {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.cardSubtitle {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.cardMeta {
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+.startButton {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.65rem;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(to left, var(--primary), #7c3aed);
+  color: white;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.startButton:hover {
+  opacity: 0.92;
+}
+
+.recentSection {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.recentTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.recentList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.65rem;
+  background: rgba(139, 92, 246, 0.04);
+  font-size: 0.9rem;
+}
+
+.recentEmpty {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}

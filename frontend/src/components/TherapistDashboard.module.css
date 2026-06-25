@@ -85,6 +85,12 @@
   box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.25);
 }
 
+.navButtonActiveTests {
+  background: linear-gradient(to left, #db2777, #ec4899);
+  color: white;
+  box-shadow: 0 10px 15px -3px rgba(219, 39, 119, 0.25);
+}
+
 .navButtonInactive {
   background-color: white;
   border: 1px solid var(--border);

@@ -49,6 +49,15 @@ export interface PatientDetail {
   };
   intakeConversationSummary?: string;
   intakeChatHighlights?: string[];
+  /** گفت‌وگوی کامل پیش‌مشاوره برای نمایش به درمانگر */
+  intakeChatMessages?: Array<{
+    role: 'user' | 'assistant';
+    content: string;
+    time?: string;
+  }>;
+  preConsultSubject?: string;
+  /** شناسهٔ session در PostgreSQL — برای بارگذاری زنده از API */
+  preConsultSessionId?: number;
   assessments: {
     neo: {
       neuroticism: number;

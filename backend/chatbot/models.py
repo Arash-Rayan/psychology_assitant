@@ -4,6 +4,8 @@ from django.db import models
 class ChatSession(models.Model):
     user_name = models.CharField(max_length=100)
     initial_mood = models.CharField(max_length=50, blank=True, null=True)
+    consultation_subject = models.CharField(max_length=20, blank=True, null=True)
+    pre_consult_completed_at = models.DateTimeField(blank=True, null=True)
     started_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(blank=True, null=True)
     total_tokens = models.IntegerField(default=0)

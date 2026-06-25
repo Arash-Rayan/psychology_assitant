@@ -20,9 +20,10 @@ import { FormBuilderDialog } from './FormBuilderDialog';
 import { SessionNotesView } from './SessionNotesView';
 import { ClinicManagementView } from './ClinicManagementView';
 import { BrandAmbassadorsView } from './BrandAmbassadorsView';
+import { TestsView } from './TestsView';
 import styles from './TherapistDashboard.module.css';
 
-type DashboardTab = 'patients' | 'forms' | 'clinic-management' | 'brand-ambassadors';
+type DashboardTab = 'patients' | 'forms' | 'clinic-management' | 'brand-ambassadors' | 'tests';
 
 interface TherapistDashboardProps {
   initialTab?: DashboardTab;
@@ -211,6 +212,8 @@ export function TherapistDashboard({
                   ? 'تحلیل جامع و پیشرفته بیماران'
                   : activeTab === 'forms'
                   ? 'مدیریت فرم‌ها و ارزیابی‌ها'
+                  : activeTab === 'tests'
+                  ? 'آزمون‌های روان‌شناختی — افسردگی بک و نئو'
                   : activeTab === 'brand-ambassadors'
                   ? 'مدیریت سفیران برند، پورسانت و رتبه‌بندی عملکرد'
                   : 'زمان‌بندی جلسات و پایش نتایج چت‌بات و آزمون‌ها'}
@@ -250,6 +253,16 @@ export function TherapistDashboard({
                 <Megaphone />
                 <span>سفیران برند</span>
               </button>
+
+              <button
+                onClick={() => router.push('/dashboard/tests')}
+                className={`${styles.navButton} ${
+                  activeTab === 'tests' ? styles.navButtonActiveTests : styles.navButtonInactive
+                }`}
+              >
+                <ClipboardList />
+                <span>تست‌ها</span>
+              </button>
               
               <button
                 onClick={() => router.push('/dashboard')}
@@ -287,6 +300,7 @@ export function TherapistDashboard({
                 <TabsTrigger value="forms">فرم‌های درمانگر</TabsTrigger>
                 <TabsTrigger value="clinic-management">مدیریت کلینیک</TabsTrigger>
                 <TabsTrigger value="brand-ambassadors">سفیران برند</TabsTrigger>
+                <TabsTrigger value="tests">تست‌ها</TabsTrigger>
               </TabsList>
             </div>
 
@@ -615,6 +629,10 @@ export function TherapistDashboard({
 
             <TabsContent value="brand-ambassadors" className={styles.tabsContent}>
               <BrandAmbassadorsView />
+            </TabsContent>
+
+            <TabsContent value="tests" className={styles.tabsContent}>
+              <TestsView />
             </TabsContent>
           </Tabs>
         </motion.div>

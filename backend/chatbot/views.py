@@ -6,9 +6,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from .prompts.interview import prompt as model_instruct
-from .prompts.pre_consult import prompt as pre_consult_instruct
+from .prompts.pre_consult import (
+    PRE_CONSULT_QUESTION_LIMIT,
+    build_pre_consult_system_prompt,
+)
 from .models import ChatSession, ChatMessage
 
 from langchain_openai import ChatOpenAI
@@ -46,14 +50,31 @@ prompt = ChatPromptTemplate.from_messages(
 
 chain = prompt | llm
 
-prompt_pre_consult = ChatPromptTemplate.from_messages(
-    [
-        ("system", pre_consult_instruct),
-        MessagesPlaceholder("chat_history"),
-        ("human", "{input}"),
-    ]
-)
-chain_pre_consult = prompt_pre_consult | llm
+def _count_assistant_messages(session_id: int) -> int:
+    return ChatMessage.objects.filter(
+        session_id=session_id,
+        role=ChatMessage.ROLE_ASSISTANT,
+    ).count()
+
+
+def _pre_consult_phase_meta(assistant_count: int) -> dict:
+    return {
+        "questions_asked": assistant_count,
+        "question_limit": PRE_CONSULT_QUESTION_LIMIT,
+        "phase": "handoff" if assistant_count >= PRE_CONSULT_QUESTION_LIMIT else "questions",
+    }
+
+
+def _build_pre_consult_chain(assistant_count: int):
+    system_prompt = build_pre_consult_system_prompt(assistant_count)
+    prompt_template = ChatPromptTemplate.from_messages(
+        [
+            ("system", system_prompt),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}"),
+        ]
+    )
+    return prompt_template | llm
 
 
 def _offline_token_count(text: str) -> int:
@@ -95,7 +116,13 @@ def _persist_assistant_message(session: ChatSession, full_reply: str) -> None:
         session.save(update_fields=["total_tokens"])
 
 
-def _chat_stream_response(request: HttpRequest, llm_chain, user_name_prefix: str = "") -> JsonResponse | StreamingHttpResponse:
+def _chat_stream_response(
+    request: HttpRequest,
+    llm_chain=None,
+    user_name_prefix: str = "",
+    *,
+    is_pre_consult: bool = False,
+) -> JsonResponse | StreamingHttpResponse:
     """
     Shared POST handler: validate body, attach session, stream assistant tokens.
     user_name_prefix keeps pre-consult sessions separate from the main /chat flow.
@@ -152,6 +179,11 @@ def _chat_stream_response(request: HttpRequest, llm_chain, user_name_prefix: str
         session = ChatSession.objects.create(
             user_name=user_name,
             initial_mood = initial_mood if isinstance(initial_mood, str) else None,
+            consultation_subject=(
+                consultation_subject
+                if isinstance(consultation_subject, str) and consultation_subject in subject_labels
+                else None
+            ),
             total_tokens=0,
         )
     else:
@@ -164,9 +196,29 @@ def _chat_stream_response(request: HttpRequest, llm_chain, user_name_prefix: str
             )
 
     chat_history = _build_langchain_history(session.id)
-    print('/'*50)
-    print(chat_history)
-    print('/'*50)
+
+    assistant_count = _count_assistant_messages(session.id)
+    phase_meta = _pre_consult_phase_meta(assistant_count) if is_pre_consult else None
+
+    if is_pre_consult:
+        update_fields: list[str] = []
+        if (
+            isinstance(consultation_subject, str)
+            and consultation_subject in subject_labels
+            and session.consultation_subject != consultation_subject
+        ):
+            session.consultation_subject = consultation_subject
+            update_fields.append("consultation_subject")
+        if assistant_count >= PRE_CONSULT_QUESTION_LIMIT and session.pre_consult_completed_at is None:
+            session.pre_consult_completed_at = timezone.now()
+            update_fields.append("pre_consult_completed_at")
+        if update_fields:
+            session.save(update_fields=update_fields)
+
+        llm_chain = _build_pre_consult_chain(assistant_count)
+    elif llm_chain is None:
+        resp = JsonResponse({"error": "LLM chain is not configured"}, status=500)
+        return _add_cors_headers(resp)
 
     user_token_count = _offline_token_count(message)
     user_seq = _next_seq(session.id)
@@ -203,6 +255,10 @@ def _chat_stream_response(request: HttpRequest, llm_chain, user_name_prefix: str
     resp["Cache-Control"] = "no-cache"
     resp["X-Accel-Buffering"] = "no"
     resp["X-Session-Id"] = str(session.id)
+    if phase_meta is not None:
+        resp["X-Pre-Consult-Phase"] = phase_meta["phase"]
+        resp["X-Pre-Consult-Questions-Asked"] = str(phase_meta["questions_asked"])
+        resp["X-Pre-Consult-Question-Limit"] = str(phase_meta["question_limit"])
     return _add_cors_headers(resp)
 
 
@@ -248,6 +304,7 @@ def _chat_history_response(request: HttpRequest, user_name_prefix: str = "") -> 
             return _add_cors_headers(resp)
 
     messages = ChatMessage.objects.filter(session_id=session.id).order_by("seq")
+    assistant_count = _count_assistant_messages(session.id)
     payload = {
         "session_id": session.id,
         "messages": [
@@ -259,6 +316,14 @@ def _chat_history_response(request: HttpRequest, user_name_prefix: str = "") -> 
             for msg in messages
         ],
     }
+    if user_name_prefix == "pre_consult:":
+        payload["pre_consult"] = _pre_consult_phase_meta(assistant_count)
+        payload["pre_consult"]["consultation_subject"] = session.consultation_subject
+        payload["pre_consult"]["completed_at"] = (
+            session.pre_consult_completed_at.isoformat()
+            if session.pre_consult_completed_at
+            else None
+        )
     resp = JsonResponse(payload)
     return _add_cors_headers(resp)
 
@@ -275,10 +340,51 @@ def pre_consult_chat(request: HttpRequest):
     POST /chat/pre-consult — پیش‌مشاوره (before first clinical visit).
     Same contract as /chat; separate session namespace via user_name prefix.
     """
-    return _chat_stream_response(request, chain_pre_consult, user_name_prefix="pre_consult:")
+    return _chat_stream_response(request, user_name_prefix="pre_consult:", is_pre_consult=True)
 
 
 @csrf_exempt
 def pre_consult_chat_history(request: HttpRequest):
     """GET /chat/pre-consult/history — pre-consult session history."""
     return _chat_history_response(request, user_name_prefix="pre_consult:")
+
+
+@csrf_exempt
+def pre_consult_session_detail(request: HttpRequest, session_id: int):
+    """GET /chat/pre-consult/session/<id> — full transcript for doctor dashboard."""
+    if request.method == "OPTIONS":
+        resp = JsonResponse({}, status=200)
+        return _add_cors_headers(resp)
+
+    if request.method != "GET":
+        resp = JsonResponse({"error": "Only GET is allowed"}, status=405)
+        return _add_cors_headers(resp)
+
+    session = get_object_or_404(ChatSession, id=session_id)
+    if not session.user_name.startswith("pre_consult:"):
+        resp = JsonResponse({"error": "Not a pre-consult session"}, status=404)
+        return _add_cors_headers(resp)
+
+    messages = ChatMessage.objects.filter(session_id=session.id).order_by("seq")
+    assistant_count = _count_assistant_messages(session.id)
+    payload = {
+        "session_id": session.id,
+        "consultation_subject": session.consultation_subject,
+        "started_at": session.started_at.isoformat(),
+        "completed_at": (
+            session.pre_consult_completed_at.isoformat()
+            if session.pre_consult_completed_at
+            else None
+        ),
+        "pre_consult": _pre_consult_phase_meta(assistant_count),
+        "messages": [
+            {
+                "role": msg.role,
+                "content": msg.content,
+                "created_at": msg.created_at.isoformat(),
+            }
+            for msg in messages
+        ],
+    }
+    resp = JsonResponse(payload)
+    return _add_cors_headers(resp)

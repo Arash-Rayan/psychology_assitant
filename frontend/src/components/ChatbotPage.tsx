@@ -53,9 +53,16 @@ interface HistoryMessage {
   created_at: string;
 }
 
+interface PreConsultProgress {
+  questions_asked: number;
+  question_limit: number;
+  phase: 'questions' | 'handoff';
+}
+
 interface ChatHistoryResponse {
   session_id: number | null;
   messages: HistoryMessage[];
+  pre_consult?: PreConsultProgress;
 }
 
 function resolveChatEndpoint(variant: ChatbotVariant): string {
@@ -82,7 +89,7 @@ function createWelcomeMessages(variant: ChatbotVariant): Message[] {
       {
         id: '1',
         text:
-          'سلام، به بخش **پیش‌مشاوره** خوش آمدید.\n\nاین بخش برای کسانی است که هنوز ویزیت با درمانگر نداشته‌اند. لطفاً ابتدا موضوع پیش‌مشاوره خود را انتخاب کنید:',
+          'سلام، به بخش **پیش‌مشاوره** خوش آمدید.\n\nاین بخش برای کسانی است که هنوز ویزیت با درمانگر نداشته‌اند. ابتدا موضوع را انتخاب کنید؛ سپس **۱۰ سوال** کوتاه و مفید می‌پرسیم تا برای ویزیت آماده شوید. در پایان می‌توانید هر نکتهٔ دیگری را برای دکتر بنویسید.',
         sender: 'bot',
         emotion: 'positive',
         timestamp: new Date(),
@@ -138,6 +145,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
   const [moodSelected, setMoodSelected] = useState(false);
   const [subjectSelected, setSubjectSelected] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<PreConsultSubject | null>(null);
+  const [preConsultProgress, setPreConsultProgress] = useState<PreConsultProgress | null>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
   const isTypingRef = useRef(isTyping);
   isTypingRef.current = isTyping;
@@ -167,6 +175,19 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
 
   const inputDisabled = variant === 'pre_consult' && !subjectSelected;
 
+  const preConsultSubtitle = useMemo(() => {
+    if (variant !== 'pre_consult' || !subjectSelected) {
+      return 'قبل از ویزیت — راهنما و سوالات اولیه';
+    }
+    if (preConsultProgress?.phase === 'handoff') {
+      return 'هر نکتهٔ دیگری برای دکتر — همینجا بنویسید';
+    }
+    if (preConsultProgress) {
+      return `${preConsultProgress.questions_asked} از ${preConsultProgress.question_limit} سوال`;
+    }
+    return '۱۰ سوال کوتاه، سپس یادداشت برای دکتر';
+  }, [variant, subjectSelected, preConsultProgress]);
+
   useLayoutEffect(() => {
     scrollToBottom(false);
   }, [messages, isTyping, scrollToBottom]);
@@ -181,6 +202,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       setMoodSelected(false);
       setSubjectSelected(false);
       setSelectedSubject(null);
+      setPreConsultProgress(null);
       setSessionId(null);
       setIsTyping(false);
 
@@ -204,6 +226,9 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
           setMessages(mapHistoryToMessages(data.messages));
           if (variant === 'pre_consult') {
             setSubjectSelected(true);
+            if (data.pre_consult) {
+              setPreConsultProgress(data.pre_consult);
+            }
           }
           if (variant === 'assistant') {
             setMoodSelected(true);
@@ -309,8 +334,9 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       } else if (sessionId != null) {
         payload.session_id = sessionId;
       }
-      if (options?.consultationSubject) {
-        payload.consultation_subject = options.consultationSubject;
+      const subjectForRequest = options?.consultationSubject ?? selectedSubject;
+      if (variant === 'pre_consult' && subjectForRequest) {
+        payload.consultation_subject = subjectForRequest;
       }
 
       const res = await fetch(chatEndpoint, {
@@ -329,6 +355,21 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
         if (!Number.isNaN(sid)) {
           setSessionId(sid);
           localStorage.setItem(sessionStorageKey, String(sid));
+        }
+      }
+
+      if (variant === 'pre_consult') {
+        const askedHeader = res.headers.get('X-Pre-Consult-Questions-Asked');
+        const limitHeader = res.headers.get('X-Pre-Consult-Question-Limit');
+        const phaseHeader = res.headers.get('X-Pre-Consult-Phase');
+        if (askedHeader != null && limitHeader != null) {
+          const questionLimit = Number.parseInt(limitHeader, 10);
+          const askedBefore = Number.parseInt(askedHeader, 10);
+          setPreConsultProgress({
+            questions_asked: Math.min(askedBefore + 1, questionLimit),
+            question_limit: questionLimit,
+            phase: phaseHeader === 'handoff' ? 'handoff' : 'questions',
+          });
         }
       }
 
@@ -374,7 +415,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       setMessages((prev) => [...prev, errorMessage]);
       setIsTyping(false);
     }
-  }, [chatEndpoint, sessionId, sessionStorageKey]);
+  }, [chatEndpoint, sessionId, sessionStorageKey, variant, selectedSubject]);
 
   const handleSubjectSelect = async (subject: (typeof PRE_CONSULT_SUBJECTS)[number]) => {
     if (subjectSelected || variant !== 'pre_consult' || isTyping) return;
@@ -396,7 +437,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
     );
 
     await streamChatReply(
-      `کاربر موضوع «${subject.label}» را انتخاب کرد (${subject.description}). لطفاً کوتاه خوش‌آمد بگو و یک سوال متمرکز دربارهٔ همین موضوع بپرس.`,
+      `کاربر موضوع «${subject.label}» را انتخاب کرد (${subject.description}). این جلسه ۱۰ سوال پیش‌مشاوره دارد. سوال اول را بپرس: کوتاه خوش‌آمد + یک سوال مفید و تعاملی.`,
       { newSession: true, consultationSubject: subject.id },
     );
   };
@@ -449,7 +490,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
                 <h2>{variant === 'pre_consult' ? 'پیش‌مشاوره' : 'روانصد'}</h2>
                 <p>
                   {variant === 'pre_consult'
-                    ? 'قبل از ویزیت — راهنما و سوالات اولیه'
+                    ? preConsultSubtitle
                     : 'دستیار هوشمند سلامت روان'}
                 </p>
               </div>
