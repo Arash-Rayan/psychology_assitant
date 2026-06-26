@@ -6,6 +6,7 @@ import { X, Sparkles, Phone, FileText, MessagesSquare } from "lucide-react";
 import type { PatientDetail } from "./PatientDetailView";
 import { PreConsultChatTranscript } from "./PreConsultChatTranscript";
 import type { PreConsultChatMessage } from "@/constants/demoPreConsultCouplesChat";
+import { filterUserVisiblePreConsultMessages } from "@/utils/preConsultMessages";
 import detailStyles from "./PatientDetailView.module.css";
 import styles from "./NewIntakePatientView.module.css";
 
@@ -44,7 +45,7 @@ export function NewIntakePatientView({
           messages: Array<{ role: string; content: string; created_at: string }>;
         };
         if (cancelled) return;
-        const mapped: PreConsultChatMessage[] = data.messages
+        const mapped: PreConsultChatMessage[] = filterUserVisiblePreConsultMessages(data.messages)
           .filter((m) => m.role === "user" || m.role === "assistant")
           .map((m) => ({
             role: m.role as "user" | "assistant",

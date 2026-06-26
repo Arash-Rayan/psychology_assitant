@@ -4,6 +4,7 @@ import {
   User,
   BookOpen,
   Headphones,
+  Film,
   CheckSquare,
   Square,
   Zap,
@@ -16,7 +17,6 @@ import {
   Phone,
   Calendar,
   MessageCircle,
-  ClipboardCheck,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
@@ -45,6 +45,14 @@ interface Podcast {
   duration: string;
 }
 
+interface Film {
+  title: string;
+  director: string;
+  topic: string;
+  duration: string;
+  description: string;
+}
+
 interface SessionStat {
   label: string;
   value: string;
@@ -58,15 +66,6 @@ interface TherapistMessage {
   date: string;
   sessionLabel?: string;
   read: boolean;
-}
-
-interface SessionFeedback {
-  id: string;
-  sessionNumber: number;
-  date: string;
-  summary: string;
-  strengths: string[];
-  focusAreas: string[];
 }
 
 /* ─── Mock data — replace with API when ready ────────── */
@@ -99,6 +98,29 @@ const PROFILE = {
     { title: 'گفتگوی روان', host: 'تیم روانصد', topic: 'سلامت روان', duration: 'هر اپیزود ۴۰ دقیقه' },
     { title: 'مدیتیشن فارسی', host: 'استودیو آرام', topic: 'ذهن‌آگاهی', duration: 'هر اپیزود ۱۵ دقیقه' },
   ] as Podcast[],
+  films: [
+    {
+      title: 'یک روز عادی',
+      director: 'اصغر فرهادی',
+      topic: 'روابط خانوادگی',
+      duration: '۱ ساعت و ۳۵ دقیقه',
+      description: 'درام انسانی دربارهٔ فاصله، گفت‌وگو و بازسازی اعتماد در خانواده',
+    },
+    {
+      title: 'Inside Out',
+      director: 'پیت داکتر',
+      topic: 'هیجان‌ها',
+      duration: '۱ ساعت و ۳۵ دقیقه',
+      description: 'نگاهی ساده و عمیق به نقش احساسات در رشد و تصمیم‌گیری',
+    },
+    {
+      title: 'The Pursuit of Happyness',
+      director: 'گبریل میتسی',
+      topic: 'تاب‌آوری',
+      duration: '۱ ساعت و ۵۷ دقیقه',
+      description: 'داستان امید و پایداری در شرایط سخت — الهام‌بخش برای ادامهٔ مسیر درمان',
+    },
+  ] as Film[],
   therapistMessages: [
     {
       id: 'm1',
@@ -121,24 +143,6 @@ const PROFILE = {
       read: true,
     },
   ] as TherapistMessage[],
-  sessionFeedback: [
-    {
-      id: 'f1',
-      sessionNumber: 8,
-      date: '۱۴۰۳/۰۴/۰۱',
-      summary: 'در این جلسه روی شناسایی افکار خودکار قبل از واکنش‌های هیجانی کار کردیم. مشارکت و صداقت شما در گفتگو محسوس بود.',
-      strengths: ['تمرکز روی احساسات لحظه‌ای', 'پذیرش بازخورد بدون دفاع'],
-      focusAreas: ['تمرین تنفس قبل از مواجهه با محرک‌ها', 'ثبت خلق روزانه'],
-    },
-    {
-      id: 'f2',
-      sessionNumber: 7,
-      date: '۱۴۰۳/۰۳/۲۵',
-      summary: 'بحث درباره الگوی اجتناب از تعارض و ارتباط آن با اضطراب. قدم کوچک اما مهم در گفتن «نه» در یک موقعیت واقعی برداشته شد.',
-      strengths: ['آمادگی برای امتحان رفتار جدید', 'گزارش دقیق اتفاقات هفته'],
-      focusAreas: ['تکرار تمرین مرزگذاری', 'مرور تکالیف قبلی'],
-    },
-  ] as SessionFeedback[],
 };
 
 const PRIORITY_COLORS: Record<Homework['priority'], string> = {
@@ -384,91 +388,42 @@ export function UserProfilePage() {
           </ul>
         </motion.div>
 
-        {/* ══ THERAPIST MESSAGES & FEEDBACK ══ */}
-        <div className={styles.therapistRow}>
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.26 }}
-            className={styles.card}
-          >
-            <div className={styles.cardHeader}>
-              <MessageCircle className={styles.cardHeaderIcon} />
-              <h3 className={styles.cardHeaderTitle}>پیام‌های درمانگر</h3>
-              {unreadMessages > 0 && (
-                <span className={styles.cardBadge}>{unreadMessages} جدید</span>
-              )}
-            </div>
-            <p className={styles.sectionIntro}>
-              پیام‌ها و یادآوری‌های {p.therapistName} بین جلسات
-            </p>
-            <ul className={styles.messageList}>
-              {p.therapistMessages.map((msg) => (
-                <li
-                  key={msg.id}
-                  className={`${styles.messageItem} ${!msg.read ? styles.messageItemUnread : ''}`}
-                >
-                  <div className={styles.messageTop}>
-                    <span className={styles.messageTherapist}>{p.therapistName}</span>
-                    <span className={styles.messageDate}>{msg.date}</span>
-                  </div>
-                  {msg.sessionLabel && (
-                    <span className={styles.messageTag}>{msg.sessionLabel}</span>
-                  )}
-                  <p className={styles.messageText}>{msg.text}</p>
-                  {!msg.read && <span className={styles.messageUnreadDot} aria-hidden />}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-            className={styles.card}
-          >
-            <div className={styles.cardHeader}>
-              <ClipboardCheck className={styles.cardHeaderIcon} />
-              <h3 className={styles.cardHeaderTitle}>بازخورد جلسات</h3>
-              <span className={styles.cardBadge}>{p.sessionFeedback.length} جلسه</span>
-            </div>
-            <p className={styles.sectionIntro}>
-              خلاصه پیشرفت و نکات کلیدی پس از هر جلسه درمان
-            </p>
-            <ul className={styles.feedbackList}>
-              {p.sessionFeedback.map((fb) => (
-                <li key={fb.id} className={styles.feedbackItem}>
-                  <div className={styles.feedbackHeader}>
-                    <span className={styles.feedbackSession}>جلسه {fb.sessionNumber.toLocaleString('fa-IR')}</span>
-                    <span className={styles.feedbackDate}>{fb.date}</span>
-                  </div>
-                  <p className={styles.feedbackSummary}>{fb.summary}</p>
-                  <div className={styles.feedbackGroups}>
-                    <div className={styles.feedbackGroup}>
-                      <p className={styles.feedbackGroupTitle}>نقاط قوت</p>
-                      <ul className={styles.feedbackBullets}>
-                        {fb.strengths.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className={styles.feedbackGroup}>
-                      <p className={`${styles.feedbackGroupTitle} ${styles.feedbackGroupTitleFocus}`}>
-                        تمرکز بعدی
-                      </p>
-                      <ul className={styles.feedbackBullets}>
-                        {fb.focusAreas.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        </div>
+        {/* ══ THERAPIST MESSAGES ══ */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.26 }}
+          className={styles.card}
+        >
+          <div className={styles.cardHeader}>
+            <MessageCircle className={styles.cardHeaderIcon} />
+            <h3 className={styles.cardHeaderTitle}>پیام‌های درمانگر</h3>
+            {unreadMessages > 0 && (
+              <span className={styles.cardBadge}>{unreadMessages} جدید</span>
+            )}
+          </div>
+          <p className={styles.sectionIntro}>
+            پیام‌ها و یادآوری‌های {p.therapistName} بین جلسات
+          </p>
+          <ul className={styles.messageList}>
+            {p.therapistMessages.map((msg) => (
+              <li
+                key={msg.id}
+                className={`${styles.messageItem} ${!msg.read ? styles.messageItemUnread : ''}`}
+              >
+                <div className={styles.messageTop}>
+                  <span className={styles.messageTherapist}>{p.therapistName}</span>
+                  <span className={styles.messageDate}>{msg.date}</span>
+                </div>
+                {msg.sessionLabel && (
+                  <span className={styles.messageTag}>{msg.sessionLabel}</span>
+                )}
+                <p className={styles.messageText}>{msg.text}</p>
+                {!msg.read && <span className={styles.messageUnreadDot} aria-hidden />}
+              </li>
+            ))}
+          </ul>
+        </motion.div>
 
         {/* ══ RESOURCES ROW ══ */}
         <div className={styles.resourcesRow}>
@@ -523,6 +478,37 @@ export function UserProfilePage() {
                     <div className={styles.podMeta}>
                       <span className={styles.podTopic}>{pod.topic}</span>
                       <span className={styles.podDuration}>{pod.duration}</span>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Films */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.36 }}
+            className={styles.card}
+          >
+            <div className={styles.cardHeader}>
+              <Film className={styles.cardHeaderIcon} />
+              <h3 className={styles.cardHeaderTitle}>فیلم‌های پیشنهادی</h3>
+            </div>
+            <ul className={styles.filmList}>
+              {p.films.map((film, i) => (
+                <li key={i} className={styles.filmItem}>
+                  <div className={styles.filmCover}>
+                    <Film className={styles.filmCoverIcon} />
+                  </div>
+                  <div className={styles.filmInfo}>
+                    <p className={styles.filmTitle}>{film.title}</p>
+                    <p className={styles.filmDirector}>{film.director}</p>
+                    <p className={styles.filmDesc}>{film.description}</p>
+                    <div className={styles.filmMeta}>
+                      <span className={styles.filmTopic}>{film.topic}</span>
+                      <span className={styles.filmDuration}>{film.duration}</span>
                     </div>
                   </div>
                 </li>

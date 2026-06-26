@@ -77,3 +77,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Session note voice uploads (Soniox STT) — up to ~25 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 26_214_400
+FILE_UPLOAD_MAX_MEMORY_SIZE = 26_214_400
+

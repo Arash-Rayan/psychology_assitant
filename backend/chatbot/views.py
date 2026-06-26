@@ -11,9 +11,13 @@ from django.utils import timezone
 from .prompts.interview import prompt as model_instruct
 from .prompts.pre_consult import (
     PRE_CONSULT_QUESTION_LIMIT,
+    build_pre_consult_bootstrap_input,
     build_pre_consult_system_prompt,
+    is_pre_consult_bootstrap_user_message,
+    PRE_CONSULT_SUBJECT_LABELS,
 )
 from .models import ChatSession, ChatMessage
+from .soniox_stt import ALLOWED_CONTENT_TYPES, SonioxSTTError, transcribe_audio_bytes
 
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -25,6 +29,10 @@ def _add_cors_headers(response: JsonResponse | StreamingHttpResponse) -> JsonRes
     response["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response["Access-Control-Allow-Headers"] = "Content-Type"
     return response
+
+
+def _json_cors(payload: dict, status: int = 200) -> JsonResponse:
+    return _add_cors_headers(JsonResponse(payload, status=status))
 
 
 # set up LangChain components once (non-streaming and streaming use the same chain)
@@ -143,17 +151,27 @@ def _chat_stream_response(
         return _add_cors_headers(resp)
 
     message = data.get("message")
-    if not isinstance(message, str) or not message.strip():
+    bootstrap_first_question = bool(data.get("bootstrap_first_question"))
+    consultation_subject = data.get("consultation_subject")
+
+    if bootstrap_first_question and is_pre_consult:
+        if not isinstance(consultation_subject, str) or consultation_subject not in PRE_CONSULT_SUBJECT_LABELS:
+            resp = JsonResponse(
+                {"error": "Field 'consultation_subject' is required for bootstrap_first_question"},
+                status=400,
+            )
+            return _add_cors_headers(resp)
+        message = build_pre_consult_bootstrap_input(consultation_subject)
+    elif not isinstance(message, str) or not message.strip():
         resp = JsonResponse({"error": "Field 'message' is required"}, status=400)
         return _add_cors_headers(resp)
 
-    consultation_subject = data.get("consultation_subject")
-    subject_labels = {
-        "couples": "زوجین",
-        "individual": "فردی",
-        "pre_marriage": "پیش از ازدواج",
-    }
-    if isinstance(consultation_subject, str) and consultation_subject in subject_labels:
+    subject_labels = PRE_CONSULT_SUBJECT_LABELS
+    if (
+        isinstance(consultation_subject, str)
+        and consultation_subject in subject_labels
+        and not bootstrap_first_question
+    ):
         label = subject_labels[consultation_subject]
         message = f"[موضوع پیش‌مشاوره: {label}]\n\n{message.strip()}"
 
@@ -221,16 +239,17 @@ def _chat_stream_response(
         return _add_cors_headers(resp)
 
     user_token_count = _offline_token_count(message)
-    user_seq = _next_seq(session.id)
-    ChatMessage.objects.create(
-        session=session,
-        seq=user_seq,
-        role=ChatMessage.ROLE_USER,
-        content=message,
-        token_count=user_token_count,
-    )
-    session.total_tokens += user_token_count
-    session.save(update_fields=["total_tokens"])
+    if not bootstrap_first_question:
+        user_seq = _next_seq(session.id)
+        ChatMessage.objects.create(
+            session=session,
+            seq=user_seq,
+            role=ChatMessage.ROLE_USER,
+            content=message,
+            token_count=user_token_count,
+        )
+        session.total_tokens += user_token_count
+        session.save(update_fields=["total_tokens"])
 
     # Use a synchronous iterator for StreamingHttpResponse under runserver/WSGI.
     # Async iterators get consumed synchronously and can buffer whole responses.
@@ -305,6 +324,15 @@ def _chat_history_response(request: HttpRequest, user_name_prefix: str = "") -> 
 
     messages = ChatMessage.objects.filter(session_id=session.id).order_by("seq")
     assistant_count = _count_assistant_messages(session.id)
+    if user_name_prefix == "pre_consult:":
+        messages = [
+            msg
+            for msg in messages
+            if not (
+                msg.role == ChatMessage.ROLE_USER
+                and is_pre_consult_bootstrap_user_message(msg.content)
+            )
+        ]
     payload = {
         "session_id": session.id,
         "messages": [
@@ -367,6 +395,14 @@ def pre_consult_session_detail(request: HttpRequest, session_id: int):
 
     messages = ChatMessage.objects.filter(session_id=session.id).order_by("seq")
     assistant_count = _count_assistant_messages(session.id)
+    visible_messages = [
+        msg
+        for msg in messages
+        if not (
+            msg.role == ChatMessage.ROLE_USER
+            and is_pre_consult_bootstrap_user_message(msg.content)
+        )
+    ]
     payload = {
         "session_id": session.id,
         "consultation_subject": session.consultation_subject,
@@ -383,8 +419,48 @@ def pre_consult_session_detail(request: HttpRequest, session_id: int):
                 "content": msg.content,
                 "created_at": msg.created_at.isoformat(),
             }
-            for msg in messages
+            for msg in visible_messages
         ],
     }
     resp = JsonResponse(payload)
     return _add_cors_headers(resp)
+
+
+@csrf_exempt
+def stt_transcribe(request: HttpRequest):
+    """
+    POST /stt/transcribe — upload audio; returns Persian transcript via Soniox.
+
+    Multipart field: ``audio`` (webm, mp3, wav, m4a, …)
+    Optional form field: ``language`` (default ``fa``)
+    """
+    if request.method == "OPTIONS":
+        return _json_cors({})
+
+    if request.method != "POST":
+        return _json_cors({"error": "Only POST is allowed"}, status=405)
+
+    upload = request.FILES.get("audio")
+    if upload is None:
+        return _json_cors({"error": "Missing multipart field 'audio'"}, status=400)
+
+    content_type = (upload.content_type or "").split(";")[0].strip().lower()
+    if content_type and content_type not in ALLOWED_CONTENT_TYPES:
+        return _json_cors(
+            {"error": f"Unsupported audio type: {content_type or 'unknown'}"},
+            status=400,
+        )
+
+    language = (request.POST.get("language") or "fa").strip() or "fa"
+    audio_bytes = upload.read()
+
+    try:
+        result = transcribe_audio_bytes(
+            audio_bytes,
+            filename=upload.name or "recording.webm",
+            language=language,
+        )
+    except SonioxSTTError as exc:
+        return _json_cors({"error": str(exc)}, status=502)
+
+    return _json_cors(result)

@@ -508,6 +508,76 @@
   line-height: 1.4;
 }
 
+.subjectBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(139, 92, 246, 0.12);
+  flex-wrap: wrap;
+}
+
+.subjectBarLabel {
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+
+.subjectChangeButton {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  background: white;
+  color: var(--primary);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.subjectChangeButton:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.06);
+}
+
+.subjectChangeButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.headerSubjectPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.headerSubjectOption {
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: white;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.headerSubjectOption:hover:not(:disabled) {
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(139, 92, 246, 0.04);
+}
+
+.headerSubjectOptionActive {
+  border-color: var(--primary);
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.headerSubjectOption:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .messageMeta {
   display: flex;
   align-items: center;

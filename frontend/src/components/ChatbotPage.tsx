@@ -5,6 +5,13 @@ import { Logo } from './Logo';
 import ReactMarkdown from 'react-markdown';
 import { ChatComposer } from './ChatComposer';
 import styles from './ChatbotPage.module.css';
+import {
+  filterUserVisiblePreConsultMessages,
+  parsePreConsultSubject,
+  type PreConsultSubject,
+} from '@/utils/preConsultMessages';
+
+export type { PreConsultSubject } from '@/utils/preConsultMessages';
 
 export type ChatbotVariant = 'assistant' | 'pre_consult';
 
@@ -19,8 +26,6 @@ interface Message {
 }
 
 type MoodType = 'very_sad' | 'sad' | 'normal' | 'good' | 'amazing';
-
-export type PreConsultSubject = 'couples' | 'individual' | 'pre_marriage';
 
 const PRE_CONSULT_SUBJECTS: {
   id: PreConsultSubject;
@@ -57,6 +62,7 @@ interface PreConsultProgress {
   questions_asked: number;
   question_limit: number;
   phase: 'questions' | 'handoff';
+  consultation_subject?: PreConsultSubject | null;
 }
 
 interface ChatHistoryResponse {
@@ -89,7 +95,7 @@ function createWelcomeMessages(variant: ChatbotVariant): Message[] {
       {
         id: '1',
         text:
-          'سلام، به بخش **پیش‌مشاوره** خوش آمدید.\n\nاین بخش برای کسانی است که هنوز ویزیت با درمانگر نداشته‌اند. ابتدا موضوع را انتخاب کنید؛ سپس **۱۰ سوال** کوتاه و مفید می‌پرسیم تا برای ویزیت آماده شوید. در پایان می‌توانید هر نکتهٔ دیگری را برای دکتر بنویسید.',
+          'سلام، به بخش **پیش‌مشاوره** خوش آمدید.\n\nاین بخش برای کسانی است که هنوز ویزیت با درمانگر نداشته‌اند. ابتدا موضوع را انتخاب کنید؛ سپس **۱۰ سوال** کوتاه و مفید می‌پرسیم تا برای ویزیت آماده شوید. در پایان می‌توانید هر نکتهٔ دیگری را برای درمانگر بنویسید.',
         sender: 'bot',
         emotion: 'positive',
         timestamp: new Date(),
@@ -145,10 +151,16 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
   const [moodSelected, setMoodSelected] = useState(false);
   const [subjectSelected, setSubjectSelected] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<PreConsultSubject | null>(null);
+  const [showSubjectPicker, setShowSubjectPicker] = useState(false);
   const [preConsultProgress, setPreConsultProgress] = useState<PreConsultProgress | null>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
   const isTypingRef = useRef(isTyping);
   isTypingRef.current = isTyping;
+
+  const selectedSubjectMeta = useMemo(
+    () => PRE_CONSULT_SUBJECTS.find((s) => s.id === selectedSubject) ?? null,
+    [selectedSubject],
+  );
 
   const emotionIcons = {
     positive: Smile,
@@ -180,12 +192,12 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       return 'قبل از ویزیت — راهنما و سوالات اولیه';
     }
     if (preConsultProgress?.phase === 'handoff') {
-      return 'هر نکتهٔ دیگری برای دکتر — همینجا بنویسید';
+      return 'هر نکتهٔ دیگری برای درمانگر — همینجا بنویسید';
     }
     if (preConsultProgress) {
       return `${preConsultProgress.questions_asked} از ${preConsultProgress.question_limit} سوال`;
     }
-    return '۱۰ سوال کوتاه، سپس یادداشت برای دکتر';
+    return '۱۰ سوال کوتاه، سپس یادداشت برای درمانگر';
   }, [variant, subjectSelected, preConsultProgress]);
 
   useLayoutEffect(() => {
@@ -202,6 +214,7 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       setMoodSelected(false);
       setSubjectSelected(false);
       setSelectedSubject(null);
+      setShowSubjectPicker(false);
       setPreConsultProgress(null);
       setSessionId(null);
       setIsTyping(false);
@@ -220,12 +233,24 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
         const data = (await res.json()) as ChatHistoryResponse;
         if (cancelled) return;
 
-        if (data.messages.length > 0 && data.session_id != null) {
+        const rawMessages = data.messages ?? [];
+        const visibleMessages =
+          variant === 'pre_consult'
+            ? filterUserVisiblePreConsultMessages(rawMessages)
+            : rawMessages;
+
+        if (visibleMessages.length > 0 && data.session_id != null) {
           setSessionId(data.session_id);
           localStorage.setItem(sessionStorageKey, String(data.session_id));
-          setMessages(mapHistoryToMessages(data.messages));
+          setMessages(mapHistoryToMessages(visibleMessages));
           if (variant === 'pre_consult') {
-            setSubjectSelected(true);
+            const subjectFromApi = parsePreConsultSubject(data.pre_consult?.consultation_subject);
+            if (subjectFromApi) {
+              setSelectedSubject(subjectFromApi);
+              setSubjectSelected(true);
+            } else {
+              setSubjectSelected(visibleMessages.some((m) => m.role === 'user'));
+            }
             if (data.pre_consult) {
               setPreConsultProgress(data.pre_consult);
             }
@@ -321,12 +346,19 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
 
   const streamChatReply = useCallback(async (
     userText: string,
-    options?: { newSession?: boolean; consultationSubject?: PreConsultSubject },
+    options?: {
+      newSession?: boolean;
+      consultationSubject?: PreConsultSubject;
+      bootstrapFirstQuestion?: boolean;
+    },
   ) => {
     setIsTyping(true);
 
     try {
       const payload: Record<string, unknown> = { message: userText };
+      if (options?.bootstrapFirstQuestion) {
+        payload.bootstrap_first_question = true;
+      }
       if (options?.newSession) {
         payload.new_session = true;
         setSessionId(null);
@@ -417,11 +449,18 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
     }
   }, [chatEndpoint, sessionId, sessionStorageKey, variant, selectedSubject]);
 
-  const handleSubjectSelect = async (subject: (typeof PRE_CONSULT_SUBJECTS)[number]) => {
-    if (subjectSelected || variant !== 'pre_consult' || isTyping) return;
+  const handleSubjectSelect = async (
+    subject: (typeof PRE_CONSULT_SUBJECTS)[number],
+    options?: { isChange?: boolean },
+  ) => {
+    if (variant !== 'pre_consult' || isTyping) return;
+    const isChange = options?.isChange ?? false;
+    if (!isChange && subjectSelected) return;
 
+    setShowSubjectPicker(false);
     setSubjectSelected(true);
     setSelectedSubject(subject.id);
+    setPreConsultProgress(null);
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -430,16 +469,21 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
       timestamp: new Date(),
     };
 
-    setMessages((prev) =>
-      prev
-        .map((msg) => (msg.showSubjectOptions ? { ...msg, showSubjectOptions: false } : msg))
-        .concat(userMessage),
-    );
+    if (isChange) {
+      setMessages([userMessage]);
+    } else {
+      setMessages((prev) =>
+        prev
+          .map((msg) => (msg.showSubjectOptions ? { ...msg, showSubjectOptions: false } : msg))
+          .concat(userMessage),
+      );
+    }
 
-    await streamChatReply(
-      `کاربر موضوع «${subject.label}» را انتخاب کرد (${subject.description}). این جلسه ۱۰ سوال پیش‌مشاوره دارد. سوال اول را بپرس: کوتاه خوش‌آمد + یک سوال مفید و تعاملی.`,
-      { newSession: true, consultationSubject: subject.id },
-    );
+    await streamChatReply('', {
+      newSession: true,
+      consultationSubject: subject.id,
+      bootstrapFirstQuestion: true,
+    });
   };
 
   const handleSendMessage = useCallback(
@@ -501,6 +545,38 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
                 </div>
               </div>
             </div>
+            {variant === 'pre_consult' && subjectSelected && selectedSubjectMeta && (
+              <div className={styles.subjectBar}>
+                <span className={styles.subjectBarLabel}>
+                  موضوع: <strong>{selectedSubjectMeta.label}</strong>
+                </span>
+                <button
+                  type="button"
+                  className={styles.subjectChangeButton}
+                  onClick={() => setShowSubjectPicker((open) => !open)}
+                  disabled={isTyping}
+                >
+                  {showSubjectPicker ? 'بستن' : 'تغییر موضوع'}
+                </button>
+              </div>
+            )}
+            {variant === 'pre_consult' && showSubjectPicker && (
+              <div className={styles.headerSubjectPicker}>
+                {PRE_CONSULT_SUBJECTS.map((subject) => (
+                  <button
+                    key={subject.id}
+                    type="button"
+                    className={`${styles.headerSubjectOption} ${
+                      selectedSubject === subject.id ? styles.headerSubjectOptionActive : ''
+                    }`}
+                    onClick={() => void handleSubjectSelect(subject, { isChange: true })}
+                    disabled={isTyping || selectedSubject === subject.id}
+                  >
+                    {subject.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Messages Area */}

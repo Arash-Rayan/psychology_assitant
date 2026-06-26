@@ -7,6 +7,7 @@ from chatbot.views import (
     chat_history,
     pre_consult_chat_history,
     pre_consult_session_detail,
+    stt_transcribe,
 )
 
 urlpatterns = [
@@ -20,4 +21,5 @@ urlpatterns = [
     path("chat/pre-consult", pre_consult_chat, name="pre_consult_chat"),
     path("chat/history", chat_history, name="chat_history"),
     path("chat", chat, name="chat"),
+    path("stt/transcribe", stt_transcribe, name="stt_transcribe"),
 ]

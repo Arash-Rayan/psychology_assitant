@@ -26,7 +26,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collap
 import { cn } from './ui/utils';
 import { toast } from 'sonner';
 import { HomeworkPickerField } from './HomeworkPickerField';
-import { useSpeechRecognition, isSpeechRecognitionSupported } from '@/hooks/useSpeechRecognition';
+import { useSonioxRecording } from '@/hooks/useSonioxRecording';
 import { VOICE_FIELD_OPTIONS, type VoiceTargetField } from '@/types/sessionNote';
 
 interface FormItem {
@@ -473,28 +473,35 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
   }, [voiceTargetField]);
 
   const {
-    isListening,
-    isReconnecting,
-    segmentCount,
-    interimText,
-    sessionTranscript,
+    isRecording,
+    isTranscribing,
+    recordingSeconds,
+    lastTranscript,
     start: startSpeech,
     stop: stopSpeech,
     resetSession: resetSpeechSession,
-  } = useSpeechRecognition({
-    lang: 'fa-IR',
-    onFinal: appendTranscriptToField,
+    supported: speechSupported,
+  } = useSonioxRecording({
+    language: 'fa',
+    onTranscript: appendTranscriptToField,
     onError: (message) => toast.error(message),
   });
 
-  const speechSupported = isSpeechRecognitionSupported();
+  const isListening = isRecording || isTranscribing;
+
+  const formatRecordingTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
 
   const handleRecordToggle = () => {
-    if (isListening) {
+    if (isRecording) {
       stopSpeech();
-      toast.success('ضبط متوقف شد');
+      toast.success('در حال تبدیل گفتار به متن (Soniox)...');
       return;
     }
+    if (isTranscribing) return;
     startSpeech();
     toast.success('شروع ضبط صدا...');
   };
@@ -514,10 +521,12 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
   };
 
   const handleSave = () => {
-    if (isListening) {
+    if (isRecording) {
       stopSpeech();
     }
-    resetSpeechSession();
+    if (!isTranscribing) {
+      resetSpeechSession();
+    }
     toast.success('یادداشت جلسه با موفقیت ذخیره شد');
     handleBack();
   };
@@ -1056,9 +1065,13 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                 >
                   {!speechSupported && (
                     <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-right text-sm text-amber-900">
-                      تشخیص گفتار در این مرورگر پشتیبانی نمی‌شود. لطفاً از Chrome یا Edge استفاده کنید.
+                      ضبط صدا در این مرورگر پشتیبانی نمی‌شود. لطفاً از Chrome یا Edge استفاده کنید.
                     </div>
                   )}
+
+                  <div className="rounded-xl border border-slate-200/80 bg-slate-50 px-4 py-3 text-right text-xs leading-relaxed text-slate-600">
+                    تبدیل گفتار به متن با Soniox (فارسی). پس از توقف ضبط، فایل صوتی به سرور ارسال و متن به فیلد انتخاب‌شده اضافه می‌شود.
+                  </div>
 
                   <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-4 text-right sm:px-5">
                     <Label htmlFor="voice-target-field" className="mb-2 block text-sm font-medium text-slate-700">
@@ -1085,39 +1098,41 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
 
                   <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-primary/25 bg-gradient-to-b from-primary/[0.04] to-transparent py-10 px-5 sm:py-12 sm:px-6">
                     <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-all ${
-                      isListening
+                      isRecording
                         ? 'bg-[#eb5757] animate-pulse'
-                        : 'bg-primary'
+                        : isTranscribing
+                          ? 'bg-amber-500 animate-pulse'
+                          : 'bg-primary'
                     }`}>
                       <Mic className="w-10 h-10 text-white" />
                     </div>
 
                     <p className="text-lg text-foreground mb-2 text-center">
-                      {isReconnecting
-                        ? 'در حال اتصال مجدد...'
-                        : isListening
-                          ? 'در حال ضبط...'
+                      {isTranscribing
+                        ? 'در حال تبدیل به متن...'
+                        : isRecording
+                          ? `در حال ضبط... ${formatRecordingTime(recordingSeconds)}`
                           : 'آماده برای ضبط صدا'}
                     </p>
                     <p className="text-sm text-muted-foreground mb-6 text-center">
-                      {isReconnecting
-                        ? 'Chrome هر ~۱۰–۱۵ ثانیه ضبط را قطع و دوباره وصل می‌کند — چند لحظه صبر کنید'
-                        : isListening
-                          ? 'صدای شما به متن تبدیل می‌شود (تشخیص گفتار Chrome)'
+                      {isTranscribing
+                        ? 'فایل صوتی به Soniox ارسال شده — چند لحظه صبر کنید'
+                        : isRecording
+                          ? 'پس از پایان صحبت، دکمه توقف را بزنید'
                           : 'برای شروع ضبط، دکمه زیر را بزنید'}
                     </p>
 
                     <button
                       type="button"
                       onClick={handleRecordToggle}
-                      disabled={!speechSupported}
+                      disabled={!speechSupported || isTranscribing}
                       className={`flex items-center gap-2 px-8 py-3 rounded-xl transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
-                        isListening
+                        isRecording
                           ? 'bg-[#eb5757] hover:bg-[#d94848] text-white'
                           : 'bg-primary hover:bg-primary-hover text-primary-foreground'
                       }`}
                     >
-                      {isListening ? (
+                      {isRecording ? (
                         <>
                           <span className="w-3 h-3 rounded-sm bg-white"></span>
                           <span>توقف ضبط</span>
@@ -1131,24 +1146,18 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                     </button>
                   </div>
 
-                  {(isListening || sessionTranscript || interimText) && (
+                  {(isRecording || isTranscribing || lastTranscript) && (
                     <div className="space-y-3 rounded-xl border border-primary/20 bg-accent/30 p-4">
                       <p className="text-sm text-muted-foreground text-right">متن تبدیل‌شده:</p>
                       <p className="text-foreground text-right leading-relaxed whitespace-pre-wrap" dir="rtl">
-                        {sessionTranscript}
-                        {interimText ? (
-                          <span className="text-slate-500 italic">
-                            {sessionTranscript ? ' ' : ''}
-                            {interimText}
-                          </span>
-                        ) : null}
+                        {lastTranscript || (isTranscribing ? '...' : '')}
                       </p>
-                      {!sessionTranscript && !interimText && isListening && !isReconnecting && (
-                        <p className="text-sm text-slate-500 text-right">در حال گوش دادن...</p>
+                      {isRecording && !lastTranscript && (
+                        <p className="text-sm text-slate-500 text-right">در حال ضبط...</p>
                       )}
-                      {isListening && segmentCount > 1 && (
+                      {isTranscribing && (
                         <p className="text-xs text-slate-400 text-right">
-                          بخش ضبط: {segmentCount} (هر بخش حدود ۱۰–۱۵ ثانیه است)
+                          Soniox در حال پردازش فایل صوتی است
                         </p>
                       )}
                     </div>
