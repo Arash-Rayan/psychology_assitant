@@ -1,6 +1,6 @@
-﻿import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowRight,
   ChevronDown,
@@ -16,6 +16,8 @@ import {
   Play,
   Clock,
   Banknote,
+  Loader2,
+  FileAudio,
   Square,
 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
@@ -27,7 +29,9 @@ import { cn } from './ui/utils';
 import { toast } from 'sonner';
 import { HomeworkPickerField } from './HomeworkPickerField';
 import { useSonioxRecording } from '@/hooks/useSonioxRecording';
-import { VOICE_FIELD_OPTIONS, type VoiceTargetField } from '@/types/sessionNote';
+import { transcribeAudioWithSoniox } from '@/lib/sonioxStt';
+
+const AUDIO_UPLOAD_ACCEPT = 'audio/webm,audio/ogg,audio/mpeg,audio/mp3,audio/wav,audio/mp4,audio/x-m4a,video/webm,.webm,.ogg,.mp3,.wav,.m4a,.mp4';
 
 interface FormItem {
   id: string;
@@ -290,7 +294,10 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
   const [supplementInputOpen, setSupplementInputOpen] = useState(false);
   const [timerOpen, setTimerOpen] = useState(true);
   const [inputMethod, setInputMethod] = useState<'type' | 'voice' | 'image'>('type');
-  const [voiceTargetField, setVoiceTargetField] = useState<VoiceTargetField>('summary');
+  const [voiceTranscript, setVoiceTranscript] = useState('');
+  const [isUploadingAudio, setIsUploadingAudio] = useState(false);
+  const [uploadedFileLabel, setUploadedFileLabel] = useState('');
+  const audioFileInputRef = useRef<HTMLInputElement>(null);
   const [sessionStartedAt, setSessionStartedAt] = useState('');
   const [sessionEndedAt, setSessionEndedAt] = useState('');
   const [isSessionRunning, setIsSessionRunning] = useState(false);
@@ -462,32 +469,27 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
     );
   };
 
-  const appendTranscriptToField = useCallback((text: string) => {
-    setFormData((prev) => {
-      const current = prev[voiceTargetField];
-      return {
-        ...prev,
-        [voiceTargetField]: current ? `${current} ${text}` : text,
-      };
-    });
-  }, [voiceTargetField]);
+  const appendVoiceTranscript = useCallback((text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setVoiceTranscript((prev) => (prev ? `${prev}\n\n${trimmed}` : trimmed));
+  }, []);
 
   const {
     isRecording,
     isTranscribing,
     recordingSeconds,
-    lastTranscript,
-    start: startSpeech,
-    stop: stopSpeech,
-    resetSession: resetSpeechSession,
-    supported: speechSupported,
+    start: startSonioxRecord,
+    stop: stopSonioxRecord,
+    resetSession: resetSonioxSession,
+    supported: recorderSupported,
   } = useSonioxRecording({
     language: 'fa',
-    onTranscript: appendTranscriptToField,
+    onTranscript: appendVoiceTranscript,
     onError: (message) => toast.error(message),
   });
 
-  const isListening = isRecording || isTranscribing;
+  const voiceBusy = isRecording || isTranscribing || isUploadingAudio;
 
   const formatRecordingTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -495,15 +497,46 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  const handleRecordToggle = () => {
+  const handleSonioxRecordToggle = () => {
     if (isRecording) {
-      stopSpeech();
-      toast.success('در حال تبدیل گفتار به متن (Soniox)...');
+      stopSonioxRecord();
+      toast.success('در حال تبدیل گفتار به متن...');
       return;
     }
-    if (isTranscribing) return;
-    startSpeech();
-    toast.success('شروع ضبط صدا...');
+    if (voiceBusy) return;
+    startSonioxRecord();
+    toast.success('ضبط صدا آغاز شد');
+  };
+
+  const handleAudioFileUpload = async (file: File) => {
+    if (voiceBusy) return;
+
+    setIsUploadingAudio(true);
+    setUploadedFileLabel(file.name);
+    try {
+      const result = await transcribeAudioWithSoniox(file, {
+        language: 'fa',
+        filename: file.name,
+      });
+      const text = (result.text || '').trim();
+      if (text) {
+        appendVoiceTranscript(text);
+        toast.success('فایل صوتی با موفقیت تبدیل به متن شد');
+      } else {
+        toast.error('متنی از فایل استخراج نشد');
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'خطا در تبدیل فایل صوتی';
+      toast.error(message);
+    } finally {
+      setIsUploadingAudio(false);
+    }
+  };
+
+  const handleAudioFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (file) void handleAudioFileUpload(file);
   };
 
   const handleImageUpload = () => {
@@ -521,12 +554,9 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
   };
 
   const handleSave = () => {
-    if (isRecording) {
-      stopSpeech();
-    }
-    if (!isTranscribing) {
-      resetSpeechSession();
-    }
+    if (isRecording) stopSonioxRecord();
+    if (!isTranscribing) resetSonioxSession();
+    setVoiceTranscript('');
     toast.success('یادداشت جلسه با موفقیت ذخیره شد');
     handleBack();
   };
@@ -988,9 +1018,9 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
               </CollapsibleTrigger>
 
               <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0">
-              <div className="space-y-6 px-5 py-6 sm:px-8 sm:py-8">
+              <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-7">
               <div
-                className="flex w-full flex-col gap-2 rounded-xl border border-slate-200/90 bg-slate-50/80 p-1.5 sm:flex-row sm:gap-2"
+                className="flex w-full flex-col gap-2 rounded-xl border border-slate-200/90 bg-slate-50/80 p-2 sm:flex-row"
                 dir="rtl"
                 role="tablist"
                 aria-label="روش ثبت"
@@ -1001,7 +1031,7 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                   aria-selected={inputMethod === 'type'}
                   onClick={() => setInputMethod('type')}
                   className={cn(
-                    'flex flex-1 items-center justify-center gap-2.5 rounded-lg py-3.5 text-sm font-medium transition-all sm:py-3',
+                    'flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-3 text-sm font-medium transition-all',
                     inputMethod === 'type'
                       ? 'bg-white text-primary shadow-sm ring-1 ring-slate-200/80'
                       : 'text-slate-600 hover:bg-white/90 hover:text-slate-900'
@@ -1016,7 +1046,7 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                   aria-selected={inputMethod === 'voice'}
                   onClick={() => setInputMethod('voice')}
                   className={cn(
-                    'flex flex-1 items-center justify-center gap-2.5 rounded-lg py-3.5 text-sm font-medium transition-all sm:py-3',
+                    'flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-3 text-sm font-medium transition-all',
                     inputMethod === 'voice'
                       ? 'bg-white text-primary shadow-sm ring-1 ring-slate-200/80'
                       : 'text-slate-600 hover:bg-white/90 hover:text-slate-900'
@@ -1031,7 +1061,7 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                   aria-selected={inputMethod === 'image'}
                   onClick={() => setInputMethod('image')}
                   className={cn(
-                    'flex flex-1 items-center justify-center gap-2.5 rounded-lg py-3.5 text-sm font-medium transition-all sm:py-3',
+                    'flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-3 text-sm font-medium transition-all',
                     inputMethod === 'image'
                       ? 'bg-white text-primary shadow-sm ring-1 ring-slate-200/80'
                       : 'text-slate-600 hover:bg-white/90 hover:text-slate-900'
@@ -1042,137 +1072,213 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                 </button>
               </div>
 
-              {inputMethod === 'type' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="rounded-xl border border-slate-200/80 bg-white px-4 py-4 text-right sm:px-5 sm:py-5"
-                  dir="rtl"
-                >
-                  <p className="text-sm leading-relaxed text-slate-600">
-                    فیلدهای بالا برای ثبت متن کافی‌اند؛ این بخش برای ضبط یا اسکن اختیاری است.
-                  </p>
-                </motion.div>
-              )}
-
-              {/* Voice Recording Method */}
-              {inputMethod === 'voice' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="w-full space-y-6"
-                  dir="rtl"
-                >
-                  {!speechSupported && (
-                    <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-right text-sm text-amber-900">
-                      ضبط صدا در این مرورگر پشتیبانی نمی‌شود. لطفاً از Chrome یا Edge استفاده کنید.
-                    </div>
-                  )}
-
-                  <div className="rounded-xl border border-slate-200/80 bg-slate-50 px-4 py-3 text-right text-xs leading-relaxed text-slate-600">
-                    تبدیل گفتار به متن با Soniox (فارسی). پس از توقف ضبط، فایل صوتی به سرور ارسال و متن به فیلد انتخاب‌شده اضافه می‌شود.
-                  </div>
-
-                  <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-4 text-right sm:px-5">
-                    <Label htmlFor="voice-target-field" className="mb-2 block text-sm font-medium text-slate-700">
-                      افزودن متن به بخش
-                    </Label>
-                    <select
-                      id="voice-target-field"
-                      value={voiceTargetField}
-                      onChange={(e) => setVoiceTargetField(e.target.value as VoiceTargetField)}
-                      disabled={isListening}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15"
+              <motion.div
+                layout
+                className="min-h-[28rem] transition-[min-height] duration-300 ease-in-out sm:min-h-[21rem]"
+              >
+                <AnimatePresence mode="wait" initial={false}>
+                  {inputMethod === 'type' && (
+                    <motion.div
+                      key="type"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.22, ease: 'easeInOut' }}
+                      className="rounded-xl border border-slate-200/80 bg-white px-5 py-5 text-right sm:px-6 sm:py-6"
                       dir="rtl"
                     >
-                      {VOICE_FIELD_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="mt-2 text-xs leading-relaxed text-slate-500">
-                      متن گفتار به‌صورت خودکار به فیلد انتخاب‌شده اضافه می‌شود. با توقف و شروع دوباره، متن جدید به همان متن قبلی اضافه می‌شود تا زمانی که یادداشت را ذخیره کنید.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-primary/25 bg-gradient-to-b from-primary/[0.04] to-transparent py-10 px-5 sm:py-12 sm:px-6">
-                    <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 transition-all ${
-                      isRecording
-                        ? 'bg-[#eb5757] animate-pulse'
-                        : isTranscribing
-                          ? 'bg-amber-500 animate-pulse'
-                          : 'bg-primary'
-                    }`}>
-                      <Mic className="w-10 h-10 text-white" />
-                    </div>
-
-                    <p className="text-lg text-foreground mb-2 text-center">
-                      {isTranscribing
-                        ? 'در حال تبدیل به متن...'
-                        : isRecording
-                          ? `در حال ضبط... ${formatRecordingTime(recordingSeconds)}`
-                          : 'آماده برای ضبط صدا'}
-                    </p>
-                    <p className="text-sm text-muted-foreground mb-6 text-center">
-                      {isTranscribing
-                        ? 'فایل صوتی به Soniox ارسال شده — چند لحظه صبر کنید'
-                        : isRecording
-                          ? 'پس از پایان صحبت، دکمه توقف را بزنید'
-                          : 'برای شروع ضبط، دکمه زیر را بزنید'}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={handleRecordToggle}
-                      disabled={!speechSupported || isTranscribing}
-                      className={`flex items-center gap-2 px-8 py-3 rounded-xl transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
-                        isRecording
-                          ? 'bg-[#eb5757] hover:bg-[#d94848] text-white'
-                          : 'bg-primary hover:bg-primary-hover text-primary-foreground'
-                      }`}
-                    >
-                      {isRecording ? (
-                        <>
-                          <span className="w-3 h-3 rounded-sm bg-white"></span>
-                          <span>توقف ضبط</span>
-                        </>
-                      ) : (
-                        <>
-                          <Mic className="w-5 h-5" />
-                          <span>شروع ضبط</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {(isRecording || isTranscribing || lastTranscript) && (
-                    <div className="space-y-3 rounded-xl border border-primary/20 bg-accent/30 p-4">
-                      <p className="text-sm text-muted-foreground text-right">متن تبدیل‌شده:</p>
-                      <p className="text-foreground text-right leading-relaxed whitespace-pre-wrap" dir="rtl">
-                        {lastTranscript || (isTranscribing ? '...' : '')}
+                      <p className="text-sm leading-relaxed text-slate-600">
+                        فیلدهای بالا برای ثبت متن کافی‌اند؛ این بخش برای ضبط یا اسکن اختیاری است.
                       </p>
-                      {isRecording && !lastTranscript && (
-                        <p className="text-sm text-slate-500 text-right">در حال ضبط...</p>
-                      )}
-                      {isTranscribing && (
-                        <p className="text-xs text-slate-400 text-right">
-                          Soniox در حال پردازش فایل صوتی است
-                        </p>
-                      )}
-                    </div>
+                    </motion.div>
                   )}
-                </motion.div>
-              )}
 
-              {/* Image Upload Method */}
-              {inputMethod === 'image' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="w-full space-y-4"
-                  dir="rtl"
-                >
+                  {inputMethod === 'voice' && (
+                    <motion.div
+                      key="voice"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.22, ease: 'easeInOut' }}
+                      dir="rtl"
+                    >
+                  <input
+                    ref={audioFileInputRef}
+                    type="file"
+                    accept={AUDIO_UPLOAD_ACCEPT}
+                    className="hidden"
+                    onChange={handleAudioFileInputChange}
+                  />
+
+                  <div className="overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm">
+                    <div className="border-b border-slate-100 px-4 py-3 sm:px-5">
+                      <h3 className="text-sm font-semibold text-slate-900">تبدیل گفتار به متن</h3>
+                      <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                        متن استخراج‌شده برای پر کردن خودکار فیلدها توسط دستیار پردازش می‌شود
+                      </p>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 sm:divide-x sm:divide-x-reverse divide-slate-100">
+                      {/* Record */}
+                      <div className="border-b border-slate-100 p-4 pt-5 pl-5 sm:border-b-0">
+                        <div
+                          className={cn(
+                            'relative flex flex-col items-center rounded-lg border px-4 py-6 pt-7 pl-5 transition-colors',
+                            isRecording
+                              ? 'border-red-200 bg-red-50/40'
+                              : 'border-slate-200/80 bg-slate-50/30',
+                          )}
+                        >
+                          <div className="mb-5 flex w-full items-center gap-2">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                              <Mic className="h-4 w-4 text-primary" />
+                            </div>
+                            <div className="min-w-0 flex-1 text-right">
+                              <p className="text-sm font-medium leading-tight text-slate-900">ضبط صدا</p>
+                              <p className="text-xs leading-tight text-slate-500">ارسال پس از توقف</p>
+                            </div>
+                          </div>
+
+                          {!recorderSupported && (
+                            <div className="mb-3 w-full rounded-md bg-amber-50 px-2.5 py-2 text-xs text-amber-800">
+                              ضبط در این مرورگر پشتیبانی نمی‌شود.
+                            </div>
+                          )}
+
+                          {isRecording && (
+                            <span className="absolute left-2.5 top-2.5 flex items-center gap-1 text-[11px] font-medium text-red-600">
+                              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
+                              {formatRecordingTime(recordingSeconds)}
+                            </span>
+                          )}
+
+                          <div
+                            className={cn(
+                              'mb-5 flex h-12 w-12 items-center justify-center rounded-full transition-all',
+                              isRecording
+                                ? 'bg-red-500 shadow-md shadow-red-500/20'
+                                : isTranscribing
+                                  ? 'bg-amber-500'
+                                  : 'bg-primary shadow-sm shadow-primary/15',
+                            )}
+                          >
+                            {isTranscribing ? (
+                              <Loader2 className="h-5 w-5 animate-spin text-white" />
+                            ) : (
+                              <Mic className="h-5 w-5 text-white" />
+                            )}
+                          </div>
+
+                          <p className="mb-8 text-center text-xs text-slate-600">
+                            {isTranscribing
+                              ? 'در حال تبدیل به متن...'
+                              : isRecording
+                                ? 'برای پایان، توقف را بزنید'
+                                : 'ضبط یادداشت صوتی جلسه'}
+                          </p>
+
+                          <button
+                            type="button"
+                            onClick={handleSonioxRecordToggle}
+                            disabled={!recorderSupported || isTranscribing || isUploadingAudio}
+                            className={cn(
+                              'mt-2 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50',
+                              isRecording
+                                ? 'bg-red-600 text-white hover:bg-red-700'
+                                : 'bg-primary text-white hover:bg-primary-hover',
+                            )}
+                          >
+                            {isRecording ? (
+                              <>
+                                <Square className="h-3 w-3 fill-current" />
+                                توقف
+                              </>
+                            ) : (
+                              <>
+                                <Mic className="h-3.5 w-3.5" />
+                                شروع ضبط
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Upload */}
+                      <div className="p-4 pt-5 pr-5 sm:pr-4">
+                        <button
+                          type="button"
+                          onClick={() => audioFileInputRef.current?.click()}
+                          disabled={voiceBusy}
+                          className={cn(
+                            'group flex w-full flex-col items-center rounded-lg border border-dashed px-5 py-6 pt-6 transition-all disabled:cursor-not-allowed disabled:opacity-50',
+                            isUploadingAudio
+                              ? 'border-amber-300 bg-amber-50/50'
+                              : 'border-slate-300/80 bg-slate-50/30 hover:border-primary/40 hover:bg-primary/[0.03]',
+                          )}
+                        >
+                          <div className="mb-4 flex w-full items-center gap-2 px-1">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-100">
+                              <FileAudio className="h-4 w-4 text-slate-600" />
+                            </div>
+                            <div className="min-w-0 flex-1 text-right">
+                              <p className="text-sm font-medium leading-tight text-slate-900">بارگذاری فایل</p>
+                              <p className="text-xs leading-tight text-slate-500">webm · mp3 · wav · m4a</p>
+                            </div>
+                          </div>
+
+                          {isUploadingAudio ? (
+                            <>
+                              <Loader2 className="mb-2 h-7 w-7 animate-spin text-amber-600" />
+                              <p className="text-xs font-medium text-slate-800">در حال پردازش...</p>
+                              {uploadedFileLabel && (
+                                <p className="mt-1 max-w-full truncate text-[11px] text-slate-500">{uploadedFileLabel}</p>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200/80 transition-transform group-hover:scale-105">
+                                <Upload className="h-5 w-5 text-slate-500 group-hover:text-primary" />
+                              </div>
+                              <p className="text-xs font-medium text-slate-800">انتخاب فایل صوتی</p>
+                              <p className="mt-0.5 text-[11px] text-slate-500">حداکثر ۲۵ مگابایت</p>
+                              {uploadedFileLabel && (
+                                <p className="mt-2 max-w-full truncate rounded-md bg-white px-2 py-0.5 text-[11px] text-primary ring-1 ring-primary/20">
+                                  {uploadedFileLabel}
+                                </p>
+                              )}
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {(isTranscribing || isUploadingAudio || voiceTranscript) && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        className="overflow-hidden border-t border-slate-100 bg-slate-50/60 px-4 py-3 sm:px-5"
+                      >
+                        <p className="mb-1 text-[11px] font-medium text-slate-400">متن استخراج‌شده</p>
+                        <p className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap" dir="rtl">
+                          {voiceTranscript || (isTranscribing || isUploadingAudio ? '...' : '')}
+                        </p>
+                      </motion.div>
+                    )}
+                  </div>
+                    </motion.div>
+                  )}
+
+                  {inputMethod === 'image' && (
+                    <motion.div
+                      key="image"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.22, ease: 'easeInOut' }}
+                      className="w-full space-y-4"
+                      dir="rtl"
+                    >
                   <div 
                     onClick={handleImageUpload}
                     className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/60 bg-muted/20 py-10 px-5 transition-all cursor-pointer hover:border-primary/35 hover:bg-primary/[0.03] sm:py-12 sm:px-6 group"
@@ -1199,8 +1305,10 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                       💡 نکته: تصاویر بارگذاری شده به صورت خودکار به متن تبدیل خواهند شد
                     </p>
                   </div>
-                </motion.div>
-              )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
               </div>
               </CollapsibleContent>
             </section>
@@ -1272,41 +1380,52 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                   </div>
 
                   <div
-                    className="mx-auto flex w-full max-w-xl flex-wrap items-center justify-center gap-2 px-2 py-3 sm:gap-4 sm:px-5 sm:py-5"
+                    className="mx-auto flex w-full max-w-2xl items-center justify-center px-2 py-4 sm:px-4 sm:py-6"
                     dir="ltr"
                   >
-                    {[
-                      { value: Math.floor(elapsedSeconds / 3600), label: 'ساعت' },
-                      { value: Math.floor((elapsedSeconds % 3600) / 60), label: 'دقیقه' },
-                      { value: elapsedSeconds % 60, label: 'ثانیه' },
-                    ].map((seg, i, arr) => (
-                      <div key={seg.label} className="flex items-center gap-2 sm:gap-4">
-                        <div className="flex min-w-[4.25rem] flex-1 flex-col items-center justify-center rounded-xl border border-slate-200/90 bg-white px-3 py-3.5 shadow-sm sm:min-w-[5.5rem] sm:flex-none sm:px-6 sm:py-6 md:min-w-[6rem]">
-                          <span
-                            className={cn(
-                              'text-center font-mono text-2xl font-bold tabular-nums leading-none sm:text-3xl md:text-4xl',
-                              isSessionRunning ? 'text-primary' : isPaused ? 'text-[#f2c94c]' : 'text-slate-800',
-                            )}
-                          >
-                            {String(seg.value).padStart(2, '0')}
-                          </span>
-                          <span className="mt-1.5 text-center text-[10px] font-medium leading-tight text-slate-500 sm:mt-2.5 sm:text-xs">
-                            {seg.label}
-                          </span>
+                    <div
+                      className={cn(
+                        'inline-flex items-center gap-3 rounded-2xl border px-4 py-4 sm:gap-5 sm:px-6 sm:py-5',
+                        isSessionRunning
+                          ? 'border-primary/20 bg-white/90 shadow-sm shadow-primary/5'
+                          : isPaused
+                            ? 'border-amber-200/70 bg-white/90 shadow-sm'
+                            : 'border-slate-200/80 bg-white/80 shadow-sm',
+                      )}
+                    >
+                      {[
+                        { value: Math.floor(elapsedSeconds / 3600), label: 'ساعت' },
+                        { value: Math.floor((elapsedSeconds % 3600) / 60), label: 'دقیقه' },
+                        { value: elapsedSeconds % 60, label: 'ثانیه' },
+                      ].map((seg, i, arr) => (
+                        <div key={seg.label} className="flex items-center gap-3 sm:gap-5">
+                          <div className="flex min-w-[4.5rem] flex-col items-center justify-center rounded-xl bg-slate-50/80 px-4 py-3 sm:min-w-[5.75rem] sm:px-5 sm:py-4">
+                            <span
+                              className={cn(
+                                'font-mono text-3xl font-bold tabular-nums leading-none tracking-tight sm:text-4xl',
+                                isSessionRunning ? 'text-primary' : isPaused ? 'text-amber-600' : 'text-slate-800',
+                              )}
+                            >
+                              {String(seg.value).padStart(2, '0')}
+                            </span>
+                            <span className="mt-2 text-[11px] font-medium text-slate-500 sm:text-xs">
+                              {seg.label}
+                            </span>
+                          </div>
+                          {i < arr.length - 1 && (
+                            <span
+                              aria-hidden
+                              className={cn(
+                                'pb-4 font-mono text-2xl font-light leading-none tabular-nums sm:text-3xl',
+                                isSessionRunning ? 'text-primary/40' : 'text-slate-300',
+                              )}
+                            >
+                              :
+                            </span>
+                          )}
                         </div>
-                        {i < arr.length - 1 && (
-                          <span
-                            aria-hidden
-                            className={cn(
-                              'self-center font-mono text-2xl font-light leading-none tabular-nums sm:text-3xl md:text-4xl',
-                              isSessionRunning ? 'text-primary/50' : 'text-slate-300',
-                            )}
-                          >
-                            :
-                          </span>
-                        )}
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
 

@@ -187,6 +187,15 @@
   max-width: 720px;
 }
 
+.sectionEyebrow {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
 .sectionHeader h2 {
   font-size: clamp(1.7rem, 1.2rem + 1.5vw, 2.1rem);
   color: var(--foreground);
@@ -476,9 +485,411 @@
   }
 }
 
+.sectionAlt {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+  background: linear-gradient(
+    to bottom,
+    rgba(139, 92, 246, 0.03),
+    rgba(248, 250, 252, 0.5)
+  );
+}
+
+@media (min-width: 768px) {
+  .sectionAlt {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .featuresGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .featuresGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.featureCard {
+  padding: 1.35rem 1.4rem;
+  border-radius: 1.25rem;
+  background-color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  box-shadow: 0 10px 25px -20px rgba(15, 23, 42, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+}
+
+.featureCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -24px rgba(15, 23, 42, 0.7);
+  border-color: rgba(129, 140, 248, 0.5);
+}
+
+.featureIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.14), rgba(59, 130, 246, 0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.featureIcon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--primary);
+}
+
+.featureCard h3 {
+  margin: 0.2rem 0 0;
+  font-size: 1rem;
+  color: var(--foreground);
+}
+
+.featureCard p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted-foreground);
+  line-height: 1.65;
+}
+
+.patientFeaturesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .patientFeaturesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.patientFeatureCard {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.5rem 1.6rem;
+  border-radius: 1.35rem;
+  background-color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 12px 28px -22px rgba(15, 23, 42, 0.8);
+}
+
+.patientFeatureIcon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.85), rgba(79, 70, 229, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.patientFeatureIcon svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: white;
+}
+
+.patientFeatureCard h3 {
+  margin: 0 0 0.35rem 0;
+  font-size: 1.05rem;
+  color: var(--foreground);
+}
+
+.patientFeatureCard p {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--muted-foreground);
+  line-height: 1.7;
+}
+
+.journeyGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .journeyGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+.journeyCard {
+  position: relative;
+  padding: 1.4rem 1.3rem;
+  border-radius: 1.25rem;
+  background-color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  box-shadow: 0 10px 20px -18px rgba(15, 23, 42, 0.85);
+}
+
+.journeyStep {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom right, var(--primary), #7c3aed);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.65rem;
+}
+
+.journeyCard h3 {
+  margin: 0 0 0.4rem 0;
+  font-size: 1rem;
+  color: var(--foreground);
+}
+
+.journeyCard p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted-foreground);
+  line-height: 1.65;
+}
+
+.journeyArrow {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .journeyArrow {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    left: -0.55rem;
+    transform: translateY(-50%);
+    color: rgba(139, 92, 246, 0.45);
+  }
+
+  .journeyArrow svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+}
+
+.modulesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .modulesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .modulesGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.moduleCard {
+  padding: 1.15rem 1.25rem;
+  border-radius: 1.1rem;
+  background-color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.moduleIcon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.65rem;
+  background: rgba(139, 92, 246, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.moduleIcon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--primary);
+}
+
+.moduleCard h3 {
+  margin: 0.15rem 0 0;
+  font-size: 0.95rem;
+  color: var(--foreground);
+}
+
+.moduleCard p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+.analysisHighlight {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem 1.6rem;
+  border-radius: 1.35rem;
+  background: linear-gradient(
+    to bottom right,
+    rgba(139, 92, 246, 0.06),
+    rgba(233, 213, 255, 0.12)
+  );
+  border: 1px solid rgba(139, 92, 246, 0.18);
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .analysisHighlight {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.analysisHighlightIcon {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.9rem;
+  background: linear-gradient(to bottom right, var(--primary), #7c3aed);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.analysisHighlightIcon svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  color: white;
+}
+
+.analysisHighlight h3 {
+  margin: 0 0 0.35rem 0;
+  font-size: 1.05rem;
+  color: var(--foreground);
+}
+
+.analysisHighlight p {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--muted-foreground);
+  line-height: 1.7;
+}
+
+.ctaSection {
+  padding: 3rem 1.25rem 4rem;
+}
+
+@media (min-width: 768px) {
+  .ctaSection {
+    padding: 4rem 1.25rem 5rem;
+  }
+}
+
+.ctaContent {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  border-radius: 1.75rem;
+  background: linear-gradient(
+    to bottom right,
+    rgba(139, 92, 246, 0.1),
+    rgba(248, 250, 252, 0.98)
+  );
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 20px 50px -30px rgba(15, 23, 42, 0.5);
+}
+
+.ctaContent h2 {
+  margin: 0 0 0.6rem 0;
+  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 1.9rem);
+  color: var(--foreground);
+}
+
+.ctaContent p {
+  margin: 0 0 1.5rem 0;
+  font-size: 1rem;
+  color: var(--muted-foreground);
+  line-height: 1.7;
+}
+
+.ctaButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.ctaPrimary,
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.ctaPrimary svg,
+.ctaSecondary svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.ctaPrimary {
+  background: linear-gradient(to bottom right, var(--primary), #7c3aed);
+  color: white;
+  box-shadow: 0 8px 20px -8px rgba(124, 58, 237, 0.6);
+}
+
+.ctaPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -10px rgba(124, 58, 237, 0.7);
+}
+
+.ctaSecondary {
+  background-color: #ffffff;
+  color: var(--foreground);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.ctaSecondary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(129, 140, 248, 0.6);
+  box-shadow: 0 8px 20px -12px rgba(15, 23, 42, 0.4);
+}
+
 @media (min-width: 1280px) {
   .heroSection,
-  .section {
+  .section,
+  .ctaSection {
     padding-left: 2.5rem;
     padding-right: 2.5rem;
   }

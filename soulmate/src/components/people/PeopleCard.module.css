@@ -1,0 +1,113 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--rs-primary-light), var(--sm-accent));
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.meta h3 {
+  font-size: 1rem;
+}
+
+.meta p {
+  font-size: 0.82rem;
+  color: var(--rs-text-muted);
+}
+
+.overlap {
+  margin-right: auto;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.overlap small {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: var(--rs-text-muted);
+}
+
+.section h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.section ul {
+  list-style: none;
+  font-size: 0.82rem;
+  color: var(--rs-text-muted);
+  line-height: 1.65;
+}
+
+.section li {
+  padding: 0.15rem 0;
+}
+
+.section li::before {
+  content: "→ ";
+  color: var(--rs-primary);
+}
+
+.chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chipLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--rs-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.chip {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--rs-bg);
+  border-radius: 999px;
+  margin-left: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.hours {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--rs-text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}

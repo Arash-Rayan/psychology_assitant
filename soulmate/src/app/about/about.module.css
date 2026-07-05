@@ -1,0 +1,97 @@
+.page {
+  padding-block: 2.5rem 4rem;
+}
+
+.title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.lead {
+  font-size: 1.05rem;
+  color: var(--rs-text-muted);
+  max-width: 720px;
+  line-height: 1.85;
+  margin-bottom: 2rem;
+}
+
+.notice {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--sm-accent-soft);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  margin-bottom: 2.5rem;
+}
+
+.notice strong {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.notice p {
+  font-size: 0.9rem;
+  color: var(--rs-text-muted);
+  line-height: 1.75;
+}
+
+.pillars {
+  display: grid;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.pillar h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+}
+
+.pillar p {
+  font-size: 0.92rem;
+  color: var(--rs-text-muted);
+  line-height: 1.8;
+  margin-bottom: 0.75rem;
+}
+
+.expert {
+  font-size: 0.8rem;
+  color: var(--rs-primary-dark);
+  font-weight: 600;
+}
+
+.references h2,
+.data h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.references ul,
+.data ul {
+  list-style: none;
+  font-size: 0.9rem;
+  color: var(--rs-text-muted);
+  line-height: 1.9;
+}
+
+.references li::before,
+.data li::before {
+  content: "→ ";
+  color: var(--rs-primary);
+}
+
+.note {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--rs-text-muted);
+}
+
+.references {
+  margin-bottom: 1.25rem;
+}

@@ -1,0 +1,40 @@
+.wrapper {
+  text-align: center;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.compact {
+  display: flex;
+  justify-content: center;
+}
+
+.subtitle {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: var(--rs-text-muted);
+  line-height: 1.8;
+}
+
+.pillars {
+  list-style: none;
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 0.5rem;
+  text-align: right;
+}
+
+.pillars li {
+  font-size: 0.88rem;
+  color: var(--rs-text);
+  padding: 0.5rem 0.75rem;
+  background: var(--rs-surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rs-border);
+}
+
+.pillars li::before {
+  content: "✓ ";
+  color: var(--rs-primary);
+  font-weight: 700;
+}

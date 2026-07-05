@@ -1,0 +1,27 @@
+.card {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.sm {
+  padding: 1rem;
+}
+
+.md {
+  padding: 1.35rem;
+}
+
+.lg {
+  padding: 1.75rem;
+}
+
+.hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}

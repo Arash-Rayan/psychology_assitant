@@ -1,0 +1,36 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: var(--rs-text-muted);
+  line-height: 1.75;
+}
+
+.iconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(60, 199, 217, 0.15), rgba(232, 121, 169, 0.15));
+  color: var(--rs-primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}

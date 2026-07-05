@@ -1,0 +1,107 @@
+.page {
+  padding-block: 2rem 4rem;
+}
+
+.page h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-top: 1rem;
+}
+
+.lead {
+  color: var(--rs-text-muted);
+  max-width: 640px;
+  line-height: 1.8;
+  margin: 0.75rem 0 2rem;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.setting h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.setting p {
+  font-size: 0.82rem;
+  color: var(--rs-text-muted);
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle span {
+  position: absolute;
+  inset: 0;
+  background: var(--rs-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.toggle span::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  right: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggle input:checked + span {
+  background: var(--rs-primary);
+}
+
+.toggle input:checked + span::after {
+  transform: translateX(-20px);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.actions h3 {
+  font-size: 0.95rem;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.actions p {
+  font-size: 0.82rem;
+  color: var(--rs-text-muted);
+}
+
+.actions svg {
+  color: var(--rs-primary);
+}
+
+.danger svg {
+  color: #ef4444;
+}

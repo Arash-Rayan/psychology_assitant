@@ -1,0 +1,72 @@
+.steps {
+  list-style: none;
+  margin-top: 2rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.steps li {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.25rem;
+  background: var(--rs-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--rs-border);
+}
+
+.num {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rs-primary), var(--sm-accent));
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+.steps h3 {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.steps p {
+  font-size: 0.88rem;
+  color: var(--rs-text-muted);
+}
+
+.useCasesTitle {
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.useCases {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.useCases h4 {
+  margin-bottom: 0.75rem;
+  color: var(--rs-primary-dark);
+}
+
+.useCases ul {
+  list-style: none;
+  font-size: 0.88rem;
+  color: var(--rs-text-muted);
+}
+
+.useCases li {
+  padding: 0.25rem 0;
+}
+
+.useCases li::before {
+  content: "• ";
+  color: var(--sm-accent);
+}

@@ -1,0 +1,12 @@
+.page { max-width: 800px; }
+.header { margin-bottom: 1.25rem; }
+.header h1 { font-size: 1.5rem; font-weight: 800; }
+.header p { color: var(--text-muted); font-size: 0.88rem; }
+.grid { display: grid; gap: 1rem; }
+.head { display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 0.75rem; }
+.avatar { width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--gradient-brand); display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.head p { font-size: 0.82rem; color: var(--text-muted); }
+.score { margin-right: auto; font-size: 1.1rem; font-weight: 800; color: var(--cyan); }
+.grid ul { list-style: none; font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 0.75rem; }
+.grid li::before { content: "→ "; color: var(--primary-light); }
+.btn { padding: 0.45rem 1rem; border-radius: var(--radius-sm); background: rgba(139,92,246,0.25); font-size: 0.82rem; color: var(--primary-light); }

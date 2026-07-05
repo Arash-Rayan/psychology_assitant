@@ -1,0 +1,30 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.default {
+  background: #f0f4f8;
+  color: var(--rs-text-muted);
+}
+
+.primary {
+  background: rgba(60, 199, 217, 0.15);
+  color: var(--rs-primary-dark);
+}
+
+.accent {
+  background: var(--sm-accent-soft);
+  color: var(--sm-accent-dark);
+}
+
+.validation {
+  background: linear-gradient(135deg, rgba(60, 199, 217, 0.12), rgba(232, 121, 169, 0.12));
+  color: var(--rs-text);
+  border: 1px solid rgba(60, 199, 217, 0.25);
+}

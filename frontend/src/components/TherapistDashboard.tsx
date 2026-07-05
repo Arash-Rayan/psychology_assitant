@@ -2,10 +2,10 @@ import { useState, useRef, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Users, TrendingUp, AlertCircle, Activity, Brain, Network, X, 
-  FileText, LayoutDashboard, ClipboardList, HeartPulse, UserCheck, 
-  Calendar, Download, Plus, Search, Filter, ChevronRight, Target,
-  Stethoscope, MessageSquare, BarChart3, Megaphone
+  Users, TrendingUp, AlertCircle, Activity, Brain,
+  FileText, LayoutDashboard, ClipboardList,
+  Calendar, Plus, ChevronRight,
+  MessageSquare, Megaphone
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { PatientCard, Patient } from './PatientCard';
@@ -13,9 +13,16 @@ import { PatientDetailView, PatientDetail } from './PatientDetailView';
 import { NewIntakePatientView } from './NewIntakePatientView';
 import { PatientsOverviewChart } from './PatientsOverviewChart';
 import { UrgentPatientsPanel } from './UrgentPatientsPanel';
-import { SCHEMA_TYPES, SCHEMA_TYPE_KEYS, SchemaType } from './SchemaTypes';
 import { generatePatients } from './generatePatientData';
 import { patientDetailToPatient } from '@/utils/patientDetailToPatient';
+import { PatientFilters } from './PatientFilters';
+import {
+  DEFAULT_PATIENT_FILTERS,
+  filterPatientDetails,
+  filterPatients,
+  type PatientFilterState,
+  type PatientStatusFilter,
+} from '@/utils/filterPatients';
 import { FormBuilderDialog } from './FormBuilderDialog';
 import { SessionNotesView } from './SessionNotesView';
 import { ClinicManagementView } from './ClinicManagementView';
@@ -37,8 +44,9 @@ export function TherapistDashboard({
   const router = useRouter();
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [showUrgentPanel, setShowUrgentPanel] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<'all' | 'safe' | 'attention' | 'urgent'>('all');
-  const [filterSchema, setFilterSchema] = useState<SchemaType | 'all'>('all');
+  const [patientFilters, setPatientFilters] = useState<PatientFilterState>(
+    DEFAULT_PATIENT_FILTERS,
+  );
   const [activeTab, setActiveTab] = useState<DashboardTab>(initialTab);
   const [showFormBuilder, setShowFormBuilder] = useState(false);
   const [showSessionNotes, setShowSessionNotes] = useState(initialShowSessionNotes);
@@ -99,21 +107,15 @@ export function TherapistDashboard({
     );
   }, [establishedPatientsData]);
 
-  // Filter by status AND/OR schema (simultaneous filtering)
-  let filteredPatients = patients;
-  
-  // Apply status filter
-  if (filterStatus !== 'all') {
-    filteredPatients = filteredPatients.filter(p => p.status === filterStatus);
-  }
-  
-  // Apply schema filter
-  if (filterSchema !== 'all') {
-    filteredPatients = filteredPatients.filter(p => {
-      const patientDetail = patientsData.find(pd => pd.id === p.id);
-      return patientDetail?.schemas.some(s => s.name === filterSchema);
-    });
-  }
+  const filteredPatientDetails = useMemo(
+    () => filterPatientDetails(establishedPatientsData, patientFilters),
+    [establishedPatientsData, patientFilters],
+  );
+
+  const filteredPatients = useMemo(
+    () => filterPatients(establishedPatientsData, patientFilters),
+    [establishedPatientsData, patientFilters],
+  );
 
   const selectedPatient = patientsData.find(p => p.id === selectedPatientId);
 
@@ -135,8 +137,8 @@ export function TherapistDashboard({
     }
   };
 
-  const handleStatClick = (status: 'all' | 'safe' | 'attention' | 'urgent') => {
-    setFilterStatus(status);
+  const handleStatClick = (status: PatientStatusFilter) => {
+    setPatientFilters((prev) => ({ ...prev, status }));
     
     // Scroll to patients list with a slight delay to allow state update
     setTimeout(() => {
@@ -358,71 +360,14 @@ export function TherapistDashboard({
                     <Users />
                     لیست بیماران
                   </h2>
-                  <div className={styles.filtersContainer}>
-                    {/* Status Filter */}
-                    <div className={styles.filterGroup} dir="rtl">
-                      <Activity />
-                      <select
-                        value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value as any)}
-                        className={styles.filterSelect}
-                        dir="rtl"
-                      >
-                        <option value="all">همه وضعیت‌ها</option>
-                        <option value="safe">ایمن</option>
-                        <option value="attention">نیاز به توجه</option>
-                        <option value="urgent">فوری</option>
-                      </select>
-                    </div>
-
-                    {/* Schema Filter */}
-                    <div className={styles.filterGroup} dir="rtl">
-                      <Network />
-                      <select
-                        value={filterSchema}
-                        onChange={(e) => setFilterSchema(e.target.value as any)}
-                        className={styles.filterSelect}
-                        dir="rtl"
-                      >
-                        <option value="all">همه طرحواره‌ها</option>
-                        {SCHEMA_TYPE_KEYS.map(schemaType => {
-                          const count = patients.filter(p => {
-                            const patientDetail = patientsData.find(pd => pd.id === p.id);
-                            return patientDetail?.schemas.some(s => s.name === schemaType);
-                          }).length;
-                          return (
-                            <option key={schemaType} value={schemaType}>
-                              {schemaType} ({count})
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </div>
-
-                    {/* Active Filters Display */}
-                    {(filterStatus !== 'all' || filterSchema !== 'all') && (
-                      <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className={styles.activeFilters}
-                      >
-                        <Filter />
-                        <span className={styles.activeFiltersText}>
-                          {filteredPatients.length} بیمار
-                        </span>
-                        <button
-                          onClick={() => {
-                            setFilterStatus('all');
-                            setFilterSchema('all');
-                          }}
-                          className={styles.clearFilterButton}
-                        >
-                          <X />
-                        </button>
-                      </motion.div>
-                    )}
-                  </div>
                 </div>
+
+                <PatientFilters
+                  patients={establishedPatientsData}
+                  filters={patientFilters}
+                  onChange={setPatientFilters}
+                  resultCount={filteredPatientDetails.length}
+                />
 
                 {/* Display Filtered Patients */}
                 <div className={styles.patientsGrid}>
@@ -457,10 +402,7 @@ export function TherapistDashboard({
                     </div>
                     <p className={styles.noResultsText}>هیچ بیماری با این فیلترها یافت نشد</p>
                     <button
-                      onClick={() => {
-                        setFilterStatus('all');
-                        setFilterSchema('all');
-                      }}
+                      onClick={() => setPatientFilters(DEFAULT_PATIENT_FILTERS)}
                       className={styles.clearFiltersButton}
                     >
                       پاک کردن فیلترها
