@@ -18,7 +18,10 @@ import {
   Banknote,
   Loader2,
   FileAudio,
+  Check,
   Square,
+  RotateCcw,
+  StopCircle,
 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Input } from './ui/input';
@@ -295,6 +298,8 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
   const [timerOpen, setTimerOpen] = useState(true);
   const [inputMethod, setInputMethod] = useState<'type' | 'voice' | 'image'>('type');
   const [voiceTranscript, setVoiceTranscript] = useState('');
+  const [pendingVoiceTranscript, setPendingVoiceTranscript] = useState('');
+  const [voiceTranscriptConfirmed, setVoiceTranscriptConfirmed] = useState(false);
   const [isUploadingAudio, setIsUploadingAudio] = useState(false);
   const [uploadedFileLabel, setUploadedFileLabel] = useState('');
   const audioFileInputRef = useRef<HTMLInputElement>(null);
@@ -473,23 +478,34 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
     const trimmed = text.trim();
     if (!trimmed) return;
     setVoiceTranscript((prev) => (prev ? `${prev}\n\n${trimmed}` : trimmed));
+    setVoiceTranscriptConfirmed(true);
   }, []);
 
   const {
     isRecording,
+    isPaused: isRecordingPaused,
     isTranscribing,
     recordingSeconds,
     start: startSonioxRecord,
+    pause: pauseSonioxRecord,
+    resume: resumeSonioxRecord,
     stop: stopSonioxRecord,
+    cancel: cancelSonioxRecord,
     resetSession: resetSonioxSession,
     supported: recorderSupported,
+    pauseSupported: recorderPauseSupported,
+    recorderChecked,
   } = useSonioxRecording({
     language: 'fa',
-    onTranscript: appendVoiceTranscript,
+    onTranscriptReady: (text) => {
+      setPendingVoiceTranscript(text);
+      setVoiceTranscriptConfirmed(false);
+    },
     onError: (message) => toast.error(message),
   });
 
   const voiceBusy = isRecording || isTranscribing || isUploadingAudio;
+  const awaitingVoiceConfirm = pendingVoiceTranscript.length > 0 && !voiceTranscriptConfirmed;
 
   const formatRecordingTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -497,15 +513,68 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  const handleSonioxRecordToggle = () => {
-    if (isRecording) {
-      stopSonioxRecord();
-      toast.success('در حال تبدیل گفتار به متن...');
+  const handleSonioxRecordStart = async () => {
+    if (isRecording || isTranscribing || isUploadingAudio) return;
+    if (pendingVoiceTranscript && !voiceTranscriptConfirmed) {
+      setPendingVoiceTranscript('');
+      setVoiceTranscriptConfirmed(false);
+    }
+    resetSonioxSession();
+    try {
+      await startSonioxRecord();
+      toast.success('ضبط صدا آغاز شد — اجازهٔ میکروفون را بدهید');
+    } catch {
+      // errors surfaced via onError toast in hook
+    }
+  };
+
+  const handleSonioxRecordPause = () => {
+    if (!isRecording) return;
+    if (isRecordingPaused) {
+      resumeSonioxRecord();
+      toast.success('ضبط ادامه یافت');
       return;
     }
-    if (voiceBusy) return;
-    startSonioxRecord();
-    toast.success('ضبط صدا آغاز شد');
+    pauseSonioxRecord();
+    toast.success('ضبط موقتاً متوقف شد');
+  };
+
+  const handleSonioxRecordStop = () => {
+    if (!isRecording) return;
+    stopSonioxRecord();
+    toast.success('در حال تبدیل گفتار به متن...');
+  };
+
+  const handleSonioxRecordRestart = () => {
+    if (isTranscribing || isUploadingAudio) return;
+    if (isRecording) {
+      cancelSonioxRecord();
+    }
+    setPendingVoiceTranscript('');
+    setVoiceTranscriptConfirmed(false);
+    resetSonioxSession();
+    toast.message('ضبط از نو آماده است');
+  };
+
+  const canStartRecord =
+    recorderChecked && recorderSupported && !isRecording && !isTranscribing && !isUploadingAudio;
+  const canPauseRecord = isRecording && !isTranscribing;
+  const canStopRecord = isRecording && !isTranscribing;
+  const canRestartRecord =
+    (isRecording || awaitingVoiceConfirm) && !isTranscribing && !isUploadingAudio;
+
+  const handleConfirmVoiceTranscript = () => {
+    if (!pendingVoiceTranscript.trim()) return;
+    appendVoiceTranscript(pendingVoiceTranscript);
+    setPendingVoiceTranscript('');
+    toast.success('متن صوتی تأیید شد');
+  };
+
+  const handleDiscardPendingVoiceTranscript = () => {
+    setPendingVoiceTranscript('');
+    setVoiceTranscriptConfirmed(false);
+    resetSonioxSession();
+    toast.message('متن حذف شد — می‌توانید دوباره ضبط کنید');
   };
 
   const handleAudioFileUpload = async (file: File) => {
@@ -520,8 +589,9 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
       });
       const text = (result.text || '').trim();
       if (text) {
-        appendVoiceTranscript(text);
-        toast.success('فایل صوتی با موفقیت تبدیل به متن شد');
+        setPendingVoiceTranscript(text);
+        setVoiceTranscriptConfirmed(false);
+        toast.success('فایل صوتی آمادهٔ بررسی است');
       } else {
         toast.error('متنی از فایل استخراج نشد');
       }
@@ -1123,83 +1193,198 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                       <div className="border-b border-slate-100 p-4 pt-5 pl-5 sm:border-b-0">
                         <div
                           className={cn(
-                            'relative flex flex-col items-center rounded-lg border px-4 py-6 pt-7 pl-5 transition-colors',
+                            'relative flex w-full flex-col items-stretch rounded-lg border px-4 py-5 transition-colors',
                             isRecording
-                              ? 'border-red-200 bg-red-50/40'
+                              ? isRecordingPaused
+                                ? 'border-amber-300 bg-amber-50/50'
+                                : 'border-red-300 bg-red-50/50'
                               : 'border-slate-200/80 bg-slate-50/30',
                           )}
                         >
-                          <div className="mb-5 flex w-full items-center gap-2">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
-                              <Mic className="h-4 w-4 text-primary" />
+                          <div className="mb-4 flex w-full items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                                <Mic className="h-4 w-4 text-primary" />
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-medium text-slate-900">ضبط صدا</p>
+                                <p className="text-xs text-slate-500">
+                                  {isTranscribing
+                                    ? 'در حال تبدیل...'
+                                    : isRecording
+                                      ? isRecordingPaused
+                                        ? 'مکث فعال'
+                                        : 'در حال ضبط'
+                                      : 'برای شروع ضبط، دکمهٔ ضبط را بزنید'}
+                                </p>
+                              </div>
                             </div>
-                            <div className="min-w-0 flex-1 text-right">
-                              <p className="text-sm font-medium leading-tight text-slate-900">ضبط صدا</p>
-                              <p className="text-xs leading-tight text-slate-500">ارسال پس از توقف</p>
-                            </div>
-                          </div>
-
-                          {!recorderSupported && (
-                            <div className="mb-3 w-full rounded-md bg-amber-50 px-2.5 py-2 text-xs text-amber-800">
-                              ضبط در این مرورگر پشتیبانی نمی‌شود.
-                            </div>
-                          )}
-
-                          {isRecording && (
-                            <span className="absolute left-2.5 top-2.5 flex items-center gap-1 text-[11px] font-medium text-red-600">
-                              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
-                              {formatRecordingTime(recordingSeconds)}
-                            </span>
-                          )}
-
-                          <div
-                            className={cn(
-                              'mb-5 flex h-12 w-12 items-center justify-center rounded-full transition-all',
-                              isRecording
-                                ? 'bg-red-500 shadow-md shadow-red-500/20'
-                                : isTranscribing
-                                  ? 'bg-amber-500'
-                                  : 'bg-primary shadow-sm shadow-primary/15',
-                            )}
-                          >
-                            {isTranscribing ? (
-                              <Loader2 className="h-5 w-5 animate-spin text-white" />
-                            ) : (
-                              <Mic className="h-5 w-5 text-white" />
+                            {(isRecording || isTranscribing) && (
+                              <span
+                                className={cn(
+                                  'rounded-full px-3 py-1 text-sm font-bold tabular-nums',
+                                  isTranscribing
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : isRecordingPaused
+                                      ? 'bg-amber-200 text-amber-900'
+                                      : 'bg-red-100 text-red-700',
+                                )}
+                              >
+                                {isTranscribing ? '...' : formatRecordingTime(recordingSeconds)}
+                              </span>
                             )}
                           </div>
 
-                          <p className="mb-8 text-center text-xs text-slate-600">
-                            {isTranscribing
-                              ? 'در حال تبدیل به متن...'
-                              : isRecording
-                                ? 'برای پایان، توقف را بزنید'
-                                : 'ضبط یادداشت صوتی جلسه'}
-                          </p>
+                          {!recorderChecked && (
+                            <p className="mb-3 text-center text-xs text-slate-500">در حال بررسی میکروفون...</p>
+                          )}
 
-                          <button
-                            type="button"
-                            onClick={handleSonioxRecordToggle}
-                            disabled={!recorderSupported || isTranscribing || isUploadingAudio}
-                            className={cn(
-                              'mt-2 inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50',
-                              isRecording
-                                ? 'bg-red-600 text-white hover:bg-red-700'
-                                : 'bg-primary text-white hover:bg-primary-hover',
-                            )}
-                          >
-                            {isRecording ? (
-                              <>
-                                <Square className="h-3 w-3 fill-current" />
-                                توقف
-                              </>
-                            ) : (
-                              <>
-                                <Mic className="h-3.5 w-3.5" />
-                                شروع ضبط
-                              </>
-                            )}
-                          </button>
+                          {recorderChecked && !recorderSupported && (
+                            <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                              مرورگر از ضبط پشتیبانی نمی‌کند — Chrome یا Edge روی localhost
+                            </p>
+                          )}
+
+                          {isTranscribing && (
+                            <div className="mb-4 flex items-center justify-center gap-2 py-2 text-amber-700">
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                              <span className="text-sm font-medium">تبدیل گفتار به متن...</span>
+                            </div>
+                          )}
+
+                          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                            <button
+                              type="button"
+                              aria-disabled={!canStartRecord}
+                              onClick={() => {
+                                if (!canStartRecord) return;
+                                void handleSonioxRecordStart();
+                              }}
+                              style={
+                                isRecording
+                                  ? {
+                                      backgroundColor: '#fef2f2',
+                                      borderColor: '#f87171',
+                                      color: '#b91c1c',
+                                    }
+                                  : canStartRecord
+                                    ? {
+                                        backgroundColor: '#ffffff',
+                                        borderColor: '#3cc7d9',
+                                        color: '#0e7490',
+                                      }
+                                    : {
+                                        backgroundColor: '#f8fafc',
+                                        borderColor: '#e2e8f0',
+                                        color: '#94a3b8',
+                                      }
+                              }
+                              className={cn(
+                                'flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-xl border-2 px-2 py-2 text-xs font-bold shadow-sm transition-all',
+                                !canStartRecord && !isRecording && 'pointer-events-none opacity-70',
+                              )}
+                            >
+                              <Mic className="h-5 w-5 shrink-0" strokeWidth={2.5} />
+                              <span>{isRecording ? 'ضبط فعال' : 'ضبط'}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              aria-disabled={!canPauseRecord}
+                              onClick={() => {
+                                if (!canPauseRecord) return;
+                                handleSonioxRecordPause();
+                              }}
+                              style={
+                                canPauseRecord
+                                  ? isRecordingPaused
+                                    ? {
+                                        backgroundColor: '#3cc7d9',
+                                        borderColor: '#3cc7d9',
+                                        color: '#ffffff',
+                                      }
+                                    : {
+                                        backgroundColor: '#f2c94c',
+                                        borderColor: '#d4a017',
+                                        color: '#1f2933',
+                                      }
+                                  : {
+                                      backgroundColor: '#f8fafc',
+                                      borderColor: '#e2e8f0',
+                                      color: '#94a3b8',
+                                    }
+                              }
+                              className={cn(
+                                'flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-xl border-2 px-2 py-2 text-xs font-bold shadow-sm transition-all',
+                                !canPauseRecord && 'pointer-events-none opacity-70',
+                              )}
+                            >
+                              {isRecordingPaused ? (
+                                <Play className="h-5 w-5 shrink-0" strokeWidth={2.5} />
+                              ) : (
+                                <Pause className="h-5 w-5 shrink-0" strokeWidth={2.5} />
+                              )}
+                              <span>{isRecordingPaused ? 'ادامه' : 'مکث'}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              aria-disabled={!canStopRecord}
+                              onClick={() => {
+                                if (!canStopRecord) return;
+                                handleSonioxRecordStop();
+                              }}
+                              style={
+                                canStopRecord
+                                  ? {
+                                      backgroundColor: '#e53e3e',
+                                      borderColor: '#c53030',
+                                      color: '#ffffff',
+                                    }
+                                  : {
+                                      backgroundColor: '#f8fafc',
+                                      borderColor: '#e2e8f0',
+                                      color: '#94a3b8',
+                                    }
+                              }
+                              className={cn(
+                                'flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-xl border-2 px-2 py-2 text-xs font-bold shadow-sm transition-all',
+                                !canStopRecord && 'pointer-events-none opacity-70',
+                              )}
+                            >
+                              <StopCircle className="h-5 w-5 shrink-0" strokeWidth={2.25} />
+                              <span>توقف</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              aria-disabled={!canRestartRecord}
+                              onClick={() => {
+                                if (!canRestartRecord) return;
+                                handleSonioxRecordRestart();
+                              }}
+                              style={
+                                canRestartRecord
+                                  ? {
+                                      backgroundColor: '#fff7ed',
+                                      borderColor: '#fb923c',
+                                      color: '#c2410c',
+                                    }
+                                  : {
+                                      backgroundColor: '#f8fafc',
+                                      borderColor: '#e2e8f0',
+                                      color: '#94a3b8',
+                                    }
+                              }
+                              className={cn(
+                                'flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-xl border-2 px-2 py-2 text-xs font-bold shadow-sm transition-all',
+                                !canRestartRecord && 'pointer-events-none opacity-70',
+                              )}
+                            >
+                              <RotateCcw className="h-5 w-5 shrink-0" strokeWidth={2.25} />
+                              <span>از نو</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -1252,17 +1437,45 @@ export default function NewSessionNotePage({ patientName, onClose }: NewSessionN
                       </div>
                     </div>
 
-                    {(isTranscribing || isUploadingAudio || voiceTranscript) && (
+                    {(isTranscribing || isUploadingAudio || awaitingVoiceConfirm || voiceTranscript) && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         transition={{ duration: 0.25, ease: 'easeInOut' }}
                         className="overflow-hidden border-t border-slate-100 bg-slate-50/60 px-4 py-3 sm:px-5"
                       >
-                        <p className="mb-1 text-[11px] font-medium text-slate-400">متن استخراج‌شده</p>
-                        <p className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap" dir="rtl">
-                          {voiceTranscript || (isTranscribing || isUploadingAudio ? '...' : '')}
+                        <p className="mb-1 text-[11px] font-medium text-slate-400">
+                          {awaitingVoiceConfirm
+                            ? 'متن استخراج‌شده — نیاز به تأیید درمانگر'
+                            : voiceTranscriptConfirmed
+                              ? 'متن تأیید‌شده'
+                              : 'متن استخراج‌شده'}
                         </p>
+                        <p className="text-sm leading-relaxed text-slate-800 whitespace-pre-wrap" dir="rtl">
+                          {awaitingVoiceConfirm
+                            ? pendingVoiceTranscript
+                            : voiceTranscript || (isTranscribing || isUploadingAudio ? '...' : '')}
+                        </p>
+
+                        {awaitingVoiceConfirm && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={handleConfirmVoiceTranscript}
+                              className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+                            >
+                              <Check className="h-4 w-4" />
+                              تأیید متن
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleDiscardPendingVoiceTranscript}
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                              ضبط مجدد
+                            </button>
+                          </div>
+                        )}
                       </motion.div>
                     )}
                   </div>
