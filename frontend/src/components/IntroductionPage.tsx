@@ -103,7 +103,12 @@ function TeamMemberCard({ member }: { member: TeamMember }) {
   );
 }
 
-export function IntroductionPage() {
+type IntroductionPageProps = {
+  /** When true, skip standalone hero (used inside combined درباره ما). */
+  omitHero?: boolean;
+};
+
+export function IntroductionPage({ omitHero = false }: IntroductionPageProps) {
   const [form, setForm] = useState<PreRegisterForm>(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
 
@@ -126,94 +131,96 @@ export function IntroductionPage() {
 
   return (
     <motion.div
-      className={styles.page}
+      className={omitHero ? styles.embedded : styles.page}
       dir="rtl"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <section className={styles.hero}>
-        <motion.div
-          className={styles.heroInner}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-        >
-          <div className={styles.heroCopy}>
-            <span className={styles.badge}>
-              <Sparkles />
-              معرفی روانصد
-            </span>
-            <h1 className={styles.heroTitle}>
-              پلتفرم هوشمند
-              <span className={styles.heroAccent}> سلامت روان</span>
-              <br />
-              برای درمانگران و مراجعان فارسی‌زبان
-            </h1>
-            <p className={styles.heroLead}>
-              روانصد ترکیبی از علم روانشناسی، تجربه بالینی و هوش مصنوعی است تا درمانگران
-              بتوانند روند درمان را دقیق‌تر ببینند، ریسک را زودتر تشخیص دهند و زمان بیشتری
-              برای رابطه انسانی با مراجع داشته باشند.
-            </p>
-            <motion.div
-              className={styles.heroActions}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <a href="#pre-register" className={styles.primaryBtn}>
-                <Stethoscope />
-                پیش‌ثبت‌نام درمانگران
-              </a>
-              <a href="#team" className={styles.secondaryBtn}>
-                <Users />
-                تیم ما
-              </a>
-            </motion.div>
-          </div>
-
+      {!omitHero ? (
+        <section className={styles.hero}>
           <motion.div
-            className={styles.heroVisual}
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.7 }}
+            className={styles.heroInner}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
           >
-            <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <Logo size="hero" priority />
-            </motion.div>
-            <div className={styles.heroStatCards}>
-              <motion.div className={styles.heroStatCard}>
-                <Microscope />
-                <strong>تحلیل بالینی</strong>
-                <span>طرحواره، هیجان، ریسک</span>
-              </motion.div>
+            <div className={styles.heroCopy}>
+              <span className={styles.badge}>
+                <Sparkles />
+                معرفی روانصد
+              </span>
+              <h1 className={styles.heroTitle}>
+                پلتفرم هوشمند
+                <span className={styles.heroAccent}> سلامت روان</span>
+                <br />
+                برای درمانگران و مراجعان فارسی‌زبان
+              </h1>
+              <p className={styles.heroLead}>
+                روانصد ترکیبی از علم روانشناسی، تجربه بالینی و هوش مصنوعی است تا درمانگران
+                بتوانند روند درمان را دقیق‌تر ببینند، ریسک را زودتر تشخیص دهند و زمان بیشتری
+                برای رابطه انسانی با مراجع داشته باشند.
+              </p>
               <motion.div
-                className={styles.heroStatCard}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
+                className={styles.heroActions}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
               >
-                <LineChart />
-                <strong>ردیابی روند</strong>
-                <span>نمودار و داشبورد</span>
-              </motion.div>
-              <motion.div
-                className={styles.heroStatCard}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                <Shield />
-                <strong>محرمانگی</strong>
-                <span>استانداردهای حرفه‌ای</span>
+                <a href="#pre-register" className={styles.primaryBtn}>
+                  <Stethoscope />
+                  پیش‌ثبت‌نام درمانگران
+                </a>
+                <a href="#team" className={styles.secondaryBtn}>
+                  <Users />
+                  تیم ما
+                </a>
               </motion.div>
             </div>
+
+            <motion.div
+              className={styles.heroVisual}
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.7 }}
+            >
+              <motion.div
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <Logo size="hero" priority />
+              </motion.div>
+              <div className={styles.heroStatCards}>
+                <motion.div className={styles.heroStatCard}>
+                  <Microscope />
+                  <strong>تحلیل بالینی</strong>
+                  <span>طرحواره، هیجان، ریسک</span>
+                </motion.div>
+                <motion.div
+                  className={styles.heroStatCard}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <LineChart />
+                  <strong>ردیابی روند</strong>
+                  <span>نمودار و داشبورد</span>
+                </motion.div>
+                <motion.div
+                  className={styles.heroStatCard}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Shield />
+                  <strong>محرمانگی</strong>
+                  <span>استانداردهای حرفه‌ای</span>
+                </motion.div>
+              </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      </section>
+        </section>
+      ) : null}
 
       <section className={styles.section}>
         <motion.div

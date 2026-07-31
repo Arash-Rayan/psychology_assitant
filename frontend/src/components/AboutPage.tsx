@@ -24,6 +24,7 @@ import {
   TrendingUp,
   UserCheck,
 } from 'lucide-react';
+import { IntroductionPage } from '@/components/IntroductionPage';
 import styles from './AboutPage.module.css';
 
 const THERAPIST_FEATURES = [
@@ -555,6 +556,9 @@ export function AboutPage() {
         </div>
       </motion.section>
 
+      {/* معرفی: هدف، تیم، پیش‌ثبت‌نام */}
+      <IntroductionPage omitHero />
+
       {/* CTA */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
@@ -568,10 +572,10 @@ export function AboutPage() {
             درمانگر هستید؟ پیش‌ثبت‌نام کنید. مراجع هستید؟ پیش‌مشاوره یا گفتگو با دستیار را شروع کنید.
           </p>
           <div className={styles.ctaButtons}>
-            <Link href="/intro" className={styles.ctaPrimary}>
+            <a href="#pre-register" className={styles.ctaPrimary}>
               <Stethoscope />
               پیش‌ثبت‌نام درمانگران
-            </Link>
+            </a>
             <Link href="/chat/pre-consult" className={styles.ctaSecondary}>
               <MessageCircle />
               شروع پیش‌مشاوره

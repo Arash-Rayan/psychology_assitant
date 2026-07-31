@@ -1,6 +1,6 @@
 'use client';
 
-import { MessageCircle, LayoutDashboard, Home, Menu, X, UserCircle2, Info, Sparkles } from 'lucide-react';
+import { MessageCircle, LayoutDashboard, Home, Menu, X, UserCircle2, Info, Stethoscope } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -11,7 +11,8 @@ export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) =>
+    path === '/doctors' ? pathname === '/doctors' || pathname.startsWith('/doctors/') : pathname === path;
   
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -27,16 +28,6 @@ export function Header() {
           
           {/* Desktop Navigation */}
           <nav className={styles.navDesktop}>
-            <Link
-              href="/intro"
-              className={`${styles.navButton} ${
-                isActive('/intro') ? styles.navButtonActive : styles.navButtonInactive
-              }`}
-            >
-              <span>معرفی</span>
-              <Sparkles />
-            </Link>
-
             <Link
               href="/auth"
               className={`${styles.navButton} ${
@@ -65,6 +56,16 @@ export function Header() {
             >
               <span>درباره ما</span>
               <Info />
+            </Link>
+
+            <Link
+              href="/doctors"
+              className={`${styles.navButton} ${
+                isActive('/doctors') ? styles.navButtonActive : styles.navButtonInactive
+              }`}
+            >
+              <span>درمانگران</span>
+              <Stethoscope />
             </Link>
             
             <Link
@@ -120,17 +121,6 @@ export function Header() {
         {mobileMenuOpen && (
           <nav className={styles.navMobile} dir="rtl">
             <Link
-              href="/intro"
-              className={`${styles.navButton} ${
-                isActive('/intro') ? styles.navButtonActive : styles.navButtonInactive
-              }`}
-              onClick={closeMobileMenu}
-            >
-              <span>معرفی</span>
-              <Sparkles />
-            </Link>
-
-            <Link
               href="/auth"
               className={`${styles.navButton} ${
                 isActive('/auth') ? styles.navButtonActive : styles.navButtonInactive
@@ -161,6 +151,17 @@ export function Header() {
             >
               <span>درباره ما</span>
               <Info />
+            </Link>
+
+            <Link
+              href="/doctors"
+              className={`${styles.navButton} ${
+                isActive('/doctors') ? styles.navButtonActive : styles.navButtonInactive
+              }`}
+              onClick={closeMobileMenu}
+            >
+              <span>درمانگران</span>
+              <Stethoscope />
             </Link>
             
             <Link

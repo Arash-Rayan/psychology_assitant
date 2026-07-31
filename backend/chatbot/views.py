@@ -8,7 +8,8 @@ from django.db.models import Max
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from .prompts.interview import prompt as model_instruct
+# from .prompts.interview import persian_prompt as model_instruct
+from .prompts.interview import prompt as model_instruct  # English — switch back for A/B test
 from .prompts.pre_consult import (
     PRE_CONSULT_QUESTION_LIMIT,
     build_pre_consult_bootstrap_input,
@@ -17,6 +18,7 @@ from .prompts.pre_consult import (
     PRE_CONSULT_SUBJECT_LABELS,
 )
 from .models import ChatSession, ChatMessage
+from .persian_normalizer import normalize_half_space
 from .soniox_stt import ALLOWED_CONTENT_TYPES, SonioxSTTError, transcribe_audio_bytes
 
 from langchain_openai import ChatOpenAI
@@ -40,11 +42,11 @@ _api_key = os.environ.get("DEEPSEEK_API_KEY")
 
 llm = ChatOpenAI(
     model="deepseek-v4-flash",
-    api_key=_api_key,
+    api_key='sk-1666caf6a268456d8df5b5da9853d5d6',
     base_url="https://api.deepseek.com",
     temperature=0.7,
     top_p = 0.9,
-    reasoning_effort="max",
+    reasoning_effort="high",
     )
         # "response_format": {"type": "json_object"} 
 
@@ -257,17 +259,15 @@ def _chat_stream_response(
     def stream_response():
         full_reply_parts: list[str] = []
 
-        # stream tokens/chunks from the model
         for chunk in llm_chain.stream({"input": message, "chat_history": chat_history}):
             token = chunk.content or ""
             if not token:
                 continue
             full_reply_parts.append(token)
-            # send raw text chunks; frontend reads the stream and appends
             yield token
 
-        # after streaming is done, persist assistant message
-        full_reply = "".join(full_reply_parts)
+        # normalize half-spaces on the complete reply before persisting
+        full_reply = normalize_half_space("".join(full_reply_parts))
         _persist_assistant_message(session, full_reply)
 
     resp = StreamingHttpResponse(stream_response(), content_type="text/plain; charset=utf-8")

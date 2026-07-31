@@ -3,6 +3,10 @@
   background: #f8fafc;
 }
 
+.embedded {
+  background: transparent;
+}
+
 /* ── Hero ── */
 .hero {
   padding: 2rem 1.25rem 4rem;

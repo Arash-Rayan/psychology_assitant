@@ -25,6 +25,15 @@ import { ChatConversationTranscript } from '@/components/ChatConversationTranscr
 import { SchemaAnalysisCard } from '@/components/SchemaAnalysisCard';
 import { getPatientChatConversation } from '@/constants/conversationAgentOutput';
 import { getMetaAnalystClinicalSummary } from '@/constants/metaAnalystOutputTest2';
+import {
+  schemaAnalysisDataTestAr,
+  attachmentAnalysisDataTestAr,
+  clinicalDisorderAnalysisDataTestAr,
+  cognitiveDistortionAnalysisDataTestAr,
+  personalTraitAnalysisDataTestAr,
+  relationalPatternAnalysisDataTestAr,
+  functionalLevelAnalysisDataTestAr,
+} from '@/constants/sessionAnalysisTestAr';
 
 interface SessionNote {
   id: string;
@@ -621,6 +630,9 @@ const functionalLevelAnalysisDataTest2 = { functional_level: {} };
 const clinicalSummaryIntroTest2 = getMetaAnalystClinicalSummary('test-patient-2')!.intro;
 const clinicalSummarySectionsTest2 = getMetaAnalystClinicalSummary('test-patient-2')!.sections;
 
+const clinicalSummaryIntroTestAr = getMetaAnalystClinicalSummary('test-patient-ar')!.intro;
+const clinicalSummarySectionsTestAr = getMetaAnalystClinicalSummary('test-patient-ar')!.sections;
+
 /** مراجع E J — graph.invoke کامل (بدون observations در UI) */
 const schemaAnalysisDataTest3: Record<string, SchemaAnalysisItem> = {
   'تأییدجویی/شناخت‌طلبی': {
@@ -902,6 +914,21 @@ function resolveSessionAnalysisBundle(patientId: string | null | undefined) {
       clinicalSummarySections: clinicalSummarySectionsTest2,
       relationalPatternPersianLabels,
       personalTraitPersianLabels
+    };
+  }
+  if (patientId === 'test-patient-ar') {
+    return {
+      schemaAnalysisData: schemaAnalysisDataTestAr,
+      attachmentAnalysisData: attachmentAnalysisDataTestAr,
+      clinicalDisorderAnalysisData: clinicalDisorderAnalysisDataTestAr,
+      cognitiveDistortionAnalysisData: cognitiveDistortionAnalysisDataTestAr,
+      personalTraitAnalysisData: personalTraitAnalysisDataTestAr,
+      relationalPatternAnalysisData: relationalPatternAnalysisDataTestAr,
+      functionalLevelAnalysisData: functionalLevelAnalysisDataTestAr,
+      clinicalSummaryIntro: clinicalSummaryIntroTestAr,
+      clinicalSummarySections: clinicalSummarySectionsTestAr,
+      relationalPatternPersianLabels,
+      personalTraitPersianLabels,
     };
   }
   return {
@@ -1474,7 +1501,8 @@ export function SessionNotesView({
 
                 {(effectiveSelectedId === 'test-patient-1' ||
                   effectiveSelectedId === 'test-patient-2' ||
-                  effectiveSelectedId === 'test-patient-3') && (
+                  effectiveSelectedId === 'test-patient-3' ||
+                  effectiveSelectedId === 'test-patient-ar') && (
                   <p className="text-xs text-muted-foreground text-right mb-3">
                     منبع: خروجی تحلیل‌گر فرامتنی (meta_analist)
                   </p>

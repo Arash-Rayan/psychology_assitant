@@ -320,6 +320,93 @@ export function generatePatients(
       }
     },
     {
+      id: 'test-patient-ar',
+      name: 'مراجع AR',
+      age: 29,
+      gender: 'مرد',
+      phone: '۰۹۱۲ ۷۸۹ ۰۱۲۳',
+      clinicalEngagement: 'established',
+      assignedDoctorId: doctors[0]?.id ?? 'd1',
+      status: 'attention',
+      overallScore: 52,
+      sessionsCount: 2,
+      lastSession: 'امروز',
+      schemas: [
+        {
+          name: 'نقص/شرم',
+          severity: 'high',
+          frequency: 11,
+          lastDetected: 'امروز',
+          description:
+            'تجربه ترک به‌خاطر پول و احساس بی‌ارزشی؛ باور به اینکه بدون امنیت مالی لایق رابطه نیست.',
+        },
+        {
+          name: 'معیارهای سرسختانه',
+          severity: 'high',
+          frequency: 12,
+          lastDetected: 'امروز',
+          description:
+            'قانون شخصی سخت‌گیرانه: تا امنیت شغلی و قابل‌برنامه‌ریزی بودن ۵ سال آینده، حق فکر کردن به رابطه ندارد.',
+        },
+        {
+          name: 'محرومیت هیجانی',
+          severity: 'medium',
+          frequency: 8,
+          lastDetected: 'امروز',
+          description:
+            'به تعویق انداختن تفریح، رابطه و رسیدگی به «کودک درون» به نفع موفقیت و امنیت مالی.',
+        },
+        {
+          name: 'بی‌اعتمادی/بدرفتاری',
+          severity: 'medium',
+          frequency: 9,
+          lastDetected: 'امروز',
+          description:
+            'باور جهان‌شمول که حتی اگر طرف بگوید پول مهم نیست، ته دل نگران امنیت خانواده است؛ ترس از ترک دوباره به‌خاطر ضعف.',
+        },
+      ],
+      behaviors: [
+        {
+          pattern: 'کار سخت و مشغولیت مداوم برای امنیت مالی',
+          occurrences: 14,
+          trend: 'increasing',
+        },
+        {
+          pattern: 'به تعویق انداختن رابطه و تفریح تا رسیدن به استاندارد امنیتی',
+          occurrences: 10,
+          trend: 'stable',
+        },
+      ],
+      monthlyMood: [
+        { date: 'هفته ۱', mood: 50, anxiety: 62, depression: 48 },
+        { date: 'هفته ۲', mood: 48, anxiety: 64, depression: 50 },
+        { date: 'هفته ۳', mood: 46, anxiety: 66, depression: 52 },
+        { date: 'هفته ۴', mood: 47, anxiety: 65, depression: 51 },
+      ],
+      aiInsights: [
+        'تضاد بین نیاز به رابطه و قانون «اول امنیت مالی»؛ تجربه ترک به‌خاطر پول و انتظار طولانی‌مدت پارتنر قبلی.',
+        'استاندارد ۵ ساله و ترس از ترک به‌خاطر ضعف به‌عنوان زره محافظتی در برابر صمیمیت.',
+      ],
+      chatbotSummary: {
+        mainTopic: 'روابط',
+        confidence: 88,
+        notes:
+          'بازخورد دوست درباره کار سخت و نادیده گرفتن تفریح/رابطه؛ تجربه ترک به‌خاطر پول؛ قانون شخصی امنیت شغلی قبل از رابطه؛ ترس از ترک دوباره به‌خاطر ضعف.',
+      },
+      assessments: {
+        neo: {
+          neuroticism: 72,
+          extraversion: 42,
+          openness: 55,
+          agreeableness: 48,
+          conscientiousness: 78,
+        },
+        depression: 52,
+        anxiety: 64,
+        stress: 68,
+      },
+    },
+    {
       id: 'test-patient-3',
       name: 'مراجع E J',
       age: 28,

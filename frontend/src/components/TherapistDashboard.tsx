@@ -5,7 +5,7 @@ import {
   Users, TrendingUp, AlertCircle, Activity, Brain,
   FileText, LayoutDashboard, ClipboardList,
   Calendar, Plus, ChevronRight,
-  MessageSquare, Megaphone
+  MessageSquare, Megaphone, CalendarCheck
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { PatientCard, Patient } from './PatientCard';
@@ -28,9 +28,16 @@ import { SessionNotesView } from './SessionNotesView';
 import { ClinicManagementView } from './ClinicManagementView';
 import { BrandAmbassadorsView } from './BrandAmbassadorsView';
 import { TestsView } from './TestsView';
+import { AppointmentBookingView } from './AppointmentBookingView';
 import styles from './TherapistDashboard.module.css';
 
-type DashboardTab = 'patients' | 'forms' | 'clinic-management' | 'brand-ambassadors' | 'tests';
+type DashboardTab =
+  | 'patients'
+  | 'forms'
+  | 'clinic-management'
+  | 'appointment-booking'
+  | 'brand-ambassadors'
+  | 'tests';
 
 interface TherapistDashboardProps {
   initialTab?: DashboardTab;
@@ -218,6 +225,8 @@ export function TherapistDashboard({
                   ? 'آزمون‌های روان‌شناختی — افسردگی بک و نئو'
                   : activeTab === 'brand-ambassadors'
                   ? 'مدیریت سفیران برند، پورسانت و رتبه‌بندی عملکرد'
+                  : activeTab === 'appointment-booking'
+                  ? 'انتخاب درمانگر و رزرو نوبت از تقویم هفتگی'
                   : 'زمان‌بندی جلسات و پایش نتایج چت‌بات و آزمون‌ها'}
               </p>
             </div>
@@ -242,6 +251,18 @@ export function TherapistDashboard({
               >
                 <Calendar />
                 <span>مدیریت کلینیک</span>
+              </button>
+
+              <button
+                onClick={() => router.push('/dashboard/appointment-booking')}
+                className={`${styles.navButton} ${
+                  activeTab === 'appointment-booking'
+                    ? styles.navButtonActiveBooking
+                    : styles.navButtonInactive
+                }`}
+              >
+                <CalendarCheck />
+                <span>دریافت نوبت</span>
               </button>
 
               <button
@@ -301,6 +322,7 @@ export function TherapistDashboard({
                 <TabsTrigger value="patients">داشبورد مراجعین</TabsTrigger>
                 <TabsTrigger value="forms">فرم‌های درمانگر</TabsTrigger>
                 <TabsTrigger value="clinic-management">مدیریت کلینیک</TabsTrigger>
+                <TabsTrigger value="appointment-booking">دریافت نوبت</TabsTrigger>
                 <TabsTrigger value="brand-ambassadors">سفیران برند</TabsTrigger>
                 <TabsTrigger value="tests">تست‌ها</TabsTrigger>
               </TabsList>
@@ -567,6 +589,10 @@ export function TherapistDashboard({
                 patients={patientsData}
                 onPatientClick={handleClinicCalendarPatientClick}
               />
+            </TabsContent>
+
+            <TabsContent value="appointment-booking" className={styles.tabsContent}>
+              <AppointmentBookingView />
             </TabsContent>
 
             <TabsContent value="brand-ambassadors" className={styles.tabsContent}>

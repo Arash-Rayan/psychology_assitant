@@ -1,5 +1,6 @@
 import { META_ANALYST_TEST_PATIENT_1 } from '@/constants/metaAnalystOutputTest1';
 import { META_ANALYST_TEST_PATIENT_3 } from '@/constants/metaAnalystOutputTest3';
+import { META_ANALYST_TEST_PATIENT_AR } from '@/constants/metaAnalystOutputTestAr';
 
 /**
  * خروجی meta_analist برای مراجع خانم (مشکلات خانوادگی) — graph.invoke کامل
@@ -74,6 +75,14 @@ export function getMetaAnalystClinicalSummary(patientId: string | null | undefin
 
   if (patientId === 'test-patient-3') {
     const data = META_ANALYST_TEST_PATIENT_3;
+    return {
+      intro: data.final_summary,
+      sections: data.clinical_sections as MetaClinicalSummarySection[],
+    };
+  }
+
+  if (patientId === 'test-patient-ar') {
+    const data = META_ANALYST_TEST_PATIENT_AR;
     return {
       intro: data.final_summary,
       sections: data.clinical_sections as MetaClinicalSummarySection[],

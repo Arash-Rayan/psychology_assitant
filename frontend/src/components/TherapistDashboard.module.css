@@ -79,6 +79,12 @@
   box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.25);
 }
 
+.navButtonActiveBooking {
+  background: linear-gradient(to left, #0f766e, #14b8a6);
+  color: white;
+  box-shadow: 0 10px 15px -3px rgba(20, 184, 166, 0.28);
+}
+
 .navButtonActiveAmbassadors {
   background: linear-gradient(to left, #059669, #10b981);
   color: white;

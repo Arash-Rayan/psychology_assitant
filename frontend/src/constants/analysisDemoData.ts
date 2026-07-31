@@ -2,6 +2,7 @@ import type { AnalysisAgentId } from '@/constants/analysisAgents';
 import { TEST_PATIENT_1_AGENT_ITEMS } from '@/constants/analysisDemoDataTest1';
 import { TEST_PATIENT_2_AGENT_ITEMS } from '@/constants/analysisDemoDataTest2';
 import { TEST_PATIENT_3_AGENT_ITEMS } from '@/constants/analysisDemoDataTest3';
+import { TEST_PATIENT_AR_AGENT_ITEMS } from '@/constants/analysisDemoDataTestAr';
 
 export interface AnalysisResultItem {
   key: string;
@@ -24,6 +25,7 @@ const PATIENT_AGENT_ITEMS: Record<string, Record<AnalysisAgentId, AnalysisResult
   'test-patient-1': TEST_PATIENT_1_AGENT_ITEMS,
   'test-patient-2': TEST_PATIENT_2_AGENT_ITEMS,
   'test-patient-3': TEST_PATIENT_3_AGENT_ITEMS,
+  'test-patient-ar': TEST_PATIENT_AR_AGENT_ITEMS,
 };
 
 const DEFAULT_TEST_PATIENT_ID = 'test-patient-1';

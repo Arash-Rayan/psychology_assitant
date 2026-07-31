@@ -1,13 +1,5 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { Header } from '@/components/Header';
-import { IntroductionPage } from '@/components/IntroductionPage';
-
-export default function IntroPage() {
-  return (
-    <>
-      <Header />
-      <IntroductionPage />
-    </>
-  );
+export default function IntroRedirect() {
+  redirect('/about');
 }
