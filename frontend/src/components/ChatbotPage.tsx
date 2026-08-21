@@ -10,6 +10,7 @@ import {
   parsePreConsultSubject,
   type PreConsultSubject,
 } from '@/utils/preConsultMessages';
+import { normalizePersianHalfSpace } from '@/utils/persianHalfSpace';
 
 export type { PreConsultSubject } from '@/utils/preConsultMessages';
 
@@ -430,11 +431,17 @@ export function ChatbotPage({ variant = 'assistant' }: ChatbotPageProps) {
           if (!chunk) continue;
 
           accumulated += chunk;
+          const display = normalizePersianHalfSpace(accumulated);
           setMessages((prev) =>
-            prev.map((m) => (m.id === botId ? { ...m, text: accumulated } : m)),
+            prev.map((m) => (m.id === botId ? { ...m, text: display } : m)),
           );
         }
       }
+
+      const finalText = normalizePersianHalfSpace(accumulated);
+      setMessages((prev) =>
+        prev.map((m) => (m.id === botId ? { ...m, text: finalText } : m)),
+      );
 
       setIsTyping(false);
     } catch {
