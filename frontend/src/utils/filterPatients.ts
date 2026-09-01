@@ -207,19 +207,15 @@ export function hasActiveFilters(filters: PatientFilterState): boolean {
     filters.severity !== 'all' ||
     filters.agents.length > 0 ||
     filters.emotionalBands.length > 0 ||
-    filters.emotionalTrends.length > 0 ||
-    filters.sortBy !== DEFAULT_PATIENT_FILTERS.sortBy
+    filters.emotionalTrends.length > 0
   );
 }
 
 export function hasActivePatientPanelFilters(filters: PatientFilterState): boolean {
   return (
-    filters.status !== 'all' ||
-    filters.agents.length > 0 ||
     filters.emotionalBands.length > 0 ||
     filters.emotionalTrends.length > 0 ||
     filters.schemas.length > 0 ||
-    filters.topics.length > 0 ||
-    filters.severity !== 'all'
+    filters.topics.length > 0
   );
 }

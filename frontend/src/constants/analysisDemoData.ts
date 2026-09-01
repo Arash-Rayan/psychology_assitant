@@ -28,7 +28,7 @@ const PATIENT_AGENT_ITEMS: Record<string, Record<AnalysisAgentId, AnalysisResult
   'test-patient-ar': TEST_PATIENT_AR_AGENT_ITEMS,
 };
 
-const DEFAULT_TEST_PATIENT_ID = 'test-patient-1';
+const DEFAULT_TEST_PATIENT_ID = 'test-patient-2';
 
 function resolvePatientAgentItems(
   patientId?: string,
